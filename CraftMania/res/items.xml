@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : items.xml
+    Created on : 31 december 2011, 17:53
+    Author     : martijncourteaux
+    Description:
+        Defines all items used in this game.
+-->
+
+<root>
+    <item name="stick">
+        <texture>5,3</texture>
+        <stackable>true</stackable>
+    </item>
+    
+    <item name="coal">
+        <texture>7,0</texture>
+        <stackable>true</stackable>
+    </item>
+    
+    <item name="feather">
+        <texture>8,1</texture>
+        <stackable>true</stackable>
+    </item>
+    
+<!-- 
+    <item name="torch">
+        <texture>0,5</texture>
+        <stackable>true</stackable>
+    </item>
+-->
+
+    <item name="wooden_shovel" class="minecraft.world.items.tools.WoodenShovel" />
+    <item name="wooden_pickaxe" class="minecraft.world.items.tools.WoodenPickaxe" />
+    <item name="wooden_axe" class="minecraft.world.items.tools.WoodenAxe" />
+    
+    <item name="stone_shovel" class="minecraft.world.items.tools.StoneShovel" />
+    <item name="stone_pickaxe" class="minecraft.world.items.tools.StonePickaxe" />
+    <item name="stone_axe" class="minecraft.world.items.tools.StoneAxe" />
+
+</root>

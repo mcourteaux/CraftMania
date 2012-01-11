@@ -1,0 +1,239 @@
+package org.craftmania.math;
+
+public class Vec3f
+{
+	private float x, y, z;
+
+	/**
+	 * Cached value for the length of the vector
+	 */
+	private float len;
+
+	/**
+	 * Constructs a new Vec3f and clones the values of the passed vector.
+	 */
+	public Vec3f(Vec3i v)
+	{
+		this(v.x(), v.y(), v.z());
+	}
+
+	public Vec3f(float x, float y, float z)
+	{
+		super();
+		set(x, y, z);
+	}
+
+	/**
+	 * Constructs a new Vec3f and copies the values of the passed vector.
+	 * 
+	 * @param v
+	 *            the vector to be copied
+	 */
+	public Vec3f(Vec3f v)
+	{
+		this(v.x, v.y, v.z);
+	}
+
+	/**
+	 * Constructs a new Vec3f with the value: (0, 0, 0)
+	 */
+	public Vec3f()
+	{
+		this(0.0f, 0.0f, 0.0f);
+	}
+
+	public void set(float x, float y, float z)
+	{
+		this.x = x;
+		this.y = y;
+		this.z = z;
+
+		clearCache();
+	}
+
+	private void clearCache()
+	{
+		this.len = Float.NaN;
+	}
+
+	/**
+	 * Subtracts this vector with the passed vector.
+	 * 
+	 * @param v
+	 *            the vector to subtract from this
+	 * @return {@code this}
+	 */
+	public Vec3f sub(Vec3f v)
+	{
+		set(x - v.x, y - v.y, z - v.z);
+		return this;
+	}
+
+	/**
+	 * Adds the passed vector to this vector
+	 * 
+	 * @param v
+	 *            the vector to add
+	 * @return {@code this}
+	 */
+	public Vec3f add(Vec3f v)
+	{
+		set(x + v.x, y + v.y, z + v.z);
+		return this;
+	}
+
+	/**
+	 * Performs a scalar product on this vector
+	 * 
+	 * @param factor
+	 * @return {@code this}
+	 */
+	public Vec3f scale(float factor)
+	{
+		/* Backup the length */
+		float len = this.len;
+
+		set(x * factor, y * factor, z * factor);
+
+		/* Restore the length */
+		if (!Float.isNaN(len))
+		{
+			this.len = len * factor;
+		}
+
+		return this;
+	}
+
+	/**
+	 * Uses cache.
+	 * 
+	 * @return the squared length of this vector
+	 */
+	public float lengthSquared()
+	{
+		return x * x + y * y + z * z;
+	}
+
+	/**
+	 * Uses cache.
+	 * 
+	 * @return the length of this vector
+	 */
+	public float length()
+	{
+		if (Float.isNaN(len))
+		{
+			len = (float) Math.sqrt(lengthSquared());
+		}
+		return len;
+	}
+
+	/**
+	 * This vector will be the result of the cross product, performed on the two
+	 * vectors passed. Returns {@code this} vector.
+	 * 
+	 * @param a
+	 * @param b
+	 * @return {@code this}
+	 */
+	public Vec3f cross(Vec3f a, Vec3f b)
+	{
+		set(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
+		return this;
+	}
+
+	/**
+	 * Performs a dot product on the two specified vectors.
+	 * 
+	 * @param a
+	 * @param b
+	 * @return the result of the dot product.
+	 */
+	public static float dot(Vec3f a, Vec3f b)
+	{
+		return a.x * b.x + a.y * b.y + a.z * b.z;
+	}
+
+	public float x()
+	{
+		return x;
+	}
+
+	public float y()
+	{
+		return y;
+	}
+
+	public float z()
+	{
+		return z;
+	}
+
+	public void setX(float x)
+	{
+		this.x = x;
+		clearCache();
+	}
+
+	public void setY(float y)
+	{
+		this.y = y;
+		clearCache();
+	}
+
+	public void setZ(float z)
+	{
+		this.z = z;
+		clearCache();
+	}
+
+	public void x(float x)
+	{
+		setX(x);
+	}
+
+	public void y(float y)
+	{
+		setY(y);
+	}
+
+	public void z(float z)
+	{
+		setZ(z);
+	}
+
+	public Vec3f set(Vec3f vec)
+	{
+		set(vec.x, vec.y, vec.z);
+		return this;
+	}
+
+	public Vec3f set(Vec3i vec)
+	{
+		set(vec.x(), vec.y(), vec.z());
+		return this;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "Vec3f [x=" + x + ", y=" + y + ", z=" + z + "]";
+	}
+
+	/**
+	 * Performs the operation: {@code this = this + (v * factor);}
+	 * 
+	 * @param v
+	 *            the vector to add
+	 * @param factor
+	 *            the multiplier for the additional vector
+	 * @return {@code this}
+	 */
+	public Vec3f addFactor(Vec3f v, float factor)
+	{
+		set(x + v.x * factor, y + v.y * factor, z + v.z * factor);
+		return this;
+	}
+
+
+}

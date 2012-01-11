@@ -1,0 +1,557 @@
+package org.craftmania.world;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import org.craftmania.blocks.Block;
+import org.craftmania.math.MathHelper;
+import org.craftmania.math.Vec3f;
+import org.craftmania.utilities.SmartRandom;
+
+public class DefaultWorldProvider extends WorldProvider
+{
+
+	public static int SAMPLE_RATE_HORIZONTAL = 8;
+	public static int SAMPLE_RATE_VERTICAL = 8;
+
+	public static int SAMPLE_RATE_TEMPERATURE = 32;
+
+	private World _world;
+	private WorldProviderGenerator _generator;
+	private List<DataPoint2D> _heights;
+	private List<DataPoint2D> _humidities;
+	private List<DataPoint2D> _trees;
+	private List<DataPoint2D> _temperatures;
+	private Vec3f _spawnPoint;
+
+	public DefaultWorldProvider(World world)
+	{
+		_world = world;
+		_generator = new WorldProviderGenerator(world);
+		_heights = new ArrayList<DefaultWorldProvider.DataPoint2D>();
+		_humidities = new ArrayList<DefaultWorldProvider.DataPoint2D>();
+		_trees = new ArrayList<DefaultWorldProvider.DataPoint2D>();
+		_temperatures = new ArrayList<DefaultWorldProvider.DataPoint2D>();
+	}
+	
+	public List<DataPoint2D> getTrees()
+	{
+		return _trees;
+	}
+
+	private int biLerpDataPoints(int x, int z, DataPoint2D q11, DataPoint2D q12, DataPoint2D q21, DataPoint2D q22)
+	{
+		return MathHelper.round(MathHelper.biLerp(x, z, q11.getData(), q12.getData(), q21.getData(), q22.getData(), q11.getX(), q22.getX(), q11.getZ(), q22.getZ()));
+	}
+
+	private boolean isPoint(DataPoint2D point, int x, int z)
+	{
+		return point._x == x && point._z == z;
+	}
+
+	@Override
+	public float getTemperatureAt(int x, int y, int z)
+	{
+		int lowerX = x;
+		int lowerZ = z;
+
+		lowerX = MathHelper.floor((float) x / SAMPLE_RATE_TEMPERATURE) * SAMPLE_RATE_TEMPERATURE;
+		lowerZ = MathHelper.floor((float) z / SAMPLE_RATE_TEMPERATURE) * SAMPLE_RATE_TEMPERATURE;
+
+		int upperX = lowerX + SAMPLE_RATE_TEMPERATURE;
+		int upperZ = lowerZ + SAMPLE_RATE_TEMPERATURE;
+
+		DataPoint2D q11, q12, q21, q22;
+		q11 = q12 = q21 = q22 = null;
+
+		for (DataPoint2D temp : _temperatures)
+		{
+			if (isPoint(temp, x, z))
+			{
+				return temp.getData();
+			}
+
+			int hX = temp._x;
+			int hZ = temp._z;
+
+			if (lowerX == hX && lowerZ == hZ)
+			{
+				q11 = temp;
+			} else if (lowerX == hX && upperZ == hZ)
+			{
+				q12 = temp;
+			} else if (upperX == hX && lowerZ == hZ)
+			{
+				q21 = temp;
+			} else if (upperX == hX && upperZ == hZ)
+			{
+				q22 = temp;
+			}
+
+			if (q11 != null && q12 != null && q21 != null && q22 != null)
+			{
+				break;
+			}
+		}
+
+		if (q11 == null || q12 == null || q21 == null || q22 == null)
+		{
+//			System.out.println("No temperature data found for this coordinates (" + x + ", " + z + ") !! So, will be generated...");
+			if (q11 == null)
+			{
+				q11 = _generator.generateTemperatureAt(lowerX, lowerZ);
+				if (isPoint(q11, x, z))
+				{
+					return q11._data;
+				}
+			}
+			if (q12 == null)
+			{
+				q12 = _generator.generateTemperatureAt(lowerX, upperZ);
+				if (isPoint(q12, x, z))
+				{
+					return q12._data;
+				}
+			}
+			if (q21 == null)
+			{
+				q21 = _generator.generateTemperatureAt(upperX, lowerZ);
+				if (isPoint(q21, x, z))
+				{
+					return q21._data;
+				}
+			}
+			if (q22 == null)
+			{
+				q22 = _generator.generateTemperatureAt(upperX, upperZ);
+				if (isPoint(q22, x, z))
+				{
+					return q22._data;
+				}
+			}
+		}
+
+		float temperature2D = biLerpDataPoints(x, z, q11, q12, q21, q22);
+
+		return temperature2D - y / 3.0f;
+	}
+
+	@Override
+	public float getHumidityAt(int x, int y, int z)
+	{
+		int lowerX = x;
+		int lowerZ = z;
+
+		lowerX = MathHelper.floor((float) x / SAMPLE_RATE_HORIZONTAL) * SAMPLE_RATE_HORIZONTAL;
+		lowerZ = MathHelper.floor((float) z / SAMPLE_RATE_HORIZONTAL) * SAMPLE_RATE_HORIZONTAL;
+
+		int upperX = lowerX + SAMPLE_RATE_HORIZONTAL;
+		int upperZ = lowerZ + SAMPLE_RATE_HORIZONTAL;
+
+		DataPoint2D q11, q12, q21, q22;
+		q11 = q12 = q21 = q22 = null;
+
+		for (DataPoint2D humidity : _humidities)
+		{
+			if (isPoint(humidity, x, z))
+			{
+				return humidity.getData();
+			}
+
+			int hX = humidity._x;
+			int hZ = humidity._z;
+
+			if (lowerX == hX && lowerZ == hZ)
+			{
+				q11 = humidity;
+			} else if (lowerX == hX && upperZ == hZ)
+			{
+				q12 = humidity;
+			} else if (upperX == hX && lowerZ == hZ)
+			{
+				q21 = humidity;
+			} else if (upperX == hX && upperZ == hZ)
+			{
+				q22 = humidity;
+			}
+
+			if (q11 != null && q12 != null && q21 != null && q22 != null)
+			{
+				break;
+			}
+		}
+
+		if (q11 == null || q12 == null || q21 == null || q22 == null)
+		{
+//			System.out.println("No humidity data found for this coordinates (" + x + ", " + z + ") !! So, will be generated...");
+			if (q11 == null)
+			{
+				q11 = _generator.generateHumidityAt(lowerX, lowerZ);
+				if (isPoint(q11, x, z))
+				{
+					return q11._data;
+				}
+			}
+			if (q12 == null)
+			{
+				q12 = _generator.generateHumidityAt(lowerX, upperZ);
+				if (isPoint(q12, x, z))
+				{
+					return q12._data;
+				}
+			}
+			if (q21 == null)
+			{
+				q21 = _generator.generateHumidityAt(upperX, lowerZ);
+				if (isPoint(q21, x, z))
+				{
+					return q21._data;
+				}
+			}
+			if (q22 == null)
+			{
+				q22 = _generator.generateHumidityAt(upperX, upperZ);
+				if (isPoint(q22, x, z))
+				{
+					return q22._data;
+				}
+			}
+		}
+
+		float humidity2D = biLerpDataPoints(x, z, q11, q12, q21, q22);
+		
+		return MathHelper.clamp(humidity2D * 10 / getTemperatureAt(x, y, z), 10, 95);
+	}
+
+	@Override
+	public int getHeightAt(int x, int z)
+	{
+		int lowerX = x;
+		int lowerZ = z;
+
+		lowerX = MathHelper.floorDivision(x, SAMPLE_RATE_HORIZONTAL) * SAMPLE_RATE_HORIZONTAL;
+		lowerZ = MathHelper.floorDivision(z, SAMPLE_RATE_HORIZONTAL) * SAMPLE_RATE_HORIZONTAL;
+
+		int upperX = lowerX + SAMPLE_RATE_HORIZONTAL;
+		int upperZ = lowerZ + SAMPLE_RATE_HORIZONTAL;
+
+		DataPoint2D q11, q12, q21, q22;
+		q11 = q12 = q21 = q22 = null;
+
+		for (DataPoint2D height : _heights)
+		{
+			if (isPoint(height, x, z))
+			{
+				return height.getData();
+			}
+
+			int hX = height._x;
+			int hZ = height._z;
+
+			if (lowerX == hX && lowerZ == hZ)
+			{
+				q11 = height;
+			} else if (lowerX == hX && upperZ == hZ)
+			{
+				q12 = height;
+			} else if (upperX == hX && lowerZ == hZ)
+			{
+				q21 = height;
+			} else if (upperX == hX && upperZ == hZ)
+			{
+				q22 = height;
+			}
+
+			if (q11 != null && q12 != null && q21 != null && q22 != null)
+			{
+				break;
+			}
+		}
+
+		if (q11 == null || q12 == null || q21 == null || q22 == null)
+		{
+//			System.out.println("No level data found for this coordinates (" + x + ", " + z + ") !! So, will be generated...");
+			if (q11 == null)
+			{
+				q11 = _generator.generateHeightAt(lowerX, lowerZ);
+				if (isPoint(q11, x, z))
+				{
+					return q11._data;
+				}
+			}
+			if (q12 == null)
+			{
+				q12 = _generator.generateHeightAt(lowerX, upperZ);
+				if (isPoint(q12, x, z))
+				{
+					return q12._data;
+				}
+			}
+			if (q21 == null)
+			{
+				q21 = _generator.generateHeightAt(upperX, lowerZ);
+				if (isPoint(q21, x, z))
+				{
+					return q21._data;
+				}
+			}
+			if (q22 == null)
+			{
+				q22 = _generator.generateHeightAt(upperX, upperZ);
+				if (isPoint(q22, x, z))
+				{
+					return q22._data;
+				}
+			}
+		}
+
+		return biLerpDataPoints(x, z, q11, q12, q21, q22);
+	}
+
+	@Override
+	public Biome getBiomeAt(int x, int y, int z)
+	{
+        float temp = getTemperatureAt(x, y, z);
+        float humidity = getHumidityAt(x, y, z);
+        
+        if (x % 8 == 0 && z % 8 == 0)
+        {
+        	System.out.println();
+        	System.out.println("Temp = " + temp + ", Humidity = " + humidity);
+        	System.out.println();
+        }
+
+        if (temp > 25.0f && humidity < 40.0f)
+        {
+            return Biome.DESERT;
+        }
+        if (temp < 5.0f)
+        {
+            return Biome.SNOW;
+        }
+        return Biome.FOREST;
+	}
+
+	@Override
+	public Vec3f getSpawnPoint()
+	{
+		if (_spawnPoint == null)
+		{
+			generateSpawnPoint();
+		}
+		return new Vec3f(_spawnPoint);
+	}
+
+	private void generateSpawnPoint()
+	{
+		SmartRandom random = new SmartRandom(new Random());
+		for (int i = 1; i <= 10; ++i)
+		{
+			int x = random.randomInt(-5 * i, 5 * i);
+			int z = random.randomInt(-5 * i, 5 * i);
+			int y = getHeightAt(x, z);
+			
+			_spawnPoint = new Vec3f(x + 0.5f, y + 1, z + 0.5f);
+			Block spawnPointBlock = _world.getChunkManager().getBlock(x, y, z, true, true);
+			if (spawnPointBlock.getBlockType().getName().equals("grass"))
+			{
+				break;
+			}
+		}
+	}
+
+	public static class DataPoint2D
+	{
+
+		private int _x, _z, _data;
+
+		public DataPoint2D(int x, int z, int data)
+		{
+			_x = x;
+			_z = z;
+			_data = data;
+		}
+
+		public int getData()
+		{
+			return _data;
+		}
+
+		public int getX()
+		{
+			return _x;
+		}
+
+		public int getZ()
+		{
+			return _z;
+		}
+
+		public void setData(int data)
+		{
+			this._data = data;
+		}
+	}
+
+	private class WorldProviderGenerator
+	{
+
+		private class DataResults
+		{
+
+			public float min, max, avg;
+			public float closest, closestDistanceSq;
+			public int count;
+
+			public DataResults()
+			{
+				min = Float.MAX_VALUE;
+				max = Float.MIN_VALUE;
+				count = 0;
+				closestDistanceSq = Float.MAX_VALUE;
+			}
+		}
+
+		private SmartRandom _random;
+		public WorldProviderGenerator(World world)
+		{
+			_random = new SmartRandom(new Random(world.getWorldSeed()));
+		}
+
+		/**
+		 * Generates a new data point, stores it in the heights array. Returns
+		 * the newly generated terrain height
+		 * 
+		 * @param x
+		 * @param z
+		 * @return
+		 */
+		public DataPoint2D generateHeightAt(int x, int z)
+		{
+			/* Rasterize the coordinates */
+			x = MathHelper.floor((float) x / DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL) * DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL;
+			z = MathHelper.floor((float) z / DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL) * DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL;
+
+			DataResults td = gatherDataAround(_heights, x, z, 20);
+
+
+			if (td.count == 0)
+			{
+				DataPoint2D data = new DataPoint2D(x, z, MathHelper.floor(_random.randomFloat(15, 23)));
+				System.out.println("Height (" + x + ", " + z + ") = " + data.getData());
+				_heights.add(data);
+				return data;
+			} else
+			{
+				float diff = _random.exponentialRandom(250.0f, 7);
+
+				float avgHeight = _random.randomFloat(td.avg - Math.min(diff * 1.5f, 7), td.avg + diff * 1.5f);
+				float maxHeight = _random.randomFloat(td.max - diff, td.max + diff * 0.6f);
+				float closestHeight = _random.randomFloat(td.closest - diff, td.closest + diff * 0.6f);
+
+				float closestFactor = (float) (DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL / Math.sqrt(td.closestDistanceSq)) / 3.0f;
+				float factor = 0.5f * (1.0f - closestFactor);
+
+				float height = avgHeight * factor + maxHeight * factor + closestHeight * closestFactor;
+
+				height = Math.max(10, height);
+				DataPoint2D data = new DataPoint2D(x, z, MathHelper.round(height));
+				System.out.println("Height (" + x + ", " + z + ") = " + data.getData());
+
+				_heights.add(data);
+				return data;
+			}
+		}
+
+		private DataResults gatherDataAround(List<DataPoint2D> list, int x, int z, float radius)
+		{
+			DataResults td = new DataResults();
+
+			float radiusSq = radius * radius;
+			float total = 0.0f;
+
+			for (DataPoint2D data : list)
+			{
+				float pX = data.getX();
+				float pZ = data.getZ();
+
+				pX -= x;
+				pZ -= z;
+
+				float distanceSq = pX * pX + pZ * pZ;
+
+				if (distanceSq < radiusSq)
+				{
+					total += data.getData();
+					td.count++;
+
+					td.min = Math.min(td.min, data.getData());
+					td.max = Math.max(td.max, data.getData());
+
+					if (td.closestDistanceSq < distanceSq)
+					{
+						td.closestDistanceSq = distanceSq;
+						td.closest = data.getData();
+					}
+				}
+			}
+
+			if (td.count != 0)
+			{
+				td.avg = total / td.count;
+			}
+
+			return td;
+		}
+
+		public DataPoint2D generateHumidityAt(int x, int z)
+		{
+			/* Rasterize the coordinates */
+			x = MathHelper.floor((float) x / DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL) * DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL;
+			z = MathHelper.floor((float) z / DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL) * DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL;
+
+			DataResults dr = gatherDataAround(_humidities, x, z, 40);
+
+			if (dr.count == 0)
+			{
+				DataPoint2D data = new DataPoint2D(x, z, _random.randomInt(40, 80));
+				_humidities.add(data);
+				return data;
+			} else
+			{
+				float diff = _random.exponentialRandom(100.0f, 4);
+				diff = _random.randomBoolean() ? diff : -diff;
+				DataPoint2D data = new DataPoint2D(x, z, (int) MathHelper.clamp(dr.avg + diff, 30.0f, 95.0f));
+				_humidities.add(data);
+				System.out.println("Humidity (" + x + ", " + z + ") = " + data.getData());
+				return data;
+			}
+		}
+
+		public DataPoint2D generateTemperatureAt(int x, int z)
+		{
+			/* Rasterize the coordinates */
+			x = MathHelper.floorDivision(x, DefaultWorldProvider.SAMPLE_RATE_TEMPERATURE) * DefaultWorldProvider.SAMPLE_RATE_TEMPERATURE;
+			z = MathHelper.floorDivision(z, DefaultWorldProvider.SAMPLE_RATE_TEMPERATURE) * DefaultWorldProvider.SAMPLE_RATE_TEMPERATURE;
+
+			DataResults dr = gatherDataAround(_temperatures, x, z, 50);
+
+			if (dr.count == 0)
+			{
+				DataPoint2D data = new DataPoint2D(x, z, _random.randomInt(20, 40));
+				_temperatures.add(data);
+				return data;
+			} else
+			{
+				float diff = _random.exponentialRandom(16.0f, 2);
+				diff = _random.randomBoolean() ? diff : -diff;
+				DataPoint2D data = new DataPoint2D(x, z, (int) MathHelper.clamp(dr.avg + diff, 10.0f, 50.0f));
+				_temperatures.add(data);
+				System.out.println("Temp (" + x + ", " + z + ") = " + data.getData());
+				return data;
+			}
+		}
+	}
+
+}

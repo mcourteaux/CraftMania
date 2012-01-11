@@ -1,0 +1,20 @@
+
+### Graphics
+fullscreen=false
+width=800
+height=480
+fps=30
+viewing_distance=60
+
+### Texture Pack
+texture_pack=GoodMorningCraftv3.2
+#texture_pack=CUBISM1.00
+#texture_pack=QuantumCraft [3.1]
+
+
+### IMPORTANT: Enabling this might cause a crash on Windows
+vsync=false
+
+### This specifies if only visible blocks need to be updated, or nearby blocks
+### which might be out of sight
+update_visible_only=false

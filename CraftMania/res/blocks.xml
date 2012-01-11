@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : blocks.xml
+    Created on : 26 december 2011, 13:55
+    Author     : martijncourteaux
+    Description:
+        Purpose of the document follows.
+-->
+
+<root>
+
+    <block id="1" name="dirt">
+        <brush>
+            <allsides>2,0</allsides>
+        </brush>
+        <resistance>3</resistance>
+        <blockClass>SAND</blockClass>
+    </block>
+    
+    <block id="2" name="grass">
+        <brush>
+            <top color="#B4B450">0,0</top>
+            <mantle>3,0</mantle>
+            <bottom>2,0</bottom>
+        </brush>
+        <resistance>3</resistance>
+        <blockClass>SAND</blockClass>
+    </block>
+
+    <block id="3" name="stone">
+        <brush>
+            <allsides>1,0</allsides>
+        </brush>
+        <resistance>10</resistance>
+        <blockClass>STONE</blockClass>
+    </block>
+    
+    <block id="4" name="wood0">
+        <brush>
+            <top>5,1</top>
+            <bottom>5,1</bottom>
+            <mantle>4,1</mantle>
+        </brush>
+        <resistance>6</resistance>
+        <blockClass>WOOD</blockClass>
+    </block>
+    
+    <block id="5" name="sand">
+        <brush>
+            <allsides>2,1</allsides>
+        </brush>
+        <fixed>false</fixed>
+        <resistance>3</resistance>
+        <blockClass>SAND</blockClass>
+    </block>
+    
+    <block id="6" name="planks">
+        <brush>
+            <allsides>4,0</allsides>
+        </brush>
+        <resistance>6</resistance>
+        <blockClass>WOOD</blockClass>
+    </block>
+    
+    <block id="7" name="leafs0">
+        <brush>
+            <allsides color="#809930">5,3</allsides>
+        </brush>
+        <resistance>1</resistance>
+        <mineResult>null</mineResult>
+    </block>
+    
+    <block id="8" name="leafs1">
+        <brush>
+            <allsides color="#B4B450">5,3</allsides>
+        </brush>
+        <resistance>1</resistance>
+        <mineResult>null</mineResult>
+    </block>
+    
+    <block id="9" name="crafting_table">
+        <brush>
+            <top>11,2</top>
+            <mantle>12,3</mantle>
+            <bottom>9,1</bottom>
+        </brush>
+        <resistance>9</resistance>
+        <blockClass>WOOD</blockClass>
+        <customLogic>minecraft.blocks.logic.CraftingTable</customLogic>
+    </block>
+    
+    <block id="10" name="snow">
+        <brush>
+            <top>2,4</top>
+            <mantle>4,4</mantle>
+            <bottom>2,0</bottom>
+        </brush>
+        <resistance>4</resistance>
+        <blockClass>SAND</blockClass>
+    </block>
+    
+    <block id="11" name="cactus">
+        <brush alphaBlending="true">
+            <top>5,4</top>
+            <mantle inset="0.0625">6,4</mantle>
+            <bottom>5,4</bottom>
+        </brush>
+        <resistance>5</resistance>
+        <normalAABB>false</normalAABB>
+    </block>
+    
+    <block id="12" name="coal_ore">
+        <brush>
+            <allsides>2,2</allsides>
+        </brush>
+        <resistance>13</resistance>
+        <blockClass>STONE</blockClass>
+        <mineResult>coal</mineResult>
+        <mineResultCount>3</mineResultCount>
+    </block>
+    
+    <block id="13" name="iron_ore">
+        <brush>
+            <allsides>1,2</allsides>
+        </brush>
+        <resistance>15</resistance>
+        <blockClass>STONE</blockClass>
+    </block>
+    
+    <block id="14" name="gravel">
+        <brush>
+            <allsides>3,1</allsides>
+        </brush>
+        <fixed>false</fixed>
+        <resistance>4</resistance>
+        <blockClass>SAND</blockClass>
+    </block>
+    
+    <block id="15" name="torch">
+        <brush alphaBlending="true">
+            <mantle inset="0.4375">0,5</mantle>
+            <top>14,0</top>
+            <bottom>14,0</bottom>
+        </brush>
+        <solid>false</solid>
+        <normalAABB>false</normalAABB>
+    </block>
+    
+    <block id="16" name="bedrock">
+    	<brush>
+    		<allsides>1,1</allsides>
+    	</brush>
+    	<resistance>100000</resistance>
+    </block>
+</root>

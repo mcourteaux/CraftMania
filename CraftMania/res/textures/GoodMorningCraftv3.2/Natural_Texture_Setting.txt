@@ -1,0 +1,80 @@
+# lines beginning with # are comments.
+
+# (top,sides,base)
+
+# Good Morning Craft
+
+grass = (8,2,8)
+stone = (4,4,4)
+
+dirt = (0,0,0)
+# dirt is 0 due to a faint, yet still disernable,
+# diagonal pattern
+
+planks = (0,0,0)
+brick = (0,0,0)
+tnt = (8,0,8)
+web = (8,8,8)
+cobblestone = (0,0,0)
+bedrock = (8,8,8)
+
+sand = (0,0,0)
+# sand is 0 becuase of a faint, yet disernable,
+# diagonal pattern.
+
+gravel = (8,8,8)
+wood = (0,0,0)
+blockSteel = (0,0,0)
+blockGold = (0,0,0)
+blockDiamond = (0,0,0)
+
+# ores are 0 due to faint highlighting, which
+# implyies a light sourse to the upper right.
+# Highlighting/light implication would look
+# wierd with radomizations, therfore, there
+# should not be any randomizations.
+
+oreGold = (0,0,0)
+oreIron = (0,0,0)
+oreCoal = (0,0,0)
+
+bookShelf = (0,0,0)
+cobblestoneMossy = (0,0,0)
+obsidian = (0,0,0)
+sponge = (8,8,8)
+glass = (0,0,0)
+oreDiamond = (0,0,0)
+oreRedstone = (0,0,0)
+
+leaves = (0,0,0)
+# Leaves have no rotations mainly due to the
+# pine needles texture (see near bed if looking at 
+# terrain.PNG)
+
+cloth = (8,8,8)
+mobSpawner = (0,0,0)
+snow = (8,2,8)
+blockSnow = (8,8,8)
+ice = (0,0,0)
+cactus = (8,2,8)
+
+blockClay = (0,0,0)
+# clay is 0 becuase of a faint, yet disernable,
+# diagonal pattern.
+
+tilledField = (4,4,4)
+pumpkin = (8,2,8)
+pumpkinLantern = (8,2,8)
+netherrack = (0,0,0)
+slowSand = (0,0,0)
+glowStone = (0,0,0)
+cake = (8,2,8)
+sandStone = (8,0,0)
+blockLapis = (0,0,0)
+oreLapis = (0,0,0)
+
+# lapis ore is 0 due to faint highlighting, which
+# implyies a light sourse to the upper right.
+# Highlighting/light implication would look
+# wierd with radomizations, therfore, there
+# should not be any randomizations.
