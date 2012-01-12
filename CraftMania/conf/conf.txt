@@ -3,6 +3,7 @@
 fullscreen=false
 width=800
 height=480
+fovy=65
 fps=30
 viewing_distance=60
 

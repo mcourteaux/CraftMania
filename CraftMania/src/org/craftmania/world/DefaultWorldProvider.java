@@ -446,7 +446,7 @@ public class DefaultWorldProvider extends WorldProvider
 			{
 				float diff = _random.exponentialRandom(250.0f, 7);
 
-				float avgHeight = _random.randomFloat(td.avg - Math.min(diff * 1.5f, 7), td.avg + diff * 1.5f);
+				float avgHeight = _random.randomFloat(td.avg - Math.min(diff * 1.8f, 7), td.avg + diff * 1.5f);
 				float maxHeight = _random.randomFloat(td.max - diff, td.max + diff * 0.6f);
 				float closestHeight = _random.randomFloat(td.closest - diff, td.closest + diff * 0.6f);
 

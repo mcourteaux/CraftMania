@@ -20,20 +20,7 @@ public class CraftMania
 	 */
 	public static void main(String[] args) throws Exception
 	{
-
-		for (float i = -3; i < 3; i += 0.3f)
-		{
-			System.out.println(i + " -> " + MathHelper.roundToZero(i));
-		}
-
-		try
-		{
-//			return;
-		} catch (Exception e)
-		{
-			// TODO: handle exception
-		}
-
+ 
 		loadNativeLibs();
 		initUncaughtExceptionHandler();
 
@@ -45,7 +32,6 @@ public class CraftMania
 		World world = new World(System.nanoTime());
 		game.setWorld(world);
 
-//		world.getChunkManager().loadTestEnvironment();
 		world.setPlayer(new Player(world.getWorldProvider().getSpawnPoint()));
 
 		/* Start the Game */

@@ -1,5 +1,7 @@
 package org.craftmania.world;
 
+import java.util.Iterator;
+
 import org.craftmania.Side;
 import org.craftmania.blocks.Block;
 import org.craftmania.blocks.BlockConstructor;
@@ -341,6 +343,8 @@ public class BlockChunk implements AABBObject
 			return;
 		}
 		_destroying = true;
+		
+		ChunkManager chman = Game.getInstance().getWorld().getChunkManager();
 
 		/* Clear the neighbors references */
 		for (int i = 0; i < 4; ++i)
@@ -361,17 +365,24 @@ public class BlockChunk implements AABBObject
 			if (b != null)
 			{
 				++count;
-				b.destory();
 				_blocks.setRawObject(index, null);
+				chman.forgetBlockMovementsForBlock(b);
+				b.setBlockChunk(null);
 			}
 		}
 		clearCache();
 		_blocks.clear();
 
+		/* Delete this chunk from the superchunk */
 		int superChunkX = MathHelper.floorDivision(this.getX(), Chunk.CHUNK_SIZE_X);
 		int superChunkZ = MathHelper.floorDivision(this.getZ(), Chunk.CHUNK_SIZE_Z);
-		Chunk<BlockChunk> superChunk = Game.getInstance().getWorld().getChunkManager().getSuperChunk(superChunkX, superChunkZ);
-		superChunk.set(this.getX() - superChunkX, this.getZ() - superChunkZ, null);
+		
+		int xInChunk = getX() - superChunkX * Chunk.CHUNK_SIZE_X;
+		int zInChunk = getZ() - superChunkZ * Chunk.CHUNK_SIZE_X;
+
+		
+		Chunk<BlockChunk> superChunk = chman.getSuperChunk(superChunkX, superChunkZ);
+		superChunk.set(xInChunk, zInChunk, null);
 		
 		setGenerated(false);
 

@@ -11,11 +11,13 @@ import static org.lwjgl.opengl.GL11.glLineWidth;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import org.craftmania.blocks.Block;
+import org.craftmania.datastructures.AABB;
 import org.craftmania.datastructures.ViewFrustum;
 import org.craftmania.game.Configuration;
 import org.craftmania.game.FontStorage;
@@ -54,9 +56,19 @@ public class World
 		_localChunks = new ArrayList<BlockChunk>();
 		_oldChunkList = new ArrayList<BlockChunk>();
 		_chunksToDelete = new ArrayList<BlockChunk>();
-
-		_visibleBlocks = new ArrayList<Block>(30000);
+		int visibleBlockBufferSize = calculateEstimatedAmountOfVisibleBlocks();
+		System.out.println("Visible Block Buffer Size = " + visibleBlockBufferSize);
+		_visibleBlocks = new ArrayList<Block>(visibleBlockBufferSize);
 		_blockDistanceComparator = new BlockDistanceComparator();
+	}
+
+	private int calculateEstimatedAmountOfVisibleBlocks()
+	{
+		float viewingDist = Game.getInstance().getConfiguration().getViewingDistance();
+		float fovy = Game.getInstance().getConfiguration().getFOVY();
+		float fovx = MathHelper.calcFOVX(fovy);
+		float viewingArea = (float) (viewingDist * viewingDist * Math.toRadians(fovx) / 2.0f);
+		return MathHelper.ceil(viewingArea * 6.0f);
 	}
 
 	public void render()
@@ -97,10 +109,6 @@ public class World
 		infoFont.print(4, 75, "Total Chunks in RAM: " + _chunkManager.getTotalBlockChunkCount());
 		infoFont.print(4, 90, "Local Chunks:        " + _localChunks.size());
 		infoFont.print(4, 105, "Total Local Blocks:  " + _localBlockCount);
-
-		/* Top Left Info */
-		infoFont.print(4, conf.getHeight() - 20, "FPS:      " + Game.getInstance().getFPS());
-		infoFont.print(4, conf.getHeight() - 20 - 15, "Sleeping: " + String.format("%9d", Game.getInstance().getSleepTime()));
 
 		/** RENDER **/
 		if (_activatedInventory != null)
@@ -186,7 +194,7 @@ public class World
 		{
 			checkForNewVisibleChunks();
 		}
-		
+
 		_tick++;
 	}
 
@@ -203,6 +211,10 @@ public class World
 
 		ViewFrustum frustum = getPlayer().getFirstPersonCamera().getViewFrustum();
 
+		boolean generate = false;
+		int xToGenerate = 0, zToGenerate = 0;
+
+		outer:
 		for (int x = -distance; x < distance; ++x)
 		{
 			for (int z = -distance; z < distance; ++z)
@@ -210,18 +222,30 @@ public class World
 				int distSq = x * x + z * z;
 				if (distSq <= distanceSq)
 				{
-					// AABB aabb = BlockChunk.createAABBForBlockChunkAt(x, z);
-					// if (frustum.intersects(aabb))
+					if (!generate || (xToGenerate * xToGenerate + zToGenerate * zToGenerate > distanceSq))
 					{
-						if (_chunkManager.getBlockChunk(centerX + x, centerZ + z, false, false) == null)
+						AABB aabb = null;
+						if (distSq > 1)
 						{
-							_chunkManager.getBlockChunk(centerX + x, centerZ + z, true, true);
-							return;
+							aabb = BlockChunk.createAABBForBlockChunkAt(centerX + x, centerZ + z);
+						}
+						if (aabb == null || frustum.intersects(aabb))
+						{
+							if (_chunkManager.getBlockChunk(centerX + x, centerZ + z, false, false) == null)
+							{
+								generate = true;
+								xToGenerate = x;
+								zToGenerate = z;
+								break outer;
+							}
 						}
 					}
-
 				}
 			}
+		}
+		if (generate)
+		{
+			_chunkManager.getBlockChunk(centerX + xToGenerate, centerZ + zToGenerate, true, true);
 		}
 
 	}

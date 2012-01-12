@@ -1,5 +1,7 @@
 package org.craftmania.math;
 
+import org.craftmania.game.Game;
+
 public class MathHelper
 {
 
@@ -293,6 +295,16 @@ public class MathHelper
 			return rounded;
 		}
 		return x;
+	}
+
+	public static int bytesToMagaBytes(long bytes)
+	{
+		return (int) (((float) bytes) / 1024.0f / 1024.0f);
+	}
+
+	public static float calcFOVX(float fovy)
+	{
+		return fovy / Game.getInstance().getConfiguration().getHeight() * Game.getInstance().getConfiguration().getWidth();
 	}
 
 

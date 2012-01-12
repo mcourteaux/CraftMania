@@ -6,148 +6,154 @@ import java.io.FileReader;
 import java.io.IOException;
 
 /**
-*
-* @author martijncourteaux
-*/
+ * 
+ * @author martijncourteaux
+ */
 public class Configuration
 {
 
-   /* Predefined viewing distances */
-   public static final float VIEWING_DISTANCE_ULTRA = 120.0f;
-   public static final float VIEWING_DISTANCE_FAR = 90.0f;
-   public static final float VIEWING_DISTANCE_NORMAL = 60.0f;
-   public static final float VIEWING_DISTANCE_SHORT = 30.0f;
-   public static final float VIEWING_DISTANCE_TINY = 15.0f;
-   
-   /* Configurations */
-   private float _viewingDistance;
-   private float _maxPlayerEditingDistance;
-   private int _width;
-   private int _height;
-   private boolean _fullscreen;
-   private int _fps;
-   private boolean _vsync;
-   private boolean _updateVisibleOnly;
-   private String _texturePack;
+	/* Predefined viewing distances */
+	public static final float VIEWING_DISTANCE_ULTRA = 120.0f;
+	public static final float VIEWING_DISTANCE_FAR = 90.0f;
+	public static final float VIEWING_DISTANCE_NORMAL = 60.0f;
+	public static final float VIEWING_DISTANCE_SHORT = 30.0f;
+	public static final float VIEWING_DISTANCE_TINY = 15.0f;
 
-   public Configuration()
-   {
-   }
+	/* Configurations */
+	private float _viewingDistance;
+	private float _maxPlayerEditingDistance;
+	private float _fovy;
+	private int _width;
+	private int _height;
+	private boolean _fullscreen;
+	private int _fps;
+	private boolean _vsync;
+	private boolean _updateVisibleOnly;
+	private String _texturePack;
 
-   public int getWidth()
-   {
-       return _width;
-   }
+	public Configuration()
+	{
+	}
 
-   public int getHeight()
-   {
-       return _height;
-   }
+	public int getWidth()
+	{
+		return _width;
+	}
 
-   public boolean isFullscreen()
-   {
-       return _fullscreen;
-   }
+	public int getHeight()
+	{
+		return _height;
+	}
 
-   public void setViewingDistance(float viewingDistance)
-   {
-       this._viewingDistance = viewingDistance;
-   }
+	public boolean isFullscreen()
+	{
+		return _fullscreen;
+	}
 
-   public float getViewingDistance()
-   {
-       return _viewingDistance;
-   }
+	public void setViewingDistance(float viewingDistance)
+	{
+		this._viewingDistance = viewingDistance;
+	}
 
-   public void setDisplaySettings(int w, int h, boolean fullscreen)
-   {
-       this._width = w;
-       this._height = h;
-       this._fullscreen = fullscreen;
-   }
+	public float getViewingDistance()
+	{
+		return _viewingDistance;
+	}
 
-   public void setMaximumPlayerEditingDistance(float maxPlayerEditingDistance)
-   {
-       this._maxPlayerEditingDistance = maxPlayerEditingDistance;
-   }
+	public void setDisplaySettings(int w, int h, boolean fullscreen)
+	{
+		this._width = w;
+		this._height = h;
+		this._fullscreen = fullscreen;
+	}
 
-   public float getMaximumPlayerEditingDistance()
-   {
-       return _maxPlayerEditingDistance;
-   }
+	public void setMaximumPlayerEditingDistance(float maxPlayerEditingDistance)
+	{
+		this._maxPlayerEditingDistance = maxPlayerEditingDistance;
+	}
 
-   public int getFPS()
-   {
-       return _fps;
-   }
+	public float getMaximumPlayerEditingDistance()
+	{
+		return _maxPlayerEditingDistance;
+	}
 
-   public void setFPS(int _fps)
-   {
-       this._fps = _fps;
-   }
+	public int getFPS()
+	{
+		return _fps;
+	}
 
-   public boolean getVSync()
-   {
-       return _vsync;
-   }
+	public void setFPS(int _fps)
+	{
+		this._fps = _fps;
+	}
 
-   public boolean getUpdateVisibleOnly()
-   {
-       return _updateVisibleOnly;
-   }
+	public boolean getVSync()
+	{
+		return _vsync;
+	}
 
-   public String getTexturePack()
-   {
-       return _texturePack;
-   }
-   
-   
+	public boolean getUpdateVisibleOnly()
+	{
+		return _updateVisibleOnly;
+	}
 
-   public void loadFromFile(String string) throws IOException
-   {
-       File f = new File(string);
+	public String getTexturePack()
+	{
+		return _texturePack;
+	}
+	
+	public float getFOVY()
+	{
+		return _fovy;
+	}
 
-       BufferedReader br = new BufferedReader(new FileReader(f));
+	public void loadFromFile(String string) throws IOException
+	{
+		File f = new File(string);
 
-       String line;
-       while ((line = br.readLine()) != null)
-       {
-           if (line.trim().isEmpty() || line.trim().startsWith("#"))
-           {
-               continue;
-           }
-           String[] prop = line.split("=");
-           String p = prop[0];
-           String v = prop[1];
+		BufferedReader br = new BufferedReader(new FileReader(f));
 
-           if (p.equals("fullscreen"))
-           {
-               _fullscreen = Boolean.parseBoolean(v);
-           } else if (p.equals("width"))
-           {
-               _width = Integer.parseInt(v);
-           } else if (p.equals("height"))
-           {
-               _height = Integer.parseInt(v);
-           } else if (p.equals("vsync"))
-           {
-               _vsync = Boolean.parseBoolean(v);
-           } else if (p.equals("update_visible_only"))
-           {
-               _updateVisibleOnly = Boolean.parseBoolean(v);
-           } else if (p.equals("fps"))
-           {
-               _fps = Integer.parseInt(v);
-           } else if (p.equals("viewing_distance"))
-           {
-               _viewingDistance = Float.parseFloat(v);
-           } else if (p.equals("texture_pack"))
-           {
-               _texturePack = v;
-           }
+		String line;
+		while ((line = br.readLine()) != null)
+		{
+			if (line.trim().isEmpty() || line.trim().startsWith("#"))
+			{
+				continue;
+			}
+			String[] prop = line.split("=");
+			String p = prop[0];
+			String v = prop[1];
 
-       }
+			if (p.equals("fullscreen"))
+			{
+				_fullscreen = Boolean.parseBoolean(v);
+			} else if (p.equals("width"))
+			{
+				_width = Integer.parseInt(v);
+			} else if (p.equals("height"))
+			{
+				_height = Integer.parseInt(v);
+			} else if (p.equals("vsync"))
+			{
+				_vsync = Boolean.parseBoolean(v);
+			} else if (p.equals("update_visible_only"))
+			{
+				_updateVisibleOnly = Boolean.parseBoolean(v);
+			} else if (p.equals("fps"))
+			{
+				_fps = Integer.parseInt(v);
+			} else if (p.equals("viewing_distance"))
+			{
+				_viewingDistance = Float.parseFloat(v);
+			} else if (p.equals("texture_pack"))
+			{
+				_texturePack = v;
+			} else if (p.equals("fovy"))
+			{
+				_fovy = Integer.parseInt(v);
+			}
 
+		}
 
-   }
+	}
 }

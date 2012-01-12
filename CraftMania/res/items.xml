@@ -23,20 +23,13 @@
         <texture>8,1</texture>
         <stackable>true</stackable>
     </item>
-    
-<!-- 
-    <item name="torch">
-        <texture>0,5</texture>
-        <stackable>true</stackable>
-    </item>
--->
 
-    <item name="wooden_shovel" class="minecraft.world.items.tools.WoodenShovel" />
-    <item name="wooden_pickaxe" class="minecraft.world.items.tools.WoodenPickaxe" />
-    <item name="wooden_axe" class="minecraft.world.items.tools.WoodenAxe" />
+    <item name="wooden_shovel" class="org.craftmania.items.tools.WoodenShovel" />
+    <item name="wooden_pickaxe" class="org.craftmania.items.tools.WoodenPickaxe" />
+    <item name="wooden_axe" class="org.craftmania.items.tools.WoodenAxe" />
     
-    <item name="stone_shovel" class="minecraft.world.items.tools.StoneShovel" />
-    <item name="stone_pickaxe" class="minecraft.world.items.tools.StonePickaxe" />
-    <item name="stone_axe" class="minecraft.world.items.tools.StoneAxe" />
+    <item name="stone_shovel" class="org.craftmania.items.tools.StoneShovel" />
+    <item name="stone_pickaxe" class="org.craftmania.items.tools.StonePickaxe" />
+    <item name="stone_axe" class="org.craftmania.items.tools.StoneAxe" />
 
 </root>

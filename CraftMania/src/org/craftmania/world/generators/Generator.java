@@ -5,6 +5,7 @@ import org.craftmania.world.ChunkManager;
 
 public class Generator
 {
+	
 	protected ChunkManager _chunkManager;
 	protected final long _worldSeed;
 

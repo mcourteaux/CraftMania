@@ -40,7 +40,7 @@ public class Chunk<T extends AABBObject> implements AABBObject
 	public void set(int x, int z, T obj)
 	{
 		T old = _content.set(x, 0, z, obj);
-		if (obj == null)
+		if (obj == null || old != null)
 		{
 			createAABB();
 		} else
@@ -61,6 +61,28 @@ public class Chunk<T extends AABBObject> implements AABBObject
 		if (obj == null && old != null)
 		{
 			_objectCount--;
+			System.err.println("ObjectCount-- = " + _objectCount);
+		}
+		
+		forceCountObjects();
+	}
+	
+	public void forceCountObjects()
+	{
+		int oldVal = _objectCount;
+		_objectCount = 0;
+		
+		for (int i = 0; i < _content.size(); ++i)
+		{
+			if (_content.getRawObject(i) != null)
+			{
+				_objectCount++;
+			}
+		}
+		
+		if (oldVal != _objectCount)
+		{
+			System.err.println("Object count is " + _objectCount + " and we though it was " + oldVal);
 		}
 	}
 

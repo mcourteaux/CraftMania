@@ -52,14 +52,17 @@ public class ChunkManager
 	{
 		int superX = MathHelper.floorDivision(x, Chunk.CHUNK_SIZE_X);
 		int superZ = MathHelper.floorDivision(z, Chunk.CHUNK_SIZE_Z);
+		
+		int xInChunk = x - superX * Chunk.CHUNK_SIZE_X;
+		int zInChunk = z - superZ * Chunk.CHUNK_SIZE_X;
 
 		Chunk<BlockChunk> superChunk = getSuperChunk(superX, superZ);
-		BlockChunk blockChunk = superChunk.get(x - superX * Chunk.CHUNK_SIZE_X, z - superZ * Chunk.CHUNK_SIZE_Z);
+		BlockChunk blockChunk = superChunk.get(xInChunk, zInChunk);
 		if (blockChunk == null && createIfNecessary)
 		{
 			blockChunk = new BlockChunk(x, z);
 			assignNeighbors(blockChunk);
-			superChunk.set(x - (superX * Chunk.CHUNK_SIZE_X), z - (superZ * Chunk.CHUNK_SIZE_Z), blockChunk);
+			superChunk.set(xInChunk, zInChunk, blockChunk);
 		}
 		if (blockChunk != null && generateIfNecessary && !blockChunk.isGenerated() && !blockChunk.isDestroying())
 		{
@@ -207,6 +210,15 @@ public class ChunkManager
 	{
 		block.getBlockChunk().setBlockTypeAbsolute(block.getX(), block.getY(), block.getZ(), (byte) 0, false, false);
 
+		forgetBlockMovementsForBlock(block);
+
+		/* Clear it from the lists */
+		block.removeFromVisibilityList();
+		block.getBlockChunk().getUpdatingBlocks().rememberToRemoveBlock(block);
+	}
+
+	public void forgetBlockMovementsForBlock(Block block)
+	{
 		/* Forget all remember block actions (i.e.: movements) */
 		for (Iterator<BlockMovement> it = _blocksToMove.iterator(); it.hasNext();)
 		{
@@ -216,12 +228,8 @@ public class ChunkManager
 				it.remove();
 			}
 		}
-
-		/* Clear it from the lists */
-		block.removeFromVisibilityList();
-		block.getBlockChunk().getUpdatingBlocks().rememberToRemoveBlock(block);
 	}
-
+	
 	public int getTotalBlockChunkCount()
 	{
 		int count = 0;

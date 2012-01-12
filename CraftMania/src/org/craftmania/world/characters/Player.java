@@ -82,7 +82,7 @@ public class Player extends GameObject
 		_body = new CharacterBody();
 
 		_camera = new Camera();
-		_camera.setFovy(70);
+		_camera.setFovy(Game.getInstance().getConfiguration().getFOVY());
 		this.x = x;
 		this.y = y;
 		this.z = z;
