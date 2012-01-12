@@ -34,7 +34,7 @@ public class DefaultWorldProvider extends WorldProvider
 		_trees = new ArrayList<DefaultWorldProvider.DataPoint2D>();
 		_temperatures = new ArrayList<DefaultWorldProvider.DataPoint2D>();
 	}
-	
+
 	public List<DataPoint2D> getTrees()
 	{
 		return _trees;
@@ -97,7 +97,8 @@ public class DefaultWorldProvider extends WorldProvider
 
 		if (q11 == null || q12 == null || q21 == null || q22 == null)
 		{
-//			System.out.println("No temperature data found for this coordinates (" + x + ", " + z + ") !! So, will be generated...");
+			// System.out.println("No temperature data found for this coordinates ("
+			// + x + ", " + z + ") !! So, will be generated...");
 			if (q11 == null)
 			{
 				q11 = _generator.generateTemperatureAt(lowerX, lowerZ);
@@ -184,7 +185,8 @@ public class DefaultWorldProvider extends WorldProvider
 
 		if (q11 == null || q12 == null || q21 == null || q22 == null)
 		{
-//			System.out.println("No humidity data found for this coordinates (" + x + ", " + z + ") !! So, will be generated...");
+			// System.out.println("No humidity data found for this coordinates ("
+			// + x + ", " + z + ") !! So, will be generated...");
 			if (q11 == null)
 			{
 				q11 = _generator.generateHumidityAt(lowerX, lowerZ);
@@ -220,7 +222,7 @@ public class DefaultWorldProvider extends WorldProvider
 		}
 
 		float humidity2D = biLerpDataPoints(x, z, q11, q12, q21, q22);
-		
+
 		return MathHelper.clamp(humidity2D * 10 / getTemperatureAt(x, y, z), 10, 95);
 	}
 
@@ -271,7 +273,8 @@ public class DefaultWorldProvider extends WorldProvider
 
 		if (q11 == null || q12 == null || q21 == null || q22 == null)
 		{
-//			System.out.println("No level data found for this coordinates (" + x + ", " + z + ") !! So, will be generated...");
+			// System.out.println("No level data found for this coordinates (" +
+			// x + ", " + z + ") !! So, will be generated...");
 			if (q11 == null)
 			{
 				q11 = _generator.generateHeightAt(lowerX, lowerZ);
@@ -312,25 +315,25 @@ public class DefaultWorldProvider extends WorldProvider
 	@Override
 	public Biome getBiomeAt(int x, int y, int z)
 	{
-        float temp = getTemperatureAt(x, y, z);
-        float humidity = getHumidityAt(x, y, z);
-        
-        if (x % 8 == 0 && z % 8 == 0)
-        {
-        	System.out.println();
-        	System.out.println("Temp = " + temp + ", Humidity = " + humidity);
-        	System.out.println();
-        }
+		float temp = getTemperatureAt(x, y, z);
+		float humidity = getHumidityAt(x, y, z);
 
-        if (temp > 25.0f && humidity < 40.0f)
-        {
-            return Biome.DESERT;
-        }
-        if (temp < 5.0f)
-        {
-            return Biome.SNOW;
-        }
-        return Biome.FOREST;
+		if (x % 8 == 0 && z % 8 == 0)
+		{
+			System.out.println();
+			System.out.println("Temp = " + temp + ", Humidity = " + humidity);
+			System.out.println();
+		}
+
+		if (temp > 25.0f && humidity < 40.0f)
+		{
+			return Biome.DESERT;
+		}
+		if (temp < 5.0f)
+		{
+			return Biome.SNOW;
+		}
+		return Biome.FOREST;
 	}
 
 	@Override
@@ -351,9 +354,20 @@ public class DefaultWorldProvider extends WorldProvider
 			int x = random.randomInt(-5 * i, 5 * i);
 			int z = random.randomInt(-5 * i, 5 * i);
 			int y = getHeightAt(x, z);
-			
+
 			_spawnPoint = new Vec3f(x + 0.5f, y + 1, z + 0.5f);
-			Block spawnPointBlock = _world.getChunkManager().getBlock(x, y, z, true, true);
+			Block spawnPointBlock = null;
+			while (spawnPointBlock == null)
+			{
+				spawnPointBlock = _world.getChunkManager().getBlock(x, y, z, true, true);
+				try
+				{
+					Thread.sleep(100);
+				} catch (Exception e)
+				{
+					// TODO: handle exception
+				}
+			}
 			if (spawnPointBlock.getBlockType().getName().equals("grass"))
 			{
 				break;
@@ -414,6 +428,7 @@ public class DefaultWorldProvider extends WorldProvider
 		}
 
 		private SmartRandom _random;
+
 		public WorldProviderGenerator(World world)
 		{
 			_random = new SmartRandom(new Random(world.getWorldSeed()));
@@ -434,7 +449,6 @@ public class DefaultWorldProvider extends WorldProvider
 			z = MathHelper.floor((float) z / DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL) * DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL;
 
 			DataResults td = gatherDataAround(_heights, x, z, 20);
-
 
 			if (td.count == 0)
 			{

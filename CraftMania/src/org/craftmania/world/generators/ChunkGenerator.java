@@ -22,14 +22,19 @@ public class ChunkGenerator extends Generator
 		_worldProvider = world.getWorldProvider();
 	}
 
-	public void generateChunk(int _x, int _z)
+	public BlockChunk generateChunk(int _x, int _z)
 	{
 		System.out.println("---------- Generate chunk: " + _x + ", " + _z);
 		
 		SmartRandom random = new SmartRandom(new Random(generateSeedForChunk(_worldSeed, _x, _z)));
+		
+		/* Acces the chunk new chunk */
 		BlockChunk chunk = _chunkManager.getBlockChunk(_x, _z, true, false);
 		chunk.setGenerated(true);
+		chunk.setGenerating(true);
+		
 
+		/* Build a density map */
 		float densityMap[][][] = new float[BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL + 1][BlockChunk.BLOCKCHUNK_SIZE_VERTICAL + 1][BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL + 1];
 
 		for (int x = 0; x < BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL + 1; x += SAMPLE_RATE_HORIZONTAL_DENSITY)
@@ -46,6 +51,7 @@ public class ChunkGenerator extends Generator
 		/* Trilerp the density map */
 		triLerpDensityMap(densityMap);
 
+		/* Create the blocks using the density map */
 		for (int x = 0; x < BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL; x++)
 		{
 			for (int z = 0; z < BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL; z++)
@@ -100,6 +106,13 @@ public class ChunkGenerator extends Generator
 			}
 
 		}
+		
+		/* Make it accessible for the game */
+		chunk.setGenerating(false);
+		/* Make sure the neighbors are assigned correctly */
+		_chunkManager.assignNeighbors(chunk);
+		
+		return chunk;
 	}
 
 	protected void triLerpDensityMap(float[][][] densityMap)

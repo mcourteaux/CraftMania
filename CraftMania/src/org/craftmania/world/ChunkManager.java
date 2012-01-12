@@ -17,12 +17,15 @@ public class ChunkManager
 	private World _world;
 	private Map<Integer, Chunk<BlockChunk>> _superChunks;
 	private List<BlockMovement> _blocksToMove;
+	private BlockChunkLoader _blockChunkLoader;
+	private List<BlockChunk> _blockChunksToInsert;
 
 	public ChunkManager(World world)
 	{
 		_world = world;
 		_superChunks = new HashMap<Integer, Chunk<BlockChunk>>();
 		_blocksToMove = new ArrayList<ChunkManager.BlockMovement>();
+		_blockChunkLoader = new BlockChunkLoader(world);
 	}
 
 	public Collection<Chunk<BlockChunk>> getAllSuperChunks()
@@ -52,7 +55,7 @@ public class ChunkManager
 	{
 		int superX = MathHelper.floorDivision(x, Chunk.CHUNK_SIZE_X);
 		int superZ = MathHelper.floorDivision(z, Chunk.CHUNK_SIZE_Z);
-		
+
 		int xInChunk = x - superX * Chunk.CHUNK_SIZE_X;
 		int zInChunk = z - superZ * Chunk.CHUNK_SIZE_X;
 
@@ -64,14 +67,21 @@ public class ChunkManager
 			assignNeighbors(blockChunk);
 			superChunk.set(xInChunk, zInChunk, blockChunk);
 		}
-		if (blockChunk != null && generateIfNecessary && !blockChunk.isGenerated() && !blockChunk.isDestroying())
+		if (blockChunk != null && generateIfNecessary && !blockChunk.isGenerating() && !blockChunk.isGenerated() && !blockChunk.isDestroying())
 		{
 			blockChunk.generate();
+			return null;
 		}
-		return blockChunk;
+		if (blockChunk == null || blockChunk.isGenerating())
+		{
+			return null;
+		} else
+		{
+			return blockChunk;
+		}
 	}
 
-	private void assignNeighbors(BlockChunk blockChunk)
+	public void assignNeighbors(BlockChunk blockChunk)
 	{
 		int x = blockChunk.getX();
 		int z = blockChunk.getZ();
@@ -229,7 +239,7 @@ public class ChunkManager
 			}
 		}
 	}
-	
+
 	public int getTotalBlockChunkCount()
 	{
 		int count = 0;
@@ -242,10 +252,16 @@ public class ChunkManager
 
 	public void deleteChunk(BlockChunk chunk)
 	{
-		System.err.println();
-		System.err.println("-------- Delete chunk: (" + chunk.getX() + ", " + chunk.getZ() + ") ----------");
-		System.err.println();
-		chunk.destroy();
-		
+		_blockChunkLoader.deleteChunk(chunk);
+	}
+
+	public void insertChunk(BlockChunk chunk)
+	{
+		_blockChunksToInsert.add(chunk);
+	}
+
+	public void generateChunk(BlockChunk blockChunk)
+	{
+		_blockChunkLoader.generateChunk(blockChunk.getX(), blockChunk.getZ());
 	}
 }

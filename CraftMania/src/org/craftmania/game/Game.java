@@ -311,6 +311,7 @@ public class Game
 		{
 			Display.setVSyncEnabled(true);
 		}
+		Thread.currentThread().setPriority(9);
 		while (!Display.isCloseRequested())
 		{
 			if (Keyboard.isKeyDown(Keyboard.KEY_LMENU) && Keyboard.isKeyDown(Keyboard.KEY_RETURN))

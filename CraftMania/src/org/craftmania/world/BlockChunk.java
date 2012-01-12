@@ -37,6 +37,7 @@ public class BlockChunk implements AABBObject
 	/* Neighbors */
 	private BlockChunk[] _neighbors;
 	private boolean _destroying;
+	private boolean _generating;
 
 	public BlockChunk(int x, int z)
 	{
@@ -79,8 +80,7 @@ public class BlockChunk implements AABBObject
 		if (!_generated)
 		{
 			_generated = true;
-			ChunkGenerator gen = new ChunkGenerator(Game.getInstance().getWorld());
-			gen.generateChunk(getX(), getZ());
+			Game.getInstance().getWorld().getChunkManager().generateChunk(this);
 		}
 	}
 
@@ -336,7 +336,7 @@ public class BlockChunk implements AABBObject
 		setBlockTypeAbsolute(x + getAbsoluteX(), y, z + getAbsoluteZ(), blockID, createIfNecessary, generateIfNecessary);
 	}
 
-	public void destroy()
+	public synchronized void destroy()
 	{
 		if (isDestroying())
 		{
@@ -388,4 +388,13 @@ public class BlockChunk implements AABBObject
 
 	}
 
+	public void setGenerating(boolean b)
+	{
+		_generating = b;
+	}
+	
+	public boolean isGenerating()
+	{
+		return _generating;
+	}
 }
