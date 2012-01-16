@@ -50,4 +50,9 @@ public class SmartRandom
         }
         return ret * upper;
     }
+
+	public long randomLong()
+	{
+		return _random.nextLong();
+	}
 }

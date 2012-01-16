@@ -11,7 +11,6 @@ import static org.lwjgl.opengl.GL11.glLineWidth;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -46,10 +45,12 @@ public class World
 	private int _localBlockCount;
 	private int _updatingBlocks;
 	private long _worldSeed;
+	private String _worldName;
 	private int _tick;
 
-	public World(long seed)
+	public World(String name, long seed) throws Exception
 	{
+		_worldName = name;
 		_worldSeed = seed;
 		_worldProvider = new DefaultWorldProvider(this);
 		_chunkManager = new ChunkManager(this);
@@ -60,6 +61,43 @@ public class World
 		System.out.println("Visible Block Buffer Size = " + visibleBlockBufferSize);
 		_visibleBlocks = new ArrayList<Block>(visibleBlockBufferSize);
 		_blockDistanceComparator = new BlockDistanceComparator();
+	}
+	
+	public void save() throws Exception
+	{
+		_worldProvider.save();
+		
+		/* Make sure the BlockChunkLoader is free. */
+		do
+		{
+			try
+			{
+				Thread.sleep(10);
+			} catch (Exception e)
+			{
+			}
+		}
+		while (_chunkManager.isBlockChunkLoaderBusy());
+		
+		/* Save the local chunks, by destroying them */
+		for (BlockChunk chunk : _localChunks)
+		{
+			_chunkManager.deleteChunk(chunk);
+		}
+		_localChunks.clear();
+		
+		/* Make sure the blockloader was finished */
+		do
+		{
+			try
+			{
+				Thread.sleep(10);
+			} catch (Exception e)
+			{
+			}
+		}
+		while (_chunkManager.isBlockChunkLoaderBusy());
+		
 	}
 
 	private int calculateEstimatedAmountOfVisibleBlocks()
@@ -155,6 +193,8 @@ public class World
 		 */
 		if (Game.getInstance().getFPS() < 3)
 			return;
+		
+		
 
 		while (Keyboard.next())
 		{
@@ -174,7 +214,10 @@ public class World
 		}
 		if (_activatedInventory == null)
 		{
-			_player.update();
+			if (!(_localChunks.size() < 4 && _oldChunkList.size() < 4))
+			{
+				_player.update();
+			}
 		} else
 		{
 			_activatedInventory.update();
@@ -202,7 +245,7 @@ public class World
 	{
 		float viewingDistance = Game.getInstance().getConfiguration().getViewingDistance();
 		viewingDistance /= BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL;
-		viewingDistance += 1.0f;
+//		viewingDistance += 1.0f;
 		int distance = MathHelper.ceil(viewingDistance);
 		int distanceSq = distance * distance;
 
@@ -214,8 +257,7 @@ public class World
 		boolean generate = false;
 		int xToGenerate = 0, zToGenerate = 0;
 
-		outer:
-		for (int x = -distance; x < distance; ++x)
+		outer: for (int x = -distance; x < distance; ++x)
 		{
 			for (int z = -distance; z < distance; ++z)
 			{
@@ -231,12 +273,17 @@ public class World
 						}
 						if (aabb == null || frustum.intersects(aabb))
 						{
-							if (_chunkManager.getBlockChunk(centerX + x, centerZ + z, false, false) == null)
+							BlockChunk chunk = _chunkManager.getBlockChunk(centerX + x, centerZ + z, false, false);
+							if (chunk == null)
 							{
 								generate = true;
 								xToGenerate = x;
 								zToGenerate = z;
 								break outer;
+							} else if (!chunk.isGenerated())
+							{
+								chunk.generate();
+								return;
 							}
 						}
 					}
@@ -261,13 +308,17 @@ public class World
 		_updatingBlocks = 0;
 		for (BlockChunk chunk : _localChunks)
 		{
-			for (Iterator<Block> it = chunk.getUpdatingBlocks().iterator(); it.hasNext();)
+			synchronized (chunk)
 			{
-				Block b = it.next();
-				b.update(it);
+
+				for (Iterator<Block> it = chunk.getUpdatingBlocks().iterator(); it.hasNext();)
+				{
+					Block b = it.next();
+					b.update(it);
+				}
+				_updatingBlocks += chunk.getUpdatingBlocks().size();
+				chunk.performListChanges();
 			}
-			_updatingBlocks += chunk.getUpdatingBlocks().size();
-			chunk.performListChanges();
 		}
 	}
 
@@ -281,7 +332,7 @@ public class World
 		_localChunks = _oldChunkList;
 		_oldChunkList = temp;
 
-		_chunkManager.getApproximateChunks(_player.getPosition(), viewingDistance, _localChunks);
+		_chunkManager.getApproximateChunks(_player.getPosition(), viewingDistance + BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL, _localChunks);
 
 		if (!_oldChunkList.isEmpty())
 		{
@@ -297,7 +348,7 @@ public class World
 						continue outer;
 					}
 				}
-				if (!chunkI.isDestroying())
+				if (!chunkI.isDestroying() && !chunkI.isLoading())
 				{
 					chunkI.clearCache();
 					_chunksToDelete.add(chunkI);
@@ -322,17 +373,20 @@ public class World
 
 		for (BlockChunk chunk : _localChunks)
 		{
-			if (chunk.isEmpty())
-				continue;
-			if (frustum.intersects(chunk.getAABB()))
+			synchronized (chunk)
 			{
-				for (Block block : chunk.getVisibleBlocks())
+				if (chunk.isEmpty())
+					continue;
+				if (frustum.intersects(chunk.getAABB()))
 				{
-					if (block.isVisible())
+					for (Block block : chunk.getVisibleBlocks())
 					{
-						if (frustum.intersects(block.getAABB()))
+						if (block.isVisible())
 						{
-							_visibleBlocks.add(block);
+							if (frustum.intersects(block.getAABB()))
+							{
+								_visibleBlocks.add(block);
+							}
 						}
 					}
 				}
@@ -371,5 +425,10 @@ public class World
 	public long getWorldSeed()
 	{
 		return _worldSeed;
+	}
+
+	public String getWorldName()
+	{
+		return _worldName;
 	}
 }

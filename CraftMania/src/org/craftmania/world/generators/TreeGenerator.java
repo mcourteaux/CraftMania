@@ -5,6 +5,7 @@ import java.util.Random;
 import org.craftmania.blocks.BlockManager;
 import org.craftmania.math.Vec3f;
 import org.craftmania.utilities.SmartRandom;
+import org.craftmania.world.BlockChunk;
 
 public class TreeGenerator extends Generator
 {
@@ -16,10 +17,10 @@ public class TreeGenerator extends Generator
 		_random = new SmartRandom(new Random(seed));
 	}
 
-	public void generateTree(int _x, int _y, int _z, boolean flatBottom)
+	public void generateBroadLeavedTree(BlockChunk targetChunk, int _x, int _y, int _z, boolean flatBottom)
 	{
 		String leafType = "leafs" + _random.randomInt(2);
-		int height = _random.randomInt(9, 11);
+		int height = _random.randomInt(9, 13);
 
 		int radius = _random.randomInt(3, (int) (height / 2.2f)) + (flatBottom ? 1 : 0);
 		float radiusSq = radius * radius;
@@ -29,7 +30,7 @@ public class TreeGenerator extends Generator
 		for (int i = 0; i < height - 1; ++i)
 		{
 			byte bl = BlockManager.getInstance().blockID("wood0");
-			_chunkManager.setBlock(_x, _y + i, _z, bl, true, false);
+			targetChunk.setBlockTypeAbsolute(_x, _y + i, _z, bl, true, false);
 		}
 
 		// Leafs
@@ -53,11 +54,11 @@ public class TreeGenerator extends Generator
 					{
 						/*
 						 * Do NOT generate (but create) the chunks where the
-						 * leafs are in, otherwise this will cause continiously
+						 * leafs are in, otherwise this will cause continuously
 						 * chunks, that contains tree which invokes the
 						 * generation of a new chunk.
 						 */
-						_chunkManager.setBlock(_x + x, _y + height - radius + y, _z + z, blLeafs, true, false);
+						targetChunk.setBlockTypeAbsolute(_x + x, _y + height - radius + y, _z + z, blLeafs, true, false);
 					}
 				}
 			}
@@ -65,12 +66,18 @@ public class TreeGenerator extends Generator
 
 	}
 
-	public void generateCactus(int x, int y, int z)
+	public void generateCactus(BlockChunk targetChunk, int x, int y, int z)
 	{
 		int height = _random.randomInt(3, 5);
 		for (int i = 0; i < height; ++i)
 		{
-			_chunkManager.setBlock(x, y + i, z, BlockManager.getInstance().blockID("cactus"), true, false);
+			targetChunk.setBlockTypeAbsolute(x, y + i, z, BlockManager.getInstance().blockID("cactus"), true, false);
 		}
+	}
+
+	public void generatePinophyta(BlockChunk chunk, int x, int y, int z)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }

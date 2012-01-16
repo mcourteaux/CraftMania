@@ -14,6 +14,7 @@ import org.craftmania.math.Vec3f;
 
 public class ChunkManager
 {
+	@SuppressWarnings("unused")
 	private World _world;
 	private Map<Integer, Chunk<BlockChunk>> _superChunks;
 	private List<BlockMovement> _blocksToMove;
@@ -50,8 +51,13 @@ public class ChunkManager
 		}
 		return superChunk;
 	}
+	
+	public BlockChunk getBlockChunk(int x, int z, boolean createIfNecesssary, boolean generateIfNecessary)
+	{
+		return getBlockChunk(x, z, createIfNecesssary, generateIfNecessary, false);
+	}
 
-	public BlockChunk getBlockChunk(int x, int z, boolean createIfNecessary, boolean generateIfNecessary)
+	public BlockChunk getBlockChunk(int x, int z, boolean createIfNecessary, boolean generateIfNecessary, boolean useEvenIfGenerating)
 	{
 		int superX = MathHelper.floorDivision(x, Chunk.CHUNK_SIZE_X);
 		int superZ = MathHelper.floorDivision(z, Chunk.CHUNK_SIZE_Z);
@@ -67,12 +73,18 @@ public class ChunkManager
 			assignNeighbors(blockChunk);
 			superChunk.set(xInChunk, zInChunk, blockChunk);
 		}
-		if (blockChunk != null && generateIfNecessary && !blockChunk.isGenerating() && !blockChunk.isGenerated() && !blockChunk.isDestroying())
+		if (blockChunk != null && generateIfNecessary && !blockChunk.isLoading() && !blockChunk.isGenerated() && !blockChunk.isDestroying())
 		{
 			blockChunk.generate();
-			return null;
+			if (useEvenIfGenerating)
+			{
+				return blockChunk;
+			} else
+			{
+				return null;
+			}
 		}
-		if (blockChunk == null || blockChunk.isGenerating())
+		if ((blockChunk == null || blockChunk.isLoading()) && !useEvenIfGenerating)
 		{
 			return null;
 		} else
@@ -85,10 +97,10 @@ public class ChunkManager
 	{
 		int x = blockChunk.getX();
 		int z = blockChunk.getZ();
-		blockChunk.setNeighborBlockChunk(Side.BACK, getBlockChunk(x, z - 1, false, false));
-		blockChunk.setNeighborBlockChunk(Side.FRONT, getBlockChunk(x, z + 1, false, false));
-		blockChunk.setNeighborBlockChunk(Side.LEFT, getBlockChunk(x - 1, z, false, false));
-		blockChunk.setNeighborBlockChunk(Side.RIGHT, getBlockChunk(x + 1, z, false, false));
+		blockChunk.setNeighborBlockChunk(Side.BACK, getBlockChunk(x, z - 1, false, false, true));
+		blockChunk.setNeighborBlockChunk(Side.FRONT, getBlockChunk(x, z + 1, false, false, true));
+		blockChunk.setNeighborBlockChunk(Side.LEFT, getBlockChunk(x - 1, z, false, false, true));
+		blockChunk.setNeighborBlockChunk(Side.RIGHT, getBlockChunk(x + 1, z, false, false, true));
 	}
 
 	public Block getBlock(int x, int y, int z, boolean createIfNecessary, boolean generateIfNecessary)
@@ -130,7 +142,7 @@ public class ChunkManager
 				int distSq = x * x + z * z;
 				if (distSq <= distanceSq)
 				{
-					BlockChunk chunk = getBlockChunk(centerX + x, centerZ + z, false, false);
+					BlockChunk chunk = getBlockChunk(centerX + x, centerZ + z, false, false, false);
 					if (chunk != null && !chunk.isDestroying())
 					{
 						chunks.add(chunk);
@@ -140,18 +152,6 @@ public class ChunkManager
 		}
 
 		return chunks;
-	}
-
-	public void loadTestEnvironment()
-	{
-		for (int x = -50; x < 50; ++x)
-		{
-			for (int z = -50; z < 50; ++z)
-			{
-				setBlock(x, 0, z, (byte) 2, true, false);
-			}
-		}
-		setBlock(4, 4, 0, (byte) 5, true, false);
 	}
 
 	public BlockChunk getBlockChunkContaining(int x, int y, int z, boolean createIfNecessary, boolean generateIfNecessary)
@@ -260,8 +260,13 @@ public class ChunkManager
 		_blockChunksToInsert.add(chunk);
 	}
 
-	public void generateChunk(BlockChunk blockChunk)
+	public void generateOrLoadChunk(BlockChunk blockChunk)
 	{
-		_blockChunkLoader.generateChunk(blockChunk.getX(), blockChunk.getZ());
+		_blockChunkLoader.generateOrLoadChunk(blockChunk.getX(), blockChunk.getZ());
+	}
+
+	public boolean isBlockChunkLoaderBusy()
+	{
+		return _blockChunkLoader.isBusy();
 	}
 }

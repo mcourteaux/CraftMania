@@ -20,9 +20,8 @@ public class DefaultBlock extends Block
 
 	private boolean _needVisibilityCheck;
 	private byte _faceMask;
-	
-	private BlockMovementPlugin _movement;
 
+	private BlockMovementPlugin _movement;
 
 	public DefaultBlock(BlockType type, BlockChunk chunk, Vec3i pos)
 	{
@@ -34,12 +33,12 @@ public class DefaultBlock extends Block
 		_needVisibilityCheck = true;
 
 	}
-	
+
 	private void createMovementPlugin()
 	{
 		_movement = new BlockMovementPlugin(this);
 	}
-	
+
 	public boolean hasMovementPlugin()
 	{
 		return _movement != null;
@@ -56,7 +55,8 @@ public class DefaultBlock extends Block
 				if (!isFalling())
 				{
 					/* Start falling */
-					if (!hasMovementPlugin()) createMovementPlugin();
+					if (!hasMovementPlugin())
+						createMovementPlugin();
 					_movement.setFalling(true);
 					_blockChunk.notifyNeighborsOf(getX(), getY(), getZ());
 				}
@@ -99,7 +99,6 @@ public class DefaultBlock extends Block
 			_updating = false;
 		}
 	}
-
 
 	private boolean isFalling()
 	{
@@ -144,7 +143,7 @@ public class DefaultBlock extends Block
 		return _faceMask != 0;
 	}
 
-	private void checkVisibility()
+	private synchronized void checkVisibility()
 	{
 		boolean preVisibility = _faceMask != 0;
 		if (isMoving())
@@ -152,26 +151,28 @@ public class DefaultBlock extends Block
 			_faceMask = ALL_FACES;
 			return;
 		}
-		for (int i = 0; i < 6; ++i)
+		if (_blockChunk != null)
 		{
-			Side side = Side.values()[i];
-			Vec3i normal = side.getNormal();
-			Block block = _blockChunk.getBlockAbsolute(getX() + normal.x(), getY() + normal.y(), getZ() + normal.z());
-			if (block != null)
+			for (int i = 0; i < 6; ++i)
 			{
-				if (block.isMoving() || !block.getBlockType().hasNormalAABB())
+				Side side = Side.values()[i];
+				Vec3i normal = side.getNormal();
+				Block block = _blockChunk.getBlockAbsolute(getX() + normal.x(), getY() + normal.y(), getZ() + normal.z());
+				if (block != null)
 				{
-					setFaceVisible(side, true);
+					if (block.isMoving() || !block.getBlockType().hasNormalAABB())
+					{
+						setFaceVisible(side, true);
+					} else
+					{
+						setFaceVisible(side, false);
+					}
 				} else
 				{
-					setFaceVisible(side, false);
+					setFaceVisible(side, true);
 				}
-			} else
-			{
-				setFaceVisible(side, true);
 			}
 		}
-		
 		/* Make the bottom layer invisible */
 		if (getY() == 0)
 		{
@@ -179,9 +180,9 @@ public class DefaultBlock extends Block
 		}
 
 		_needVisibilityCheck = false;
-		
+
 		boolean newVisibility = _faceMask != 0;
-		
+
 		if (newVisibility != preVisibility)
 		{
 			if (newVisibility)
@@ -230,7 +231,7 @@ public class DefaultBlock extends Block
 			addToUpdateList();
 		}
 	}
-	
+
 	@Override
 	public void forceVisiblilityCheck()
 	{

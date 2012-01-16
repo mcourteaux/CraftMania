@@ -1,7 +1,5 @@
 package org.craftmania.world;
 
-import java.util.Iterator;
-
 import org.craftmania.Side;
 import org.craftmania.blocks.Block;
 import org.craftmania.blocks.BlockConstructor;
@@ -14,7 +12,6 @@ import org.craftmania.math.Vec2i;
 import org.craftmania.math.Vec3f;
 import org.craftmania.math.Vec3i;
 import org.craftmania.world.BlockList.BlockAcceptor;
-import org.craftmania.world.generators.ChunkGenerator;
 
 public class BlockChunk implements AABBObject
 {
@@ -27,7 +24,10 @@ public class BlockChunk implements AABBObject
 	private AABB _aabb;
 	private int _blockCount;
 	private boolean _generated;
+	private boolean _destroying;
+	private boolean _loading;
 	private boolean _cached;
+	private long _creationTime;
 
 	/* Blocks */
 	private Fast3DArray<Block> _blocks;
@@ -36,14 +36,11 @@ public class BlockChunk implements AABBObject
 
 	/* Neighbors */
 	private BlockChunk[] _neighbors;
-	private boolean _destroying;
-	private boolean _generating;
 
 	public BlockChunk(int x, int z)
 	{
 		_position = new Vec2i(x, z);
-		_blocks = new Fast3DArray<Block>(BLOCKCHUNK_SIZE_HORIZONTAL, BLOCKCHUNK_SIZE_VERTICAL, BLOCKCHUNK_SIZE_HORIZONTAL); // 256
-																															// KB
+		_blocks = new Fast3DArray<Block>(BLOCKCHUNK_SIZE_HORIZONTAL, BLOCKCHUNK_SIZE_VERTICAL, BLOCKCHUNK_SIZE_HORIZONTAL);
 		_aabb = createAABBForBlockChunkAt(x, z);
 		_visibleBlocks = new BlockList();
 		_updatingBlocks = new BlockList();
@@ -51,6 +48,7 @@ public class BlockChunk implements AABBObject
 		_neighbors = new BlockChunk[4];
 
 		System.out.println("BlockChunk constructed at: " + x + " " + z + "  \t (AABB = " + _aabb.toString() + ")");
+		_creationTime = System.currentTimeMillis();
 
 	}
 
@@ -80,7 +78,7 @@ public class BlockChunk implements AABBObject
 		if (!_generated)
 		{
 			_generated = true;
-			Game.getInstance().getWorld().getChunkManager().generateChunk(this);
+			Game.getInstance().getWorld().getChunkManager().generateOrLoadChunk(this);
 		}
 	}
 
@@ -257,6 +255,7 @@ public class BlockChunk implements AABBObject
 			BlockChunk neighbor = getNeighborBlockChunk(side);
 			if (neighbor == null)
 			{
+				// return null;
 				return Game.getInstance().getWorld().getChunkManager().getBlockChunkContaining(x, y, z, createIfNecessary, generateIfNecessary);
 			} else
 			{
@@ -344,6 +343,9 @@ public class BlockChunk implements AABBObject
 		}
 		_destroying = true;
 		
+		long lifeTime = System.currentTimeMillis() - _creationTime;
+		System.out.println("Deleting chunk (" + getX() + ", " + getZ() + ") with lifetime " + (lifeTime / 1000.0f));
+
 		ChunkManager chman = Game.getInstance().getWorld().getChunkManager();
 
 		/* Clear the neighbors references */
@@ -364,10 +366,13 @@ public class BlockChunk implements AABBObject
 			Block b = _blocks.getRawObject(index);
 			if (b != null)
 			{
-				++count;
-				_blocks.setRawObject(index, null);
-				chman.forgetBlockMovementsForBlock(b);
-				b.setBlockChunk(null);
+				synchronized (b)
+				{
+					++count;
+					_blocks.setRawObject(index, null);
+					chman.forgetBlockMovementsForBlock(b);
+					b.setBlockChunk(null);
+				}
 			}
 		}
 		clearCache();
@@ -376,25 +381,34 @@ public class BlockChunk implements AABBObject
 		/* Delete this chunk from the superchunk */
 		int superChunkX = MathHelper.floorDivision(this.getX(), Chunk.CHUNK_SIZE_X);
 		int superChunkZ = MathHelper.floorDivision(this.getZ(), Chunk.CHUNK_SIZE_Z);
-		
+
 		int xInChunk = getX() - superChunkX * Chunk.CHUNK_SIZE_X;
 		int zInChunk = getZ() - superChunkZ * Chunk.CHUNK_SIZE_X;
 
-		
 		Chunk<BlockChunk> superChunk = chman.getSuperChunk(superChunkX, superChunkZ);
 		superChunk.set(xInChunk, zInChunk, null);
-		
+
 		setGenerated(false);
 
 	}
 
-	public void setGenerating(boolean b)
+	public void setLoading(boolean b)
 	{
-		_generating = b;
+		_loading = b;
 	}
-	
-	public boolean isGenerating()
+
+	public boolean isLoading()
 	{
-		return _generating;
+		return _loading;
+	}
+
+	public int getUniquePositionID()
+	{
+		return MathHelper.cantorize(MathHelper.mapToPositive(getX()), MathHelper.mapToPositive(getZ()));
+	}
+
+	public Fast3DArray<Block> getBlocks()
+	{
+		return _blocks;
 	}
 }

@@ -1,5 +1,7 @@
 package org.craftmania.datastructures;
 
+import org.craftmania.math.Vec3i;
+
 /**
  * 
  * @author martijncourteaux
@@ -22,6 +24,13 @@ public class Fast3DArray<T>
 
 		_size = _lX * _lY * _lZ;
 		_array = new Object[_size];
+	}
+	
+	public void rawIndexToVec3i(int index, Vec3i vec)
+	{
+		vec.setX(index / (_lX * _lY));
+		vec.setY((index / _lX) % _lY);
+		vec.setZ(index % _lZ);
 	}
 
 	/**

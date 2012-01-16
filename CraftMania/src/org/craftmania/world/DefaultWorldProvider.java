@@ -1,10 +1,19 @@
 package org.craftmania.world;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import org.craftmania.blocks.Block;
+import org.craftmania.game.Game;
 import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3f;
 import org.craftmania.utilities.SmartRandom;
@@ -17,12 +26,15 @@ public class DefaultWorldProvider extends WorldProvider
 
 	public static int SAMPLE_RATE_TEMPERATURE = 32;
 
+	private static boolean DEBUG_WOLRD_PROVIDER = false;
+
 	private World _world;
 	private WorldProviderGenerator _generator;
 	private List<DataPoint2D> _heights;
 	private List<DataPoint2D> _humidities;
-	private List<DataPoint2D> _trees;
 	private List<DataPoint2D> _temperatures;
+	private List<TreeDefinition> _trees;
+	private Vec3f _initialSpawnPoint;
 	private Vec3f _spawnPoint;
 
 	public DefaultWorldProvider(World world)
@@ -31,11 +43,11 @@ public class DefaultWorldProvider extends WorldProvider
 		_generator = new WorldProviderGenerator(world);
 		_heights = new ArrayList<DefaultWorldProvider.DataPoint2D>();
 		_humidities = new ArrayList<DefaultWorldProvider.DataPoint2D>();
-		_trees = new ArrayList<DefaultWorldProvider.DataPoint2D>();
+		_trees = new ArrayList<TreeDefinition>();
 		_temperatures = new ArrayList<DefaultWorldProvider.DataPoint2D>();
 	}
 
-	public List<DataPoint2D> getTrees()
+	public List<TreeDefinition> getTrees()
 	{
 		return _trees;
 	}
@@ -318,7 +330,7 @@ public class DefaultWorldProvider extends WorldProvider
 		float temp = getTemperatureAt(x, y, z);
 		float humidity = getHumidityAt(x, y, z);
 
-		if (x % 8 == 0 && z % 8 == 0)
+		if (DEBUG_WOLRD_PROVIDER && x % 8 == 0 && z % 8 == 0)
 		{
 			System.out.println();
 			System.out.println("Temp = " + temp + ", Humidity = " + humidity);
@@ -346,6 +358,16 @@ public class DefaultWorldProvider extends WorldProvider
 		return new Vec3f(_spawnPoint);
 	}
 
+	@Override
+	public Vec3f getInitialSpawnPoint()
+	{
+		if (_spawnPoint == null)
+		{
+			generateSpawnPoint();
+		}
+		return _initialSpawnPoint;
+	}
+
 	private void generateSpawnPoint()
 	{
 		SmartRandom random = new SmartRandom(new Random());
@@ -365,7 +387,6 @@ public class DefaultWorldProvider extends WorldProvider
 					Thread.sleep(100);
 				} catch (Exception e)
 				{
-					// TODO: handle exception
 				}
 			}
 			if (spawnPointBlock.getBlockType().getName().equals("grass"))
@@ -373,6 +394,7 @@ public class DefaultWorldProvider extends WorldProvider
 				break;
 			}
 		}
+		_initialSpawnPoint = new Vec3f(_spawnPoint);
 	}
 
 	public static class DataPoint2D
@@ -453,14 +475,15 @@ public class DefaultWorldProvider extends WorldProvider
 			if (td.count == 0)
 			{
 				DataPoint2D data = new DataPoint2D(x, z, MathHelper.floor(_random.randomFloat(15, 23)));
-				System.out.println("Height (" + x + ", " + z + ") = " + data.getData());
+				if (DEBUG_WOLRD_PROVIDER)
+					System.out.println("Height (" + x + ", " + z + ") = " + data.getData());
 				_heights.add(data);
 				return data;
 			} else
 			{
 				float diff = _random.exponentialRandom(250.0f, 7);
 
-				float avgHeight = _random.randomFloat(td.avg - Math.min(diff * 1.8f, 7), td.avg + diff * 1.5f);
+				float avgHeight = _random.randomFloat(td.avg - Math.min(diff * 2.8f, 7), td.avg + diff * 1.5f);
 				float maxHeight = _random.randomFloat(td.max - diff, td.max + diff * 0.6f);
 				float closestHeight = _random.randomFloat(td.closest - diff, td.closest + diff * 0.6f);
 
@@ -471,7 +494,8 @@ public class DefaultWorldProvider extends WorldProvider
 
 				height = Math.max(10, height);
 				DataPoint2D data = new DataPoint2D(x, z, MathHelper.round(height));
-				System.out.println("Height (" + x + ", " + z + ") = " + data.getData());
+				if (DEBUG_WOLRD_PROVIDER)
+					System.out.println("Height (" + x + ", " + z + ") = " + data.getData());
 
 				_heights.add(data);
 				return data;
@@ -538,7 +562,8 @@ public class DefaultWorldProvider extends WorldProvider
 				diff = _random.randomBoolean() ? diff : -diff;
 				DataPoint2D data = new DataPoint2D(x, z, (int) MathHelper.clamp(dr.avg + diff, 30.0f, 95.0f));
 				_humidities.add(data);
-				System.out.println("Humidity (" + x + ", " + z + ") = " + data.getData());
+				if (DEBUG_WOLRD_PROVIDER)
+					System.out.println("Humidity (" + x + ", " + z + ") = " + data.getData());
 				return data;
 			}
 		}
@@ -562,9 +587,120 @@ public class DefaultWorldProvider extends WorldProvider
 				diff = _random.randomBoolean() ? diff : -diff;
 				DataPoint2D data = new DataPoint2D(x, z, (int) MathHelper.clamp(dr.avg + diff, 10.0f, 50.0f));
 				_temperatures.add(data);
-				System.out.println("Temp (" + x + ", " + z + ") = " + data.getData());
+				if (DEBUG_WOLRD_PROVIDER)
+					System.out.println("Temp (" + x + ", " + z + ") = " + data.getData());
 				return data;
 			}
+		}
+	}
+
+	@Override
+	public void save() throws Exception
+	{
+		File file = Game.getInstance().getRelativeFile(Game.FILE_BASE_USER_DATA, "${world}/world.dat");
+
+		DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+
+		_initialSpawnPoint = new Vec3f(_world.getPlayer().getPosition());
+		writeVec3f(dos, _spawnPoint);
+		writeVec3f(dos, _initialSpawnPoint);
+
+		writeDataPointList(dos, _heights);
+		writeDataPointList(dos, _humidities);
+		writeDataPointList(dos, _temperatures);
+
+		/* Tree Definitions */
+		{
+			dos.writeInt(_trees.size());
+			for (int i = 0; i < _trees.size(); ++i)
+			{
+				TreeDefinition dp2d = _trees.get(i);
+				dos.writeInt(dp2d.x);
+				dos.writeInt(dp2d.y);
+				dos.writeInt(dp2d.z);
+				dos.writeByte(dp2d.type);
+			}
+		}
+
+		dos.flush();
+		dos.close();
+	}
+
+	private void writeVec3f(DataOutputStream dos, Vec3f vec) throws IOException
+	{
+		dos.writeFloat(vec.x());
+		dos.writeFloat(vec.y());
+		dos.writeFloat(vec.z());
+	}
+
+	@Override
+	public void load() throws Exception
+	{
+		File file = Game.getInstance().getRelativeFile(Game.FILE_BASE_USER_DATA, "${world}/world.dat");
+
+		if (!file.exists())
+		{
+			System.err.println("No level data found! " + file.getPath());
+			return;
+		}
+
+		DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+
+		_spawnPoint = new Vec3f();
+		_initialSpawnPoint = new Vec3f();
+		readVec3f(dis, _spawnPoint);
+		readVec3f(dis, _initialSpawnPoint);
+
+		readDataPointList(dis, _heights);
+		readDataPointList(dis, _humidities);
+		readDataPointList(dis, _temperatures);
+
+		/* Tree Definitions */
+		{
+			int size = dis.readInt();
+			for (int i = 0; i < size; ++i)
+			{
+				TreeDefinition dp2d = new TreeDefinition(0, 0, 0, 0);
+				dp2d.x = dis.readInt();
+				dp2d.y = dis.readInt();
+				dp2d.z = dis.readInt();
+				dp2d.type = dis.readByte();
+			}
+		}
+
+		dis.close();
+
+	}
+
+	private void readVec3f(DataInputStream dis, Vec3f vec) throws Exception
+	{
+		vec.x(dis.readFloat());
+		vec.y(dis.readFloat());
+		vec.z(dis.readFloat());
+	}
+
+	private void writeDataPointList(DataOutputStream dos, List<DataPoint2D> list) throws IOException
+	{
+		dos.writeInt(list.size());
+		for (int i = 0; i < list.size(); ++i)
+		{
+			DataPoint2D dp2d = list.get(i);
+			dos.writeInt(dp2d.getX());
+			dos.writeInt(dp2d.getZ());
+			dos.writeInt(dp2d.getData());
+		}
+	}
+
+	private void readDataPointList(DataInputStream dis, List<DataPoint2D> list) throws IOException
+	{
+		int size = dis.readInt();
+		for (int i = 0; i < size; ++i)
+		{
+			DataPoint2D dp2d = new DataPoint2D(0, 0, 0);
+			dp2d._x = dis.readInt();
+			dp2d._z = dis.readInt();
+			dp2d._data = dis.readInt();
+			list.add(dp2d);
 		}
 	}
 

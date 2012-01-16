@@ -9,6 +9,7 @@ import org.craftmania.world.Biome;
 import org.craftmania.world.BlockChunk;
 import org.craftmania.world.World;
 import org.craftmania.world.WorldProvider;
+import org.craftmania.world.WorldProvider.TreeDefinition;
 
 public class ChunkGenerator extends Generator
 {
@@ -28,10 +29,10 @@ public class ChunkGenerator extends Generator
 		
 		SmartRandom random = new SmartRandom(new Random(generateSeedForChunk(_worldSeed, _x, _z)));
 		
-		/* Acces the chunk new chunk */
-		BlockChunk chunk = _chunkManager.getBlockChunk(_x, _z, true, false);
+		/* Access the new chunk */
+		BlockChunk chunk = _chunkManager.getBlockChunk(_x, _z, true, false, true);
 		chunk.setGenerated(true);
-		chunk.setGenerating(true);
+		chunk.setLoading(true);
 		
 
 		/* Build a density map */
@@ -107,8 +108,55 @@ public class ChunkGenerator extends Generator
 
 		}
 		
+		/* Generate trees */
+		{
+            int treeCount = MathHelper.round((1.0f - random.randomFloat(1.0f)) * 12.0f);
+            TreeGenerator gen = new TreeGenerator(random.randomLong());
+            trees:
+            for (int i = 0; i < treeCount; ++i)
+            {
+                int x = chunk.getAbsoluteX() + random.randomInt(0, BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL);
+                int z = chunk.getAbsoluteZ() + random.randomInt(0, BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL);
+
+                /* Check for enough distance from the other trees */
+                for (TreeDefinition treeDef : _worldProvider.getTrees())
+                {
+                    float xDiff = x - treeDef.x;
+                    float zDiff = z - treeDef.z;
+
+                    float distSq = xDiff * xDiff + zDiff * zDiff;
+                    if (distSq < 17)
+                    {
+                        continue trees;
+                    }
+                }
+                int type = -1;
+                int y = _worldProvider.getHeightAt(x, z);
+
+                /* Check if the root of the tree is INSIDE THIS blockchunk, to prevent generating trees for one chunk multiple times */
+//                if (chunk.contains(x, y, z))
+                {
+                    Biome biome = _worldProvider.getBiomeAt(x, y, z);
+                    if (biome == Biome.FOREST)
+                    {
+                        gen.generateBroadLeavedTree(chunk, x, y, z, random.randomInt(3) == 0);
+                        type = 0;
+                    } else if (biome == Biome.DESERT)
+                    {
+                        gen.generateCactus(chunk, x, y + 1, z);
+                        type = 1;
+                    } else if (biome == Biome.SNOW)
+                    {
+                    	gen.generatePinophyta(chunk, x, y, z);
+                    	type = 2;
+                    }
+                    _worldProvider.getTrees().add(new TreeDefinition(x, y, z, type));
+                }
+            }
+        }
+		
 		/* Make it accessible for the game */
-		chunk.setGenerating(false);
+		chunk.setLoading(false);
 		/* Make sure the neighbors are assigned correctly */
 		_chunkManager.assignNeighbors(chunk);
 		

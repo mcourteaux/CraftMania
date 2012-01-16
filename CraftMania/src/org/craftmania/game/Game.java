@@ -14,7 +14,6 @@ import static org.lwjgl.opengl.GL11.GL_FOG_END;
 import static org.lwjgl.opengl.GL11.GL_FOG_HINT;
 import static org.lwjgl.opengl.GL11.GL_FOG_MODE;
 import static org.lwjgl.opengl.GL11.GL_FOG_START;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
 import static org.lwjgl.opengl.GL11.GL_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_NICEST;
@@ -42,11 +41,10 @@ import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glOrtho;
 import static org.lwjgl.opengl.GL11.glVertex2i;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.swing.text.Utilities;
 
 import org.craftmania.blocks.BlockXMLLoader;
 import org.craftmania.items.ItemXMLLoader;
@@ -281,8 +279,8 @@ public class Game
 
 		glDisable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LEQUAL);
-		// glDepthFunc(GL_ALWAYS);
+//		glDepthFunc(GL_LEQUAL);
+		 glDepthFunc(GL_ALWAYS);
 		glEnable(GL_CULL_FACE);
 
 		glMatrixMode(GL_PROJECTION);
@@ -345,6 +343,18 @@ public class Game
 				_sleepTimeMillis = 0;
 			}
 
+		}
+		
+		if (_world != null)
+		{
+			try
+			{
+				getWorld().save();
+			} catch (Exception e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		TextureStorage.release();
@@ -439,5 +449,44 @@ public class Game
 	public int getSleepTime()
 	{
 		return _sleepTimeMillis;
+	}
+
+	public static final int FILE_BASE_APPLICATION = 0x01;
+	public static final int FILE_BASE_USER_DATA = 0x02;
+	
+	public File getRelativeFile(int fileBase, String string)
+	{
+		string = string.replace("${world}", getWorld().getWorldName());
+		switch (fileBase)
+		{
+		case FILE_BASE_USER_DATA:
+			return new File(getUserDataFolder(), string);
+		case FILE_BASE_APPLICATION:
+		default:
+			return new File(string);
+		}
+	}
+
+	private File getUserHome()
+	{
+		return new File(System.getProperty("user.home"));
+	}
+	
+	private File getUserDataFolder()
+	{
+		String os = System.getProperty("os.name").toLowerCase();
+		File f = null;
+		if (os.contains("mac"))
+		{
+			f = new File(getUserHome(), "Library/Application Support/craftmania");			
+		} else if (os.contains("inux") || os.contains("nix"))
+		{
+			f = new File(getUserHome(), ".craftmania");
+		} else if (os.contains("win"))
+		{
+			f = new File(getUserHome(), ".craftmania");
+		}
+		f.mkdir();
+		return f;
 	}
 }

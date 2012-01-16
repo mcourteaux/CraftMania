@@ -8,7 +8,6 @@ import java.util.Arrays;
 import javax.swing.JOptionPane;
 
 import org.craftmania.game.Game;
-import org.craftmania.math.MathHelper;
 import org.craftmania.world.World;
 import org.craftmania.world.characters.Player;
 
@@ -29,10 +28,11 @@ public class CraftMania
 		game.init();
 
 		/* Construct a new World */
-		World world = new World(System.nanoTime());
+		World world = new World("world2", System.nanoTime());
 		game.setWorld(world);
+		world.getWorldProvider().load();
 
-		world.setPlayer(new Player(world.getWorldProvider().getSpawnPoint()));
+		world.setPlayer(new Player(world.getWorldProvider().getInitialSpawnPoint()));
 
 		/* Start the Game */
 		game.startGameLoop();

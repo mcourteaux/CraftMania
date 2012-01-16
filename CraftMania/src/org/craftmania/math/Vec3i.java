@@ -195,4 +195,10 @@ public class Vec3i
 	{
 		set(vec.x, vec.y, vec.z);
 	}
+
+	@Override
+	public String toString()
+	{
+		return "Vec3i [x=" + x + ", y=" + y + ", z=" + z + "]";
+	}
 }
