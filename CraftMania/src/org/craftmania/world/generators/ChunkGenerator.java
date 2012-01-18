@@ -30,7 +30,7 @@ public class ChunkGenerator extends Generator
 		SmartRandom random = new SmartRandom(new Random(generateSeedForChunk(_worldSeed, _x, _z)));
 		
 		/* Access the new chunk */
-		BlockChunk chunk = _chunkManager.getBlockChunk(_x, _z, true, false, true);
+		BlockChunk chunk = _chunkManager.getBlockChunk(_x, _z, true, false, false);
 		chunk.setGenerated(true);
 		chunk.setLoading(true);
 		
@@ -66,40 +66,40 @@ public class ChunkGenerator extends Generator
 					if (y < 4)
 					{
 						/* Create a bedrock layer */
-						chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("bedrock"), true, false);
+						chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("bedrock"), true, false, false);
 						continue;
 					}
 					int depth = baseLevel - y;
 					if (topBiome == Biome.DESERT && y >= baseLevel - 3)
 					{
-						chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("sand"), true, false);
+						chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("sand"), true, false, false);
 					} else if (topBiome == Biome.SNOW && y == baseLevel)
 					{
-						chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("snow"), true, false);
+						chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("snow"), true, false, false);
 					} else if (topBiome == Biome.FOREST && y == baseLevel)
 					{
-						chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("grass"), true, false);
+						chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("grass"), true, false, false);
 					} else
 					{
 						float density = densityMap[x][y][z];
 						if (density < 7.3f && depth > 8)
 						{
-							chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("gravel"), true, false);
+							chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("gravel"), true, false, false);
 						} else if (density < 6.3f)
 						{
-							chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("dirt"), true, false);
+							chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("dirt"), true, false, false);
 						} else if (density < 9.0f)
 						{
-							chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("stone"), true, false);
+							chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("stone"), true, false, false);
 						} else if (density < 9.5f && depth > 5)
 						{
-							chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("coal_ore"), true, false);
+							chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("coal_ore"), true, false, false);
 						} else if (density < 10.0f && depth > 10)
 						{
-							chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("iron_ore"), true, false);
+							chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("iron_ore"), true, false, false);
 						} else
 						{
-							chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("stone"), true, false);
+							chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("stone"), true, false, false);
 
 						}
 					}

@@ -30,7 +30,7 @@ public class TreeGenerator extends Generator
 		for (int i = 0; i < height - 1; ++i)
 		{
 			byte bl = BlockManager.getInstance().blockID("wood0");
-			targetChunk.setBlockTypeAbsolute(_x, _y + i, _z, bl, true, false);
+			targetChunk.setBlockTypeAbsolute(_x, _y + i, _z, bl, true, true, false);
 		}
 
 		// Leafs
@@ -58,7 +58,7 @@ public class TreeGenerator extends Generator
 						 * chunks, that contains tree which invokes the
 						 * generation of a new chunk.
 						 */
-						targetChunk.setBlockTypeAbsolute(_x + x, _y + height - radius + y, _z + z, blLeafs, true, false);
+						targetChunk.setBlockTypeAbsolute(_x + x, _y + height - radius + y, _z + z, blLeafs, true, true, false);
 					}
 				}
 			}
@@ -71,7 +71,7 @@ public class TreeGenerator extends Generator
 		int height = _random.randomInt(3, 5);
 		for (int i = 0; i < height; ++i)
 		{
-			targetChunk.setBlockTypeAbsolute(x, y + i, z, BlockManager.getInstance().blockID("cactus"), true, false);
+			targetChunk.setBlockTypeAbsolute(x, y + i, z, BlockManager.getInstance().blockID("cactus"), true, true, false);
 		}
 	}
 

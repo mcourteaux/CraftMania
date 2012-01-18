@@ -77,70 +77,74 @@ public class DefaultWorldProvider extends WorldProvider
 		DataPoint2D q11, q12, q21, q22;
 		q11 = q12 = q21 = q22 = null;
 
-		for (DataPoint2D temp : _temperatures)
+		synchronized (_temperatures)
 		{
-			if (isPoint(temp, x, z))
-			{
-				return temp.getData();
-			}
 
-			int hX = temp._x;
-			int hZ = temp._z;
-
-			if (lowerX == hX && lowerZ == hZ)
+			for (DataPoint2D temp : _temperatures)
 			{
-				q11 = temp;
-			} else if (lowerX == hX && upperZ == hZ)
-			{
-				q12 = temp;
-			} else if (upperX == hX && lowerZ == hZ)
-			{
-				q21 = temp;
-			} else if (upperX == hX && upperZ == hZ)
-			{
-				q22 = temp;
-			}
-
-			if (q11 != null && q12 != null && q21 != null && q22 != null)
-			{
-				break;
-			}
-		}
-
-		if (q11 == null || q12 == null || q21 == null || q22 == null)
-		{
-			// System.out.println("No temperature data found for this coordinates ("
-			// + x + ", " + z + ") !! So, will be generated...");
-			if (q11 == null)
-			{
-				q11 = _generator.generateTemperatureAt(lowerX, lowerZ);
-				if (isPoint(q11, x, z))
+				if (isPoint(temp, x, z))
 				{
-					return q11._data;
+					return temp.getData();
+				}
+
+				int hX = temp._x;
+				int hZ = temp._z;
+
+				if (lowerX == hX && lowerZ == hZ)
+				{
+					q11 = temp;
+				} else if (lowerX == hX && upperZ == hZ)
+				{
+					q12 = temp;
+				} else if (upperX == hX && lowerZ == hZ)
+				{
+					q21 = temp;
+				} else if (upperX == hX && upperZ == hZ)
+				{
+					q22 = temp;
+				}
+
+				if (q11 != null && q12 != null && q21 != null && q22 != null)
+				{
+					break;
 				}
 			}
-			if (q12 == null)
+
+			if (q11 == null || q12 == null || q21 == null || q22 == null)
 			{
-				q12 = _generator.generateTemperatureAt(lowerX, upperZ);
-				if (isPoint(q12, x, z))
+				// System.out.println("No temperature data found for this coordinates ("
+				// + x + ", " + z + ") !! So, will be generated...");
+				if (q11 == null)
 				{
-					return q12._data;
+					q11 = _generator.generateTemperatureAt(lowerX, lowerZ);
+					if (isPoint(q11, x, z))
+					{
+						return q11._data;
+					}
 				}
-			}
-			if (q21 == null)
-			{
-				q21 = _generator.generateTemperatureAt(upperX, lowerZ);
-				if (isPoint(q21, x, z))
+				if (q12 == null)
 				{
-					return q21._data;
+					q12 = _generator.generateTemperatureAt(lowerX, upperZ);
+					if (isPoint(q12, x, z))
+					{
+						return q12._data;
+					}
 				}
-			}
-			if (q22 == null)
-			{
-				q22 = _generator.generateTemperatureAt(upperX, upperZ);
-				if (isPoint(q22, x, z))
+				if (q21 == null)
 				{
-					return q22._data;
+					q21 = _generator.generateTemperatureAt(upperX, lowerZ);
+					if (isPoint(q21, x, z))
+					{
+						return q21._data;
+					}
+				}
+				if (q22 == null)
+				{
+					q22 = _generator.generateTemperatureAt(upperX, upperZ);
+					if (isPoint(q22, x, z))
+					{
+						return q22._data;
+					}
 				}
 			}
 		}
@@ -164,75 +168,77 @@ public class DefaultWorldProvider extends WorldProvider
 
 		DataPoint2D q11, q12, q21, q22;
 		q11 = q12 = q21 = q22 = null;
-
-		for (DataPoint2D humidity : _humidities)
+		synchronized (_humidities)
 		{
-			if (isPoint(humidity, x, z))
+
+			for (DataPoint2D humidity : _humidities)
 			{
-				return humidity.getData();
+				if (isPoint(humidity, x, z))
+				{
+					return humidity.getData();
+				}
+
+				int hX = humidity._x;
+				int hZ = humidity._z;
+
+				if (lowerX == hX && lowerZ == hZ)
+				{
+					q11 = humidity;
+				} else if (lowerX == hX && upperZ == hZ)
+				{
+					q12 = humidity;
+				} else if (upperX == hX && lowerZ == hZ)
+				{
+					q21 = humidity;
+				} else if (upperX == hX && upperZ == hZ)
+				{
+					q22 = humidity;
+				}
+
+				if (q11 != null && q12 != null && q21 != null && q22 != null)
+				{
+					break;
+				}
 			}
 
-			int hX = humidity._x;
-			int hZ = humidity._z;
-
-			if (lowerX == hX && lowerZ == hZ)
+			if (q11 == null || q12 == null || q21 == null || q22 == null)
 			{
-				q11 = humidity;
-			} else if (lowerX == hX && upperZ == hZ)
-			{
-				q12 = humidity;
-			} else if (upperX == hX && lowerZ == hZ)
-			{
-				q21 = humidity;
-			} else if (upperX == hX && upperZ == hZ)
-			{
-				q22 = humidity;
-			}
-
-			if (q11 != null && q12 != null && q21 != null && q22 != null)
-			{
-				break;
+				// System.out.println("No humidity data found for this coordinates ("
+				// + x + ", " + z + ") !! So, will be generated...");
+				if (q11 == null)
+				{
+					q11 = _generator.generateHumidityAt(lowerX, lowerZ);
+					if (isPoint(q11, x, z))
+					{
+						return q11._data;
+					}
+				}
+				if (q12 == null)
+				{
+					q12 = _generator.generateHumidityAt(lowerX, upperZ);
+					if (isPoint(q12, x, z))
+					{
+						return q12._data;
+					}
+				}
+				if (q21 == null)
+				{
+					q21 = _generator.generateHumidityAt(upperX, lowerZ);
+					if (isPoint(q21, x, z))
+					{
+						return q21._data;
+					}
+				}
+				if (q22 == null)
+				{
+					q22 = _generator.generateHumidityAt(upperX, upperZ);
+					if (isPoint(q22, x, z))
+					{
+						return q22._data;
+					}
+				}
 			}
 		}
-
-		if (q11 == null || q12 == null || q21 == null || q22 == null)
-		{
-			// System.out.println("No humidity data found for this coordinates ("
-			// + x + ", " + z + ") !! So, will be generated...");
-			if (q11 == null)
-			{
-				q11 = _generator.generateHumidityAt(lowerX, lowerZ);
-				if (isPoint(q11, x, z))
-				{
-					return q11._data;
-				}
-			}
-			if (q12 == null)
-			{
-				q12 = _generator.generateHumidityAt(lowerX, upperZ);
-				if (isPoint(q12, x, z))
-				{
-					return q12._data;
-				}
-			}
-			if (q21 == null)
-			{
-				q21 = _generator.generateHumidityAt(upperX, lowerZ);
-				if (isPoint(q21, x, z))
-				{
-					return q21._data;
-				}
-			}
-			if (q22 == null)
-			{
-				q22 = _generator.generateHumidityAt(upperX, upperZ);
-				if (isPoint(q22, x, z))
-				{
-					return q22._data;
-				}
-			}
-		}
-
 		float humidity2D = biLerpDataPoints(x, z, q11, q12, q21, q22);
 
 		return MathHelper.clamp(humidity2D * 10 / getTemperatureAt(x, y, z), 10, 95);
@@ -253,70 +259,75 @@ public class DefaultWorldProvider extends WorldProvider
 		DataPoint2D q11, q12, q21, q22;
 		q11 = q12 = q21 = q22 = null;
 
-		for (DataPoint2D height : _heights)
+		synchronized (_heights)
 		{
-			if (isPoint(height, x, z))
-			{
-				return height.getData();
-			}
 
-			int hX = height._x;
-			int hZ = height._z;
-
-			if (lowerX == hX && lowerZ == hZ)
+			for (DataPoint2D height : _heights)
 			{
-				q11 = height;
-			} else if (lowerX == hX && upperZ == hZ)
-			{
-				q12 = height;
-			} else if (upperX == hX && lowerZ == hZ)
-			{
-				q21 = height;
-			} else if (upperX == hX && upperZ == hZ)
-			{
-				q22 = height;
-			}
-
-			if (q11 != null && q12 != null && q21 != null && q22 != null)
-			{
-				break;
-			}
-		}
-
-		if (q11 == null || q12 == null || q21 == null || q22 == null)
-		{
-			// System.out.println("No level data found for this coordinates (" +
-			// x + ", " + z + ") !! So, will be generated...");
-			if (q11 == null)
-			{
-				q11 = _generator.generateHeightAt(lowerX, lowerZ);
-				if (isPoint(q11, x, z))
+				if (isPoint(height, x, z))
 				{
-					return q11._data;
+					return height.getData();
+				}
+
+				int hX = height._x;
+				int hZ = height._z;
+
+				if (lowerX == hX && lowerZ == hZ)
+				{
+					q11 = height;
+				} else if (lowerX == hX && upperZ == hZ)
+				{
+					q12 = height;
+				} else if (upperX == hX && lowerZ == hZ)
+				{
+					q21 = height;
+				} else if (upperX == hX && upperZ == hZ)
+				{
+					q22 = height;
+				}
+
+				if (q11 != null && q12 != null && q21 != null && q22 != null)
+				{
+					break;
 				}
 			}
-			if (q12 == null)
+
+			if (q11 == null || q12 == null || q21 == null || q22 == null)
 			{
-				q12 = _generator.generateHeightAt(lowerX, upperZ);
-				if (isPoint(q12, x, z))
+				// System.out.println("No level data found for this coordinates ("
+				// +
+				// x + ", " + z + ") !! So, will be generated...");
+				if (q11 == null)
 				{
-					return q12._data;
+					q11 = _generator.generateHeightAt(lowerX, lowerZ);
+					if (isPoint(q11, x, z))
+					{
+						return q11._data;
+					}
 				}
-			}
-			if (q21 == null)
-			{
-				q21 = _generator.generateHeightAt(upperX, lowerZ);
-				if (isPoint(q21, x, z))
+				if (q12 == null)
 				{
-					return q21._data;
+					q12 = _generator.generateHeightAt(lowerX, upperZ);
+					if (isPoint(q12, x, z))
+					{
+						return q12._data;
+					}
 				}
-			}
-			if (q22 == null)
-			{
-				q22 = _generator.generateHeightAt(upperX, upperZ);
-				if (isPoint(q22, x, z))
+				if (q21 == null)
 				{
-					return q22._data;
+					q21 = _generator.generateHeightAt(upperX, lowerZ);
+					if (isPoint(q21, x, z))
+					{
+						return q21._data;
+					}
+				}
+				if (q22 == null)
+				{
+					q22 = _generator.generateHeightAt(upperX, upperZ);
+					if (isPoint(q22, x, z))
+					{
+						return q22._data;
+					}
 				}
 			}
 		}
@@ -381,7 +392,7 @@ public class DefaultWorldProvider extends WorldProvider
 			Block spawnPointBlock = null;
 			while (spawnPointBlock == null)
 			{
-				spawnPointBlock = _world.getChunkManager().getBlock(x, y, z, true, true);
+				spawnPointBlock = _world.getChunkManager().getBlock(x, y, z, true, true, true);
 				try
 				{
 					Thread.sleep(100);

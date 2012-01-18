@@ -6,7 +6,6 @@ import org.craftmania.Side;
 import org.craftmania.datastructures.AABB;
 import org.craftmania.game.Game;
 import org.craftmania.inventory.InventoryItem;
-import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3f;
 import org.craftmania.math.Vec3i;
 import org.craftmania.world.BlockChunk;
@@ -14,6 +13,7 @@ import org.craftmania.world.BlockChunk;
 public class DefaultBlock extends Block
 {
 	private static final Vec3f HALF_BLOCK_SIZE = new Vec3f(0.5f, 0.5f, 0.5f);
+	@SuppressWarnings("unused")
 	private static final Vec3f BLOCK_SIZE = new Vec3f(1.0f, 1.0f, 1.0f);
 
 	public static final byte ALL_FACES = 0x3f; // 0011 1111
@@ -31,7 +31,6 @@ public class DefaultBlock extends Block
 		setFaceVisible(Side.BOTTOM, true);
 		_aabb = new AABB(new Vec3f(pos).add(HALF_BLOCK_SIZE), HALF_BLOCK_SIZE);
 		_needVisibilityCheck = true;
-
 	}
 
 	private void createMovementPlugin()
@@ -126,6 +125,7 @@ public class DefaultBlock extends Block
 	@Override
 	public void render()
 	{
+		_rendering = true;
 		if (isVisible())
 		{
 			_blockType.getBrush().setPosition(_aabb.getPosition());
@@ -149,36 +149,36 @@ public class DefaultBlock extends Block
 		if (isMoving())
 		{
 			_faceMask = ALL_FACES;
-			return;
-		}
-		if (_blockChunk != null)
+		} else
 		{
-			for (int i = 0; i < 6; ++i)
+			if (_blockChunk != null)
 			{
-				Side side = Side.values()[i];
-				Vec3i normal = side.getNormal();
-				Block block = _blockChunk.getBlockAbsolute(getX() + normal.x(), getY() + normal.y(), getZ() + normal.z());
-				if (block != null)
+				for (int i = 0; i < 6; ++i)
 				{
-					if (block.isMoving() || !block.getBlockType().hasNormalAABB())
+					Side side = Side.values()[i];
+					Vec3i normal = side.getNormal();
+					Block block = _blockChunk.getBlockAbsolute(getX() + normal.x(), getY() + normal.y(), getZ() + normal.z());
+					if (block != null)
 					{
-						setFaceVisible(side, true);
+						if (block.isMoving() || !block.getBlockType().hasNormalAABB())
+						{
+							setFaceVisible(side, true);
+						} else
+						{
+							setFaceVisible(side, false);
+						}
 					} else
 					{
-						setFaceVisible(side, false);
+						setFaceVisible(side, true);
 					}
-				} else
-				{
-					setFaceVisible(side, true);
 				}
 			}
+			/* Make the bottom layer invisible */
+			if (getY() == 0)
+			{
+				setFaceVisible(Side.BOTTOM, false);
+			}
 		}
-		/* Make the bottom layer invisible */
-		if (getY() == 0)
-		{
-			setFaceVisible(Side.BOTTOM, false);
-		}
-
 		_needVisibilityCheck = false;
 
 		boolean newVisibility = _faceMask != 0;
@@ -218,7 +218,7 @@ public class DefaultBlock extends Block
 	}
 
 	@Override
-	public void neighborChanged(Side side)
+	public synchronized void neighborChanged(Side side)
 	{
 		_needVisibilityCheck = true;
 		if (!_rendering)
@@ -233,9 +233,13 @@ public class DefaultBlock extends Block
 	}
 
 	@Override
-	public void forceVisiblilityCheck()
+	public synchronized void forceVisiblilityCheck()
 	{
 		_needVisibilityCheck = true;
+		if (!_rendering)
+		{
+			checkVisibility();
+		}
 	}
 
 	@Override

@@ -202,7 +202,7 @@ public class Game
 		glEnable(GL_FOG);
 		glFog(GL_FOG_COLOR, GLUtils.wrapDirect(color, color, color, 1.0f));
 		glFogi(GL_FOG_MODE, GL_LINEAR);
-		glFogf(GL_FOG_START, _configuration.getViewingDistance() * 0.65f);
+		glFogf(GL_FOG_START, _configuration.getViewingDistance() * 0.45f);
 		glFogf(GL_FOG_END, _configuration.getViewingDistance());
 		glFogi(NVFogDistance.GL_FOG_DISTANCE_MODE_NV, NVFogDistance.GL_EYE_RADIAL_NV);
 		glHint(GL_FOG_HINT, GL_NICEST);
@@ -309,7 +309,7 @@ public class Game
 		{
 			Display.setVSyncEnabled(true);
 		}
-		Thread.currentThread().setPriority(9);
+		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		while (!Display.isCloseRequested())
 		{
 			if (Keyboard.isKeyDown(Keyboard.KEY_LMENU) && Keyboard.isKeyDown(Keyboard.KEY_RETURN))

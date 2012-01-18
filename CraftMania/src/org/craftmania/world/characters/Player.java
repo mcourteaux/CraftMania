@@ -249,11 +249,11 @@ public class Player extends GameObject
 								// Player is where the block has to come
 							} else
 							{
-								BlockChunk bc = _chunkManager.getBlockChunkContaining(bX, bY, bZ, true, true);
+								BlockChunk bc = _chunkManager.getBlockChunkContaining(bX, bY, bZ, true, true, true);
 								Block currentBlock = bc.getBlockAbsolute(bX, bY, bZ);
 								if (currentBlock == null)
 								{
-									bc.setBlockTypeAbsolute(bX, bY, bZ, ((BlockType) _selectedItem).getID(), true, true);
+									bc.setBlockTypeAbsolute(bX, bY, bZ, ((BlockType) _selectedItem).getID(), true, true, true);
 									_inventory.getInventoryPlace(_selectedInventoryItemIndex).getStack().decreaseItemCount();
 									setSelectedInventoryItemIndex(_selectedInventoryItemIndex);
 								}
@@ -416,7 +416,7 @@ public class Player extends GameObject
 		Block wall2 = null;
 		{
 			int xx = MathHelper.floor(x), yy = MathHelper.floor(y + 0.1f), zz = MathHelper.floor(z);
-			bc = _chunkManager.getBlockChunkContaining(xx, yy, zz, false, true);
+			bc = _chunkManager.getBlockChunkContaining(xx, yy, zz, false, true, true);
 			if (bc != null)
 			{
 				wall = bc.getBlockAbsolute(xx, yy, zz);
@@ -429,7 +429,7 @@ public class Player extends GameObject
 				wall2 = bc.getBlockAbsolute(xx, yy, zz);
 			} else
 			{
-				bc = _chunkManager.getBlockChunkContaining(xx, yy, zz, false, true);
+				bc = _chunkManager.getBlockChunkContaining(xx, yy, zz, false, true, true);
 				if (bc != null)
 				{
 					wall2 = bc.getBlockAbsolute(xx, yy, zz);
@@ -462,8 +462,8 @@ public class Player extends GameObject
 	{
 		float step = Game.getInstance().getStep();
 		ChunkManager chunkManager = Game.getInstance().getWorld().getChunkManager();
-		Block support = chunkManager.getBlock(MathHelper.floor(x), MathHelper.floor(y - 0.1f), MathHelper.floor(z), false, false);
-		Block subSupport = chunkManager.getBlock(MathHelper.floor(x), MathHelper.floor(y - 0.1f) - 1, MathHelper.floor(z), false, false);
+		Block support = chunkManager.getBlock(MathHelper.floor(x), MathHelper.floor(y - 0.1f), MathHelper.floor(z), false, false, false);
+		Block subSupport = chunkManager.getBlock(MathHelper.floor(x), MathHelper.floor(y - 0.1f) - 1, MathHelper.floor(z), false, false, false);
 		float supportHeight = Float.NEGATIVE_INFINITY;
 
 		if (Keyboard.isKeyDown(Keyboard.KEY_SPACE))
@@ -517,7 +517,7 @@ public class Player extends GameObject
 			if (ySpeed > 0.0f)
 			{
 				int headbangY = MathHelper.floor(y + 0.1f) + 2;
-				Block headbang = chunkManager.getBlock(MathHelper.floor(x), headbangY, MathHelper.floor(z), false, false);
+				Block headbang = chunkManager.getBlock(MathHelper.floor(x), headbangY, MathHelper.floor(z), false, false, false);
 				if (headbang != null && (headbangY < y + playerHeight))
 				{
 					y = (float) headbangY - playerHeight;

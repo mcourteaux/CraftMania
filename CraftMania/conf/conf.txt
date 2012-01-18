@@ -4,7 +4,7 @@ fullscreen=false
 width=800
 height=480
 fovy=65
-fps=60
+fps=40
 viewing_distance=40
 
 ### Texture Pack

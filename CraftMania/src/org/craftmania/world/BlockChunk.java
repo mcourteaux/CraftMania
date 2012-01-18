@@ -12,6 +12,7 @@ import org.craftmania.math.Vec2i;
 import org.craftmania.math.Vec3f;
 import org.craftmania.math.Vec3i;
 import org.craftmania.world.BlockList.BlockAcceptor;
+import org.craftmania.world.generators.ChunkGenerator;
 
 public class BlockChunk implements AABBObject
 {
@@ -78,7 +79,9 @@ public class BlockChunk implements AABBObject
 		if (!_generated)
 		{
 			_generated = true;
-			Game.getInstance().getWorld().getChunkManager().generateOrLoadChunk(this);
+			ChunkGenerator gen = new ChunkGenerator(Game.getInstance().getWorld());
+			gen.generateChunk(getX(), getZ());
+			_loading = false;
 		}
 	}
 
@@ -115,7 +118,7 @@ public class BlockChunk implements AABBObject
 
 	public Block getBlockAbsolute(int x, int y, int z)
 	{
-		BlockChunk chunk = getBlockChunkContaining(x, y, z, false, false);
+		BlockChunk chunk = getBlockChunkContaining(x, y, z, false, false, false);
 		if (chunk == null || chunk.isDestroying())
 		{
 			return null;
@@ -169,13 +172,13 @@ public class BlockChunk implements AABBObject
 		return _updatingBlocks;
 	}
 
-	public void setBlockTypeAbsolute(int x, int y, int z, byte blockType, boolean createIfNecessary, boolean generateIfNecessary)
+	public void setBlockTypeAbsolute(int x, int y, int z, byte blockType, boolean createIfNecessary, boolean loadIfNecessary, boolean generateIfNecessary)
 	{
-		BlockChunk chunk = getBlockChunkContaining(x, y, z, createIfNecessary, generateIfNecessary);
+		BlockChunk chunk = getBlockChunkContaining(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
 		if (chunk != null)
 		{
 			Block block = BlockConstructor.construct(x, y, z, chunk, blockType, (byte) 0);
-			chunk.setBlockAbsolute(x, y, z, block, createIfNecessary, generateIfNecessary);
+			chunk.setBlockAbsolute(x, y, z, block, createIfNecessary, loadIfNecessary, generateIfNecessary);
 		}
 	}
 
@@ -222,7 +225,7 @@ public class BlockChunk implements AABBObject
 		_updatingBlocks.updateCacheManagment();
 	}
 
-	public BlockChunk getBlockChunkContaining(int x, int y, int z, boolean createIfNecessary, boolean generateIfNecessary)
+	public BlockChunk getBlockChunkContaining(int x, int y, int z, boolean createIfNecessary, boolean loadIfNecessary, boolean generateIfNecessary)
 	{
 		int relativeX = x - getAbsoluteX();
 		int relativeZ = z - getAbsoluteZ();
@@ -256,17 +259,17 @@ public class BlockChunk implements AABBObject
 			if (neighbor == null)
 			{
 				// return null;
-				return Game.getInstance().getWorld().getChunkManager().getBlockChunkContaining(x, y, z, createIfNecessary, generateIfNecessary);
+				return Game.getInstance().getWorld().getChunkManager().getBlockChunkContaining(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
 			} else
 			{
-				return getNeighborBlockChunk(side).getBlockChunkContaining(x, y, z, createIfNecessary, generateIfNecessary);
+				return getNeighborBlockChunk(side).getBlockChunkContaining(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
 			}
 		}
 	}
 
-	public void setBlockAbsolute(int x, int y, int z, Block block, boolean createIfNecessary, boolean generateIfNecessary)
+	public void setBlockAbsolute(int x, int y, int z, Block block, boolean createIfNecessary, boolean loadIfNecessary, boolean generateIfNecessary)
 	{
-		BlockChunk chunk = getBlockChunkContaining(x, y, z, createIfNecessary, generateIfNecessary);
+		BlockChunk chunk = getBlockChunkContaining(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
 		if (chunk != null)
 		{
 			Block oldBlock = chunk._blocks.set(x - chunk.getAbsoluteX(), y, z - chunk.getAbsoluteZ(), block);
@@ -330,9 +333,9 @@ public class BlockChunk implements AABBObject
 		_generated = b;
 	}
 
-	public void setBlockTypeRelative(int x, int y, int z, byte blockID, boolean createIfNecessary, boolean generateIfNecessary)
+	public void setBlockTypeRelative(int x, int y, int z, byte blockID, boolean createIfNecessary, boolean loadIfNecessary, boolean generateIfNecessary)
 	{
-		setBlockTypeAbsolute(x + getAbsoluteX(), y, z + getAbsoluteZ(), blockID, createIfNecessary, generateIfNecessary);
+		setBlockTypeAbsolute(x + getAbsoluteX(), y, z + getAbsoluteZ(), blockID, createIfNecessary, loadIfNecessary, generateIfNecessary);
 	}
 
 	public synchronized void destroy()

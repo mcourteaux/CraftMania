@@ -1,5 +1,6 @@
 package org.craftmania.world;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,14 +20,15 @@ public class ChunkManager
 	private Map<Integer, Chunk<BlockChunk>> _superChunks;
 	private List<BlockMovement> _blocksToMove;
 	private BlockChunkLoader _blockChunkLoader;
-	private List<BlockChunk> _blockChunksToInsert;
+	private BlockChunkThreading _blockChunkThreading;
 
 	public ChunkManager(World world)
 	{
 		_world = world;
 		_superChunks = new HashMap<Integer, Chunk<BlockChunk>>();
 		_blocksToMove = new ArrayList<ChunkManager.BlockMovement>();
-		_blockChunkLoader = new BlockChunkLoader(world);
+		_blockChunkLoader = new BlockChunkLoader();
+		_blockChunkThreading = new BlockChunkThreading(this);
 	}
 
 	public Collection<Chunk<BlockChunk>> getAllSuperChunks()
@@ -51,13 +53,8 @@ public class ChunkManager
 		}
 		return superChunk;
 	}
-	
-	public BlockChunk getBlockChunk(int x, int z, boolean createIfNecesssary, boolean generateIfNecessary)
-	{
-		return getBlockChunk(x, z, createIfNecesssary, generateIfNecessary, false);
-	}
 
-	public BlockChunk getBlockChunk(int x, int z, boolean createIfNecessary, boolean generateIfNecessary, boolean useEvenIfGenerating)
+	public BlockChunk getBlockChunk(int x, int z, boolean createIfNecessary, boolean loadIfNecessary, boolean generateIfNecessary)
 	{
 		int superX = MathHelper.floorDivision(x, Chunk.CHUNK_SIZE_X);
 		int superZ = MathHelper.floorDivision(z, Chunk.CHUNK_SIZE_Z);
@@ -66,29 +63,32 @@ public class ChunkManager
 		int zInChunk = z - superZ * Chunk.CHUNK_SIZE_X;
 
 		Chunk<BlockChunk> superChunk = getSuperChunk(superX, superZ);
-		BlockChunk blockChunk = superChunk.get(xInChunk, zInChunk);
-		if (blockChunk == null && createIfNecessary)
+		synchronized (superChunk)
 		{
-			blockChunk = new BlockChunk(x, z);
-			assignNeighbors(blockChunk);
-			superChunk.set(xInChunk, zInChunk, blockChunk);
-		}
-		if (blockChunk != null && generateIfNecessary && !blockChunk.isLoading() && !blockChunk.isGenerated() && !blockChunk.isDestroying())
-		{
-			blockChunk.generate();
-			if (useEvenIfGenerating)
+
+			BlockChunk blockChunk = superChunk.get(xInChunk, zInChunk);
+			if (blockChunk == null && createIfNecessary)
 			{
-				return blockChunk;
-			} else
-			{
-				return null;
+				blockChunk = new BlockChunk(x, z);
+				assignNeighbors(blockChunk);
+				superChunk.set(xInChunk, zInChunk, blockChunk);
+				if (loadIfNecessary)
+				{
+					try
+					{
+						_blockChunkLoader.loadChunk(blockChunk);
+					} catch (IOException e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+
 			}
-		}
-		if ((blockChunk == null || blockChunk.isLoading()) && !useEvenIfGenerating)
-		{
-			return null;
-		} else
-		{
+			if (blockChunk != null && generateIfNecessary && !blockChunk.isLoading() && !blockChunk.isGenerated() && !blockChunk.isDestroying())
+			{
+				blockChunk.generate();
+			}
 			return blockChunk;
 		}
 	}
@@ -97,29 +97,29 @@ public class ChunkManager
 	{
 		int x = blockChunk.getX();
 		int z = blockChunk.getZ();
-		blockChunk.setNeighborBlockChunk(Side.BACK, getBlockChunk(x, z - 1, false, false, true));
-		blockChunk.setNeighborBlockChunk(Side.FRONT, getBlockChunk(x, z + 1, false, false, true));
-		blockChunk.setNeighborBlockChunk(Side.LEFT, getBlockChunk(x - 1, z, false, false, true));
-		blockChunk.setNeighborBlockChunk(Side.RIGHT, getBlockChunk(x + 1, z, false, false, true));
+		blockChunk.setNeighborBlockChunk(Side.BACK, getBlockChunk(x, z - 1, false, false, false));
+		blockChunk.setNeighborBlockChunk(Side.FRONT, getBlockChunk(x, z + 1, false, false, false));
+		blockChunk.setNeighborBlockChunk(Side.LEFT, getBlockChunk(x - 1, z, false, false, false));
+		blockChunk.setNeighborBlockChunk(Side.RIGHT, getBlockChunk(x + 1, z, false, false, false));
 	}
 
-	public Block getBlock(int x, int y, int z, boolean createIfNecessary, boolean generateIfNecessary)
+	public Block getBlock(int x, int y, int z, boolean createIfNecessary, boolean loadIfNecessary, boolean generateIfNecessary)
 	{
-		BlockChunk blockChunk = getBlockChunkContaining(x, y, z, createIfNecessary, generateIfNecessary);
+		BlockChunk blockChunk = getBlockChunkContaining(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
 		if (blockChunk == null)
 			return null;
 		return blockChunk.getBlockAbsolute(x, y, z);
 	}
 
-	public void setBlock(int x, int y, int z, byte blockType, boolean createIfNecessary, boolean generateIfNecessary)
+	public void setBlock(int x, int y, int z, byte blockType, boolean createIfNecessary, boolean loadIfNecessary, boolean generateIfNecessary)
 	{
-		BlockChunk blockChunk = getBlockChunkContaining(x, y, z, createIfNecessary, generateIfNecessary);
+		BlockChunk blockChunk = getBlockChunkContaining(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
 		if (blockChunk == null)
 		{
 			System.out.println("BlockChunk not found for " + x + " " + z);
 			return;
 		}
-		blockChunk.setBlockTypeAbsolute(x, y, z, blockType, createIfNecessary, generateIfNecessary);
+		blockChunk.setBlockTypeAbsolute(x, y, z, blockType, createIfNecessary, loadIfNecessary, generateIfNecessary);
 	}
 
 	public List<BlockChunk> getApproximateChunks(Vec3f position, float viewingDistance, List<BlockChunk> chunks)
@@ -143,7 +143,7 @@ public class ChunkManager
 				if (distSq <= distanceSq)
 				{
 					BlockChunk chunk = getBlockChunk(centerX + x, centerZ + z, false, false, false);
-					if (chunk != null && !chunk.isDestroying())
+					if (chunk != null && !chunk.isDestroying() && !chunk.isLoading())
 					{
 						chunks.add(chunk);
 					}
@@ -154,10 +154,10 @@ public class ChunkManager
 		return chunks;
 	}
 
-	public BlockChunk getBlockChunkContaining(int x, int y, int z, boolean createIfNecessary, boolean generateIfNecessary)
+	public BlockChunk getBlockChunkContaining(int x, int y, int z, boolean createIfNecessary, boolean loadIfNeccessary, boolean generateIfNecessary)
 	{
 		return getBlockChunk(MathHelper.floorDivision(x, BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL), MathHelper.floorDivision(z, BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL),
-				createIfNecessary, generateIfNecessary);
+				createIfNecessary, loadIfNeccessary, generateIfNecessary);
 	}
 
 	/**
@@ -170,10 +170,10 @@ public class ChunkManager
 	public void moveBlockTo(Block block, int srcX, int srcY, int srcZ, int dstX, int dstY, int dstZ)
 	{
 		BlockChunk oldChunk = block.getBlockChunk();
-		BlockChunk newChunk = oldChunk.getBlockChunkContaining(dstX, dstY, dstZ, true, false);
+		BlockChunk newChunk = oldChunk.getBlockChunkContaining(dstX, dstY, dstZ, true, true, false);
 
-		oldChunk.setBlockAbsolute(srcX, srcY, srcZ, null, false, false);
-		newChunk.setBlockAbsolute(dstX, dstY, dstZ, block, true, false);
+		oldChunk.setBlockAbsolute(srcX, srcY, srcZ, null, false, false, false);
+		newChunk.setBlockAbsolute(dstX, dstY, dstZ, block, true, true, false);
 	}
 
 	public void rememberBlockMovement(Block block, int srcX, int srcY, int srcZ, int dstX, int dstY, int dstZ)
@@ -218,7 +218,7 @@ public class ChunkManager
 
 	public void destroyBlock(Block block)
 	{
-		block.getBlockChunk().setBlockTypeAbsolute(block.getX(), block.getY(), block.getZ(), (byte) 0, false, false);
+		block.getBlockChunk().setBlockTypeAbsolute(block.getX(), block.getY(), block.getZ(), (byte) 0, false, false, false);
 
 		forgetBlockMovementsForBlock(block);
 
@@ -250,23 +250,62 @@ public class ChunkManager
 		return count;
 	}
 
-	public void deleteChunk(BlockChunk chunk)
+	public void saveAndUnloadChunk(BlockChunk chunk, boolean seperateThread)
 	{
-		_blockChunkLoader.deleteChunk(chunk);
+		if (seperateThread)
+		{
+			_blockChunkThreading.saveAndUnloadChunk(chunk);
+		} else
+		{
+			try
+			{
+				_blockChunkLoader.saveChunk(chunk);
+			} catch (Exception e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			chunk.destroy();
+		}
 	}
 
-	public void insertChunk(BlockChunk chunk)
+	public void generateChunk(BlockChunk chunk, boolean seperateThread)
 	{
-		_blockChunksToInsert.add(chunk);
+		if (seperateThread)
+		{
+			_blockChunkThreading.generateChunk(chunk);
+		} else
+		{
+			chunk.generate();
+		}
 	}
 
-	public void generateOrLoadChunk(BlockChunk blockChunk)
+	public BlockChunkLoader getBlockChunkLoader()
 	{
-		_blockChunkLoader.generateOrLoadChunk(blockChunk.getX(), blockChunk.getZ());
+		return _blockChunkLoader;
 	}
 
-	public boolean isBlockChunkLoaderBusy()
+	public boolean isBlockChunkThreadingBusy()
 	{
-		return _blockChunkLoader.isBusy();
+		return _blockChunkThreading.isTreadingBusy();
+	}
+
+	public void loadAndGenerateChunk(BlockChunk chunk, boolean separateThread)
+	{
+		if (separateThread)
+		{
+			_blockChunkThreading.loadAndGenerateChunk(chunk);
+		} else
+		{
+			try
+			{
+				_blockChunkLoader.loadChunk(chunk);
+			} catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			chunk.generate();
+		}
 	}
 }

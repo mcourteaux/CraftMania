@@ -12,7 +12,6 @@ import org.craftmania.world.BlockChunk;
 
 public abstract class Block implements AABBObject
 {
-	// 67840 * chunks * 37  
 	protected BlockType _blockType;
 	protected Vec3i _postion;
 	protected BlockChunk _blockChunk;
@@ -93,7 +92,7 @@ public abstract class Block implements AABBObject
 		}
 	}
 	
-	public void addToVisibilityList()
+	public synchronized void addToVisibilityList()
 	{
 		if (!_rendering)
 		{
@@ -102,7 +101,7 @@ public abstract class Block implements AABBObject
 		}
 	}
 	
-	public void addToUpdateList()
+	public synchronized void addToUpdateList()
 	{
 		if (!_updating)
 		{
@@ -119,13 +118,13 @@ public abstract class Block implements AABBObject
 	public abstract boolean smash(InventoryItem item);
 	public abstract void neighborChanged(Side side);
 
-	public void setUpdatingFlag(boolean u)
+	public synchronized void setUpdatingFlag(boolean u)
 	{
 		_updating = u;
 		
 	}
 
-	public void setRenderingFlag(boolean v)
+	public synchronized void setRenderingFlag(boolean v)
 	{
 		_rendering = v;
 	}

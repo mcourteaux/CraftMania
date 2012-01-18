@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.craftmania.blocks.Block;
 import org.craftmania.datastructures.AABB;
+import org.craftmania.datastructures.Fast3DArray;
 import org.craftmania.datastructures.ViewFrustum;
 import org.craftmania.game.Configuration;
 import org.craftmania.game.FontStorage;
@@ -37,7 +38,6 @@ public class World
 
 	private List<BlockChunk> _localChunks;
 	private List<BlockChunk> _oldChunkList;
-	private List<BlockChunk> _chunksToDelete;
 
 	private List<Block> _visibleBlocks;
 	private Inventory _activatedInventory;
@@ -56,7 +56,6 @@ public class World
 		_chunkManager = new ChunkManager(this);
 		_localChunks = new ArrayList<BlockChunk>();
 		_oldChunkList = new ArrayList<BlockChunk>();
-		_chunksToDelete = new ArrayList<BlockChunk>();
 		int visibleBlockBufferSize = calculateEstimatedAmountOfVisibleBlocks();
 		System.out.println("Visible Block Buffer Size = " + visibleBlockBufferSize);
 		_visibleBlocks = new ArrayList<Block>(visibleBlockBufferSize);
@@ -77,27 +76,14 @@ public class World
 			{
 			}
 		}
-		while (_chunkManager.isBlockChunkLoaderBusy());
+		while (_chunkManager.isBlockChunkThreadingBusy());
 		
 		/* Save the local chunks, by destroying them */
 		for (BlockChunk chunk : _localChunks)
 		{
-			_chunkManager.deleteChunk(chunk);
+			_chunkManager.saveAndUnloadChunk(chunk, false);
 		}
 		_localChunks.clear();
-		
-		/* Make sure the blockloader was finished */
-		do
-		{
-			try
-			{
-				Thread.sleep(10);
-			} catch (Exception e)
-			{
-			}
-		}
-		while (_chunkManager.isBlockChunkLoaderBusy());
-		
 	}
 
 	private int calculateEstimatedAmountOfVisibleBlocks()
@@ -210,6 +196,20 @@ public class World
 			} else if (Keyboard.getEventKey() == Keyboard.KEY_F && Keyboard.getEventKeyState())
 			{
 				_player.toggleFlying();
+			} else if (Keyboard.getEventKey() == Keyboard.KEY_C && Keyboard.getEventKeyState())
+			{
+				for (BlockChunk c : _localChunks)
+				{
+					Fast3DArray<Block> blocks = c.getBlocks();
+					for (int i = 0; i < blocks.size(); ++i)
+					{
+						Block b = blocks.getRawObject(i);
+						if (b != null)
+						{
+							b.forceVisiblilityCheck();
+						}
+					}
+				}
 			}
 		}
 		if (_activatedInventory == null)
@@ -225,11 +225,6 @@ public class World
 
 		selectLocalChunks();
 		updateLocalChunks();
-
-		if (!_chunksToDelete.isEmpty())
-		{
-			_chunkManager.deleteChunk(_chunksToDelete.remove(_chunksToDelete.size() - 1));
-		}
 
 		_chunkManager.performRememberedBlockChanges();
 
@@ -257,7 +252,7 @@ public class World
 		boolean generate = false;
 		int xToGenerate = 0, zToGenerate = 0;
 
-		outer: for (int x = -distance; x < distance; ++x)
+		for (int x = -distance; x < distance; ++x)
 		{
 			for (int z = -distance; z < distance; ++z)
 			{
@@ -273,17 +268,17 @@ public class World
 						}
 						if (aabb == null || frustum.intersects(aabb))
 						{
-							BlockChunk chunk = _chunkManager.getBlockChunk(centerX + x, centerZ + z, false, false);
+							BlockChunk chunk = _chunkManager.getBlockChunk(centerX + x, centerZ + z, false, false, false);
 							if (chunk == null)
 							{
 								generate = true;
 								xToGenerate = x;
 								zToGenerate = z;
-								break outer;
-							} else if (!chunk.isGenerated())
+							} else if (!chunk.isGenerated() && !chunk.isLoading())
 							{
-								chunk.generate();
-								return;
+								generate = true;
+								xToGenerate = x;
+								zToGenerate = z;
 							}
 						}
 					}
@@ -292,7 +287,8 @@ public class World
 		}
 		if (generate)
 		{
-			_chunkManager.getBlockChunk(centerX + xToGenerate, centerZ + zToGenerate, true, true);
+			BlockChunk ch = _chunkManager.getBlockChunk(centerX + xToGenerate, centerZ + zToGenerate, true, false, false);
+			_chunkManager.loadAndGenerateChunk(ch, true);
 		}
 
 	}
@@ -350,8 +346,7 @@ public class World
 				}
 				if (!chunkI.isDestroying() && !chunkI.isLoading())
 				{
-					chunkI.clearCache();
-					_chunksToDelete.add(chunkI);
+					_chunkManager.saveAndUnloadChunk(chunkI, true);
 				}
 			}
 		}

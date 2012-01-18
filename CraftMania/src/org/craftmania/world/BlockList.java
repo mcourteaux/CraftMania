@@ -141,8 +141,14 @@ public class BlockList implements Iterable<Block>
 			// System.out.println("Uncache");
 		}
 		_blocks.clear();
-		_blocksToAdd.clear();
-		_blocksToRemove.clear();
+		synchronized (_blocksToAdd)
+		{
+			_blocksToAdd.clear();
+		}
+		synchronized (_blocksToRemove)
+		{
+			_blocksToRemove.clear();
+		}
 		_cached = false;
 	}
 
@@ -200,21 +206,27 @@ public class BlockList implements Iterable<Block>
 		/* Remove blocks */
 		synchronized (_blocksToRemove)
 		{
-			for (Block bl : _blocksToRemove)
+			if (!_blocksToRemove.isEmpty())
 			{
-				removeBlock(bl);
+				for (Block bl : _blocksToRemove)
+				{
+					removeBlock(bl);
+				}
+				_blocksToRemove.clear();
 			}
-			_blocksToRemove.clear();
 		}
 
 		/* Add blocks */
 		synchronized (_blocksToAdd)
 		{
-			for (Block bl : _blocksToAdd)
+			if (!_blocksToAdd.isEmpty())
 			{
-				addBlock(bl);
+				for (Block bl : _blocksToAdd)
+				{
+					addBlock(bl);
+				}
+				_blocksToAdd.clear();
 			}
-			_blocksToAdd.clear();
 		}
 	}
 
