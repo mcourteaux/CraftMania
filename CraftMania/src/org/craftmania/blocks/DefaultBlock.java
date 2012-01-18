@@ -227,7 +227,7 @@ public class DefaultBlock extends Block
 		}
 		if (side == Side.BOTTOM && !_blockType.isFixed())
 		{
-			System.out.println("Support changed for " + _blockType.getName() + ", add to update list");
+//			System.out.println("Support changed for " + _blockType.getName() + ", add to update list");
 			addToUpdateList();
 		}
 	}

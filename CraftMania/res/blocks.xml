@@ -87,7 +87,7 @@
         </brush>
         <resistance>9</resistance>
         <blockClass>WOOD</blockClass>
-        <customLogic>minecraft.blocks.logic.CraftingTable</customLogic>
+        <customClass>org.craftmania.blocks.customblocks.CraftingTable</customClass>
     </block>
     
     <block id="10" name="snow">

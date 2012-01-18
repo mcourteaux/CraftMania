@@ -159,7 +159,7 @@ public class Player extends GameObject
 		/* Update the camera */
 		_camera.setPosition(x, y + eyeHeight, z);
 		_camera.setRotation(rotX, rotY);
-		
+
 		_body.update();
 		_body.disableUsingRightHand();
 
@@ -230,11 +230,10 @@ public class Player extends GameObject
 				{
 					if (_aimedBlock != null)
 					{
-						// if (_aimedBlock.getCustomLogic().hasAction())
-						// {
-						// _aimedBlock.getCustomLogic().executeAction();
-						// } else
-						if (_selectedItem instanceof BlockType)
+						if (_aimedBlock.hasSpecialAction())
+						{
+							_aimedBlock.performSpecialAction();
+						} else if (_selectedItem instanceof BlockType)
 						{
 							int bX = _aimedAdjacentBlockPosition.x();
 							int bY = _aimedAdjacentBlockPosition.y();
@@ -297,7 +296,7 @@ public class Player extends GameObject
 							{
 								boolean added = _inventory.addToInventory(ItemManager.getInstance().getInventoryItem(
 										(short) (mineResult == -1 ? _aimedBlock.getBlockType().getInventoryTypeID() : mineResult)));
-								
+
 								if (added)
 								{
 									// TODO Play sound for taking an item
@@ -455,7 +454,6 @@ public class Player extends GameObject
 		rotY = MathHelper.simplifyRadians(rotY);
 		rotX = MathHelper.clamp(rotX, -MathHelper.f_PI / 2.001f, MathHelper.f_PI / 2.001f);
 
-
 	}
 
 	private void physics()
@@ -556,7 +554,7 @@ public class Player extends GameObject
 			{
 				continue;
 			}
-			
+
 			v.set(bl.getAABB().getPosition());
 
 			v.sub(getPosition());

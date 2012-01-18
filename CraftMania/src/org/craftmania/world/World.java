@@ -207,6 +207,7 @@ public class World
 						if (b != null)
 						{
 							b.forceVisiblilityCheck();
+							b.addToVisibilityList();
 						}
 					}
 				}
@@ -293,7 +294,7 @@ public class World
 
 	}
 
-	private void setActivatedInventory(Inventory inv)
+	public void setActivatedInventory(Inventory inv)
 	{
 		_activatedInventory = inv;
 		Mouse.setGrabbed(inv == null);

@@ -29,7 +29,7 @@ public final class BlockType extends InventoryItem
 	private boolean normalAABB;
 	private int mineResult;
 	private int mineResultCount;
-	private String customLogic;
+	private String customClass;
 
 	public enum BlockClass
 	{
@@ -53,7 +53,7 @@ public final class BlockType extends InventoryItem
 		normalAABB = true;
 		mineResult = -1;
 		mineResultCount = 1;
-		customLogic = null;
+		customClass = null;
 	}
 
 	@Override
@@ -105,9 +105,9 @@ public final class BlockType extends InventoryItem
 		return mineResultCount;
 	}
 
-	public String getCustomLogic()
+	public String getCustomClass()
 	{
-		return customLogic;
+		return customClass;
 	}
 
 	@Override
@@ -205,6 +205,6 @@ public final class BlockType extends InventoryItem
 
 	public boolean wantsToBeUpdated()
 	{
-		return (!fixed) || (customLogic != null);
+		return (!fixed) || (customClass != null);
 	}
 }

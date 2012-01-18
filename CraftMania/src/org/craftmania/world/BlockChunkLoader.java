@@ -31,7 +31,7 @@ public class BlockChunkLoader
 		f.getParentFile().mkdir();
 		return f;
 	}
-	
+
 	private File getChunkFile(BlockChunk ch)
 	{
 		return getChunkFile(ch.getX(), ch.getZ());
@@ -44,7 +44,7 @@ public class BlockChunkLoader
 		{
 			return;
 		}
-		
+
 		chunk.setLoading(true);
 		DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
 
@@ -66,10 +66,17 @@ public class BlockChunkLoader
 				int bz = blockPos.z();
 				chunk.setBlockTypeRelative(bx, by, bz, b, false, false, false);
 			}
-			
-			if (i % 16 == 0)
+
+			if (i % 512 == 0)
 			{
-				Thread.yield();
+				try
+				{
+					Thread.sleep(1);
+				} catch (InterruptedException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 
@@ -78,7 +85,7 @@ public class BlockChunkLoader
 
 		chunk.setLoading(false);
 	}
-	
+
 	protected void saveChunk(BlockChunk blockChunk) throws Exception
 	{
 		File file = getChunkFile(blockChunk.getX(), blockChunk.getZ());
@@ -102,6 +109,18 @@ public class BlockChunkLoader
 			{
 				dos.writeByte(b.getBlockType().getID());
 			}
+			if (i % 512 == 0)
+			{
+				try
+				{
+					Thread.sleep(1);
+				} catch (InterruptedException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
 		}
 
 		dos.flush();

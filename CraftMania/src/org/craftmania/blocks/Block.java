@@ -117,6 +117,16 @@ public abstract class Block implements AABBObject
 	public abstract AABB getAABB();
 	public abstract boolean smash(InventoryItem item);
 	public abstract void neighborChanged(Side side);
+	
+	public boolean hasSpecialAction()
+	{
+		return false;
+	}
+	
+	public void performSpecialAction()
+	{
+		
+	}
 
 	public synchronized void setUpdatingFlag(boolean u)
 	{
