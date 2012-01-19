@@ -5,11 +5,6 @@ public class Vec3f
 	private float x, y, z;
 
 	/**
-	 * Cached value for the length of the vector
-	 */
-	private float len;
-
-	/**
 	 * Constructs a new Vec3f and clones the values of the passed vector.
 	 */
 	public Vec3f(Vec3i v)
@@ -47,13 +42,6 @@ public class Vec3f
 		this.x = x;
 		this.y = y;
 		this.z = z;
-
-		clearCache();
-	}
-
-	private void clearCache()
-	{
-		this.len = Float.NaN;
 	}
 
 	/**
@@ -90,16 +78,7 @@ public class Vec3f
 	 */
 	public Vec3f scale(float factor)
 	{
-		/* Backup the length */
-		float len = this.len;
-
 		set(x * factor, y * factor, z * factor);
-
-		/* Restore the length */
-		if (!Float.isNaN(len))
-		{
-			this.len = len * factor;
-		}
 
 		return this;
 	}
@@ -121,11 +100,7 @@ public class Vec3f
 	 */
 	public float length()
 	{
-		if (Float.isNaN(len))
-		{
-			len = (float) Math.sqrt(lengthSquared());
-		}
-		return len;
+		return (float) Math.sqrt(lengthSquared());
 	}
 
 	/**
@@ -172,19 +147,16 @@ public class Vec3f
 	public void setX(float x)
 	{
 		this.x = x;
-		clearCache();
 	}
 
 	public void setY(float y)
 	{
 		this.y = y;
-		clearCache();
 	}
 
 	public void setZ(float z)
 	{
 		this.z = z;
-		clearCache();
 	}
 
 	public void x(float x)
@@ -234,6 +206,5 @@ public class Vec3f
 		set(x + v.x * factor, y + v.y * factor, z + v.z * factor);
 		return this;
 	}
-
 
 }

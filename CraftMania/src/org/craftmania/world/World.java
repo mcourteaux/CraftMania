@@ -369,7 +369,7 @@ public class World
 
 		for (BlockChunk chunk : _localChunks)
 		{
-			synchronized (chunk)
+			/* TODO implement checking in which quadrant (relative to the player) the chunk is in and compare with the view direction of the player */
 			{
 				if (chunk.isEmpty())
 					continue;

@@ -157,19 +157,27 @@ public class DefaultBlock extends Block
 				{
 					Side side = Side.values()[i];
 					Vec3i normal = side.getNormal();
-					Block block = _blockChunk.getBlockAbsolute(getX() + normal.x(), getY() + normal.y(), getZ() + normal.z());
-					if (block != null)
+					BlockChunk chunk = _blockChunk.getBlockChunkContaining(getX() + normal.x(), getY() + normal.y(), getZ() + normal.z(), false, false, false);
+					if (chunk == null)
 					{
-						if (block.isMoving() || !block.getBlockType().hasNormalAABB())
-						{
-							setFaceVisible(side, true);
-						} else
-						{
-							setFaceVisible(side, false);
-						}
+						/* TODO Solve */
+						setFaceVisible(side, false);
 					} else
 					{
-						setFaceVisible(side, true);
+						Block block = chunk.getBlockAbsolute(getX() + normal.x(), getY() + normal.y(), getZ() + normal.z());
+						if (block != null)
+						{
+							if (block.isMoving() || !block.getBlockType().hasNormalAABB())
+							{
+								setFaceVisible(side, true);
+							} else
+							{
+								setFaceVisible(side, false);
+							}
+						} else
+						{
+							setFaceVisible(side, true);
+						}
 					}
 				}
 			}
@@ -227,7 +235,8 @@ public class DefaultBlock extends Block
 		}
 		if (side == Side.BOTTOM && !_blockType.isFixed())
 		{
-//			System.out.println("Support changed for " + _blockType.getName() + ", add to update list");
+			// System.out.println("Support changed for " + _blockType.getName()
+			// + ", add to update list");
 			addToUpdateList();
 		}
 	}

@@ -7,6 +7,7 @@ import org.craftmania.world.BlockChunk;
 
 public class BlockConstructor
 {
+	@SuppressWarnings("unchecked")
 	public static Block construct(int x, int y, int z, BlockChunk chunk, byte blockType, byte metadata)
 	{
 		if (blockType == 0)

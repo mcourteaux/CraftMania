@@ -33,7 +33,7 @@ public class BlockDistanceComparator implements Comparator<Block>
 	public int compare(Block o1, Block o2)
 	{
 		float d1, d2;
-		synchronized (_blockVector)
+//		synchronized (_blockVector)
 		{
 			d1 = relativeToOrigin(o1.getAABB().getPosition()).lengthSquared();
 			d2 = relativeToOrigin(o2.getAABB().getPosition()).lengthSquared();

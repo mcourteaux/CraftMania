@@ -2,10 +2,10 @@
 ### Graphics
 fullscreen=false
 width=800
-height=480
+height=600
 fovy=65
 fps=40
-viewing_distance=40
+viewing_distance=70
 
 ### Texture Pack
 texture_pack=GoodMorningCraftv3.2

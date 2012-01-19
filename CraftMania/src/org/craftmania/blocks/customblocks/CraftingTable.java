@@ -16,6 +16,7 @@ public class CraftingTable extends DefaultBlock
 	{
 		super(BlockManager.getInstance().getBlockType(BlockManager.getInstance().blockID("crafting_table")), chunk, pos);
 		_inventory = new CraftingTableInventory();
+		_inventory.setSharedContent(Game.getInstance().getWorld().getPlayer().getSharedInventoryContent());
 	}
 	
 	@Override

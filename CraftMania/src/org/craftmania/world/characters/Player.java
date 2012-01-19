@@ -178,55 +178,8 @@ public class Player extends GameObject
 			int button = Mouse.getEventButton();
 			if (button != -1)
 			{
-				// if (button == 0 && Mouse.getEventButtonState() &&
-				// Keyboard.isKeyDown(Keyboard.KEY_V))
-				// {
-				// /* Print the visible blocks */
-				//
-				// for (Block bl :
-				// Game.getInstance().getWorld().visibleBlocks())
-				// {
-				// if (Keyboard.isKeyDown(Keyboard.KEY_C))
-				// {
-				// bl.needsVisibilityCheck();
-				// } else
-				// {
-				// System.out.printf("Block: %4d, %4d, %4d (%12s) (mask = %s)%n",
-				// bl.getX(), bl.getY(), bl.getZ(), bl.getBlockType().getType(),
-				// String.format("%6s",
-				// Integer.toBinaryString(bl.getFaceMask())).replace(' ', '0'));
-				// }
-				// }
-				// try
-				// {
-				// Thread.sleep(100);
-				//
-				// } catch (Exception e)
-				// {
-				// }
-				// } else if (button == 0 && Mouse.getEventButtonState() &&
-				// Keyboard.isKeyDown(Keyboard.KEY_U))
-				// {
-				// /* Print the update blocks */
-				// for (BlockChunk chunk :
-				// Game.getInstance().getWorld().getLocalChunks())
-				// {
-				// for (Block bl : chunk.cachedUpdateListBlocks())
-				// {
-				// System.out.printf("Block: %4d, %4d, %4d (%s)%n", bl.getX(),
-				// bl.getY(), bl.getZ(), bl.getBlockType().getType());
-				// }
-				// }
-				// try
-				// {
-				// Thread.sleep(100);
-				//
-				// } catch (Exception e)
-				// {
-				// }
-				// } else
-				if (button == 0 && Mouse.getEventButtonState()) // Create OR Do
-																// Action
+				/* Create OR Do Action */
+				if (button == 0 && Mouse.getEventButtonState()) 
 				{
 					if (_aimedBlock != null)
 					{

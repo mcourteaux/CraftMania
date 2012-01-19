@@ -67,17 +67,17 @@ public class BlockChunkLoader
 				chunk.setBlockTypeRelative(bx, by, bz, b, false, false, false);
 			}
 
-			if (i % 512 == 0)
-			{
-				try
-				{
-					Thread.sleep(1);
-				} catch (InterruptedException e)
-				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
+//			if (i % 512 == 0)
+//			{
+//				try
+//				{
+//					Thread.sleep(1);
+//				} catch (InterruptedException e)
+//				{
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			}
 		}
 
 		dis.close();
@@ -109,17 +109,17 @@ public class BlockChunkLoader
 			{
 				dos.writeByte(b.getBlockType().getID());
 			}
-			if (i % 512 == 0)
-			{
-				try
-				{
-					Thread.sleep(1);
-				} catch (InterruptedException e)
-				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
+//			if (i % 512 == 0)
+//			{
+//				try
+//				{
+//					Thread.sleep(1);
+//				} catch (InterruptedException e)
+//				{
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			}
 
 		}
 
