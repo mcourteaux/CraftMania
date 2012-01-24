@@ -207,4 +207,10 @@ public class Vec3f
 		return this;
 	}
 
+	public Vec3f addFactor(Vec3i v, float factor)
+	{
+		set(x + v.x() * factor, y + v.y() * factor, z + v.z() * factor);
+		return this;
+	}
+
 }

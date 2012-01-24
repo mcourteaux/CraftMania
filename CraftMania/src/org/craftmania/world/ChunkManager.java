@@ -63,7 +63,7 @@ public class ChunkManager
 		int zInChunk = z - superZ * Chunk.CHUNK_SIZE_X;
 
 		Chunk<BlockChunk> superChunk = getSuperChunk(superX, superZ);
-		synchronized (superChunk)
+//		synchronized (superChunk)
 		{
 
 			BlockChunk blockChunk = superChunk.get(xInChunk, zInChunk);

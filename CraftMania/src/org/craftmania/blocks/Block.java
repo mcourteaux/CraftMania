@@ -18,6 +18,9 @@ public abstract class Block implements AABBObject
 	protected AABB _aabb;
 	protected float _health;
 	
+	public int _distanceID;
+	public float _distance;
+	
 	/* List facts */
 	protected boolean _updating;
 	protected boolean _rendering;

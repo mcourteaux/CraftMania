@@ -382,7 +382,7 @@ public class DefaultWorldProvider extends WorldProvider
 	private void generateSpawnPoint()
 	{
 		SmartRandom random = new SmartRandom(new Random());
-		for (int i = 1; i <= 10; ++i)
+		for (int i = 1; i <= 15; ++i)
 		{
 			int x = random.randomInt(-5 * i, 5 * i);
 			int z = random.randomInt(-5 * i, 5 * i);
@@ -402,7 +402,15 @@ public class DefaultWorldProvider extends WorldProvider
 			}
 			if (spawnPointBlock.getBlockType().getName().equals("grass"))
 			{
-				break;
+				Block above = _world.getChunkManager().getBlock(x, y + 1, z, true, true, true);
+				if (above == null)
+				{
+					above = _world.getChunkManager().getBlock(x, y + 2, z, true, true, true);
+					if (above == null)
+					{
+						break;
+					}
+				}
 			}
 		}
 		_initialSpawnPoint = new Vec3f(_spawnPoint);

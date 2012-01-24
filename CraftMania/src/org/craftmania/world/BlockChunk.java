@@ -1,8 +1,13 @@
 package org.craftmania.world;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.BitSet;
+
 import org.craftmania.Side;
 import org.craftmania.blocks.Block;
 import org.craftmania.blocks.BlockConstructor;
+import org.craftmania.blocks.DefaultBlock;
 import org.craftmania.datastructures.AABB;
 import org.craftmania.datastructures.AABBObject;
 import org.craftmania.datastructures.Fast3DArray;
@@ -11,8 +16,13 @@ import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec2i;
 import org.craftmania.math.Vec3f;
 import org.craftmania.math.Vec3i;
+import org.craftmania.rendering.ChunkMesh;
+import org.craftmania.rendering.ChunkMeshBuilder;
+import org.craftmania.rendering.ChunkMeshRenderer;
 import org.craftmania.world.BlockList.BlockAcceptor;
 import org.craftmania.world.generators.ChunkGenerator;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
 
 public class BlockChunk implements AABBObject
 {
@@ -29,6 +39,9 @@ public class BlockChunk implements AABBObject
 	private boolean _loading;
 	private boolean _cached;
 	private long _creationTime;
+
+	private ChunkMesh _mesh;
+	private boolean _newVboNeeded;
 
 	/* Blocks */
 	private Fast3DArray<Block> _blocks;
@@ -51,11 +64,42 @@ public class BlockChunk implements AABBObject
 		System.out.println("BlockChunk constructed at: " + x + " " + z + "  \t (AABB = " + _aabb.toString() + ")");
 		_creationTime = System.currentTimeMillis();
 
+		_newVboNeeded = true;
 	}
 
 	public static AABB createAABBForBlockChunkAt(int x, int z)
 	{
 		return new AABB(new Vec3f(x * BLOCKCHUNK_SIZE_HORIZONTAL, 0, z * BLOCKCHUNK_SIZE_HORIZONTAL).add(new Vec3f(HALF_BLOCKCHUNK_SIZE)), new Vec3f(HALF_BLOCKCHUNK_SIZE));
+	}
+
+	public void needsNewVBO()
+	{
+		_newVboNeeded = true;
+	}
+
+	public ChunkMesh getMesh()
+	{
+		return _mesh;
+	}
+
+	public void setMesh(ChunkMesh mesh)
+	{
+		_mesh = mesh;
+	}
+
+	public void createVBO()
+	{
+		_newVboNeeded = false;
+		performListChanges();
+		_newVboNeeded = false;
+
+		if (_mesh == null)
+		{
+			_mesh = new ChunkMesh();
+		}
+
+		ChunkMeshBuilder.generateChunkMesh(this);
+
 	}
 
 	public void cache()
@@ -325,6 +369,7 @@ public class BlockChunk implements AABBObject
 
 			/* Notify neighbors */
 			chunk.notifyNeighborsOf(x, y, z);
+			needsNewVBO();
 		}
 	}
 
@@ -345,7 +390,13 @@ public class BlockChunk implements AABBObject
 			return;
 		}
 		_destroying = true;
-		
+
+		/* Remove the VBO */
+		if (_mesh != null)
+		{
+			_mesh.destroy();
+		}
+
 		long lifeTime = System.currentTimeMillis() - _creationTime;
 		System.out.println("Deleting chunk (" + getX() + ", " + getZ() + ") with lifetime " + (lifeTime / 1000.0f));
 
@@ -413,5 +464,41 @@ public class BlockChunk implements AABBObject
 	public Fast3DArray<Block> getBlocks()
 	{
 		return _blocks;
+	}
+
+	public void render()
+	{
+		if (_newVboNeeded)
+		{
+			createVBO();
+		}
+		ChunkMeshRenderer.renderChunkMesh(this);
+	}
+
+	public int getNumberOfVisibleFaces()
+	{
+		int count = 0;
+		Block block = null;
+		DefaultBlock defaultBlock = null;
+		for (int i = 0; i < getVisibleBlocks().size(); ++i)
+		{
+			block = getVisibleBlocks().getBlockAtIndex(i);
+			if (block instanceof DefaultBlock)
+			{
+				defaultBlock = (DefaultBlock) block;
+				count += MathHelper.cardinality(defaultBlock.getFaceMask());
+			}
+		}
+		return count;
+	}
+
+	public void destroyMesh()
+	{
+		if (_mesh != null)
+		{
+			_mesh.destroy();
+			_mesh = null;
+			_newVboNeeded = true;
+		}
 	}
 }

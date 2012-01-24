@@ -26,6 +26,7 @@ import org.craftmania.inventory.Inventory;
 import org.craftmania.math.BlockDistanceComparator;
 import org.craftmania.math.MathHelper;
 import org.craftmania.rendering.GLFont;
+import org.craftmania.utilities.FastArrayList;
 import org.craftmania.world.characters.Player;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -39,7 +40,8 @@ public class World
 	private List<BlockChunk> _localChunks;
 	private List<BlockChunk> _oldChunkList;
 
-	private List<Block> _visibleBlocks;
+	private FastArrayList<Block> _visibleBlocks;
+	private FastArrayList<BlockChunk> _visibleChunks;
 	private Inventory _activatedInventory;
 	private BlockDistanceComparator _blockDistanceComparator;
 	private int _localBlockCount;
@@ -58,14 +60,15 @@ public class World
 		_oldChunkList = new ArrayList<BlockChunk>();
 		int visibleBlockBufferSize = calculateEstimatedAmountOfVisibleBlocks();
 		System.out.println("Visible Block Buffer Size = " + visibleBlockBufferSize);
-		_visibleBlocks = new ArrayList<Block>(visibleBlockBufferSize);
+		_visibleBlocks = new FastArrayList<Block>(visibleBlockBufferSize);
+		_visibleChunks = new FastArrayList<BlockChunk>(30);
 		_blockDistanceComparator = new BlockDistanceComparator();
 	}
-	
+
 	public void save() throws Exception
 	{
 		_worldProvider.save();
-		
+
 		/* Make sure the BlockChunkLoader is free. */
 		do
 		{
@@ -75,9 +78,8 @@ public class World
 			} catch (Exception e)
 			{
 			}
-		}
-		while (_chunkManager.isBlockChunkThreadingBusy());
-		
+		} while (_chunkManager.isBlockChunkThreadingBusy());
+
 		/* Save the local chunks, by destroying them */
 		for (BlockChunk chunk : _localChunks)
 		{
@@ -104,12 +106,17 @@ public class World
 		_player.getFirstPersonCamera().lookThrough();
 
 		/* Select the visible blocks */
+		selectVisibleChunks(_player.getFirstPersonCamera().getViewFrustum());
 		selectVisibleBlocks(_player.getFirstPersonCamera().getViewFrustum());
 
-		for (Block b : _visibleBlocks)
+		for (BlockChunk ch : _visibleChunks)
 		{
-			b.render();
+			ch.render();
 		}
+		// for (Block b : _visibleBlocks)
+		// {
+		// b.render();
+		// }
 
 		_player.render();
 
@@ -126,7 +133,7 @@ public class World
 		GLFont infoFont = FontStorage.getFont("Monospaced_20");
 
 		/* Down Left Info */
-		infoFont.print(4, 4, "MineCraft");
+		infoFont.print(4, 4, "CraftMania");
 		infoFont.print(4, 30, _player.coordinatesToString());
 		infoFont.print(4, 45, "Visible Blocks:      " + _visibleBlocks.size());
 		infoFont.print(4, 60, "Updading Blocks:     " + _updatingBlocks);
@@ -179,8 +186,6 @@ public class World
 		 */
 		if (Game.getInstance().getFPS() < 3)
 			return;
-		
-		
 
 		while (Keyboard.next())
 		{
@@ -207,9 +212,10 @@ public class World
 						if (b != null)
 						{
 							b.forceVisiblilityCheck();
-							b.addToVisibilityList();
+							// b.addToVisibilityList();
 						}
 					}
+					c.getVisibleBlocks().updateCacheManagment();
 				}
 			}
 		}
@@ -227,12 +233,11 @@ public class World
 		selectLocalChunks();
 		updateLocalChunks();
 
-		_chunkManager.performRememberedBlockChanges();
-
 		if (_tick % 5 == 0)
 		{
 			checkForNewVisibleChunks();
 		}
+		_chunkManager.performRememberedBlockChanges();
 
 		_tick++;
 	}
@@ -241,7 +246,7 @@ public class World
 	{
 		float viewingDistance = Game.getInstance().getConfiguration().getViewingDistance();
 		viewingDistance /= BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL;
-//		viewingDistance += 1.0f;
+		// viewingDistance += 1.0f;
 		int distance = MathHelper.ceil(viewingDistance);
 		int distanceSq = distance * distance;
 
@@ -305,17 +310,17 @@ public class World
 		_updatingBlocks = 0;
 		for (BlockChunk chunk : _localChunks)
 		{
-			synchronized (chunk)
-			{
+			// synchronized (chunk)
+			// {
 
-				for (Iterator<Block> it = chunk.getUpdatingBlocks().iterator(); it.hasNext();)
-				{
-					Block b = it.next();
-					b.update(it);
-				}
-				_updatingBlocks += chunk.getUpdatingBlocks().size();
-				chunk.performListChanges();
+			for (Iterator<Block> it = chunk.getUpdatingBlocks().iterator(); it.hasNext();)
+			{
+				Block b = it.next();
+				b.update(it);
 			}
+			_updatingBlocks += chunk.getUpdatingBlocks().size();
+			chunk.performListChanges();
+			// }
 		}
 	}
 
@@ -340,6 +345,7 @@ public class World
 				/* Check if the old chunk is also in the new list */
 				for (BlockChunk chunkJ : _localChunks)
 				{
+
 					if (chunkI == chunkJ)
 					{
 						continue outer;
@@ -355,40 +361,74 @@ public class World
 		/* Make sure every local chunk is cached */
 		for (BlockChunk chunk : _localChunks)
 		{
-			if (chunk.isDestroying())
+			if (chunk.isDestroying() || chunk.isLoading())
 				continue;
 			chunk.cache();
 			_localBlockCount += chunk.getBlockCount();
 		}
 	}
 
-	public void selectVisibleBlocks(ViewFrustum frustum)
+	private void selectVisibleChunks(ViewFrustum frustum)
 	{
-
-		_visibleBlocks.clear();
-
-		for (BlockChunk chunk : _localChunks)
+		_visibleChunks.clear(false);
+		BlockChunk chunk = null;
+		for (int chunkIndex = 0; chunkIndex < _localChunks.size(); ++chunkIndex)
 		{
-			/* TODO implement checking in which quadrant (relative to the player) the chunk is in and compare with the view direction of the player */
+			chunk = _localChunks.get(chunkIndex);
 			{
 				if (chunk.isEmpty())
 					continue;
 				if (frustum.intersects(chunk.getAABB()))
 				{
-					for (Block block : chunk.getVisibleBlocks())
-					{
-						if (block.isVisible())
-						{
-							if (frustum.intersects(block.getAABB()))
-							{
-								_visibleBlocks.add(block);
-							}
-						}
-					}
+					_visibleChunks.add(chunk);
 				}
 			}
 		}
+	}
 
+	public void selectVisibleBlocks(ViewFrustum frustum)
+	{
+
+		_visibleBlocks.clear(false);
+
+		int blocksChecked = 0;
+		int blocksVisible = 0;
+		BlockChunk chunk = null;
+		for (int chunkIndex = 0; chunkIndex < _visibleChunks.size(); ++chunkIndex)
+		{
+			chunk = _visibleChunks.get(chunkIndex);
+
+			blocksChecked = 0;
+			blocksVisible = 0;
+
+			BlockList blockList = chunk.getVisibleBlocks();
+			Block block = null;
+			for (int blockIndex = 0; blockIndex < blockList.size(); ++blockIndex)
+			{
+				block = blockList.getBlockAtIndex(blockIndex);
+				blocksChecked++;
+				if (block.isVisible())
+				{
+					blocksVisible++;
+					if (frustum.intersects(block.getAABB()))
+					{
+						_visibleBlocks.add(block);
+					}
+				} else
+				{
+//					System.out.println("Block which is supposed to be not in the visibility list! " + block.toString());
+					blockList.rememberToRemoveBlock(block);
+				}
+			}
+			if (blocksChecked != blocksVisible)
+			{
+				System.err.println("Chunk (" + chunk.getX() + ", " + chunk.getZ() + "): Blocks Checked: " + blocksChecked + "; Blocks Visible: " + blocksVisible);
+			}
+			blockList.updateCacheManagment();
+
+		}
+
+		_blockDistanceComparator.newID();
 		_blockDistanceComparator.setOrigin(_player.getFirstPersonCamera().getPosition());
 		Collections.sort(_visibleBlocks, _blockDistanceComparator);
 	}

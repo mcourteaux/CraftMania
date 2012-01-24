@@ -46,6 +46,10 @@ public class BlockChunkThreading
 	
 	public void deleteChunk(final BlockChunk chunk)
 	{
+		/* Mesh has to be deleted in the main thread, because of OpenGL */
+		chunk.destroyMesh();
+		
+		/* Add a runnable to the pool */
 		_deletePool.addThread(new Runnable()
 		{
 
@@ -121,6 +125,10 @@ public class BlockChunkThreading
 
 	public void saveAndUnloadChunk(final BlockChunk chunk)
 	{
+		/* Mesh has to be deleted in the main thread, because of OpenGL */
+		chunk.destroyMesh();
+		
+		/* Add a runnable to the pool */
 		_savePool.addThread(new Runnable()
 		{
 

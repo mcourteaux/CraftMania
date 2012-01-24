@@ -12,14 +12,14 @@ import org.craftmania.world.BlockChunk;
 
 public class DefaultBlock extends Block
 {
-	private static final Vec3f HALF_BLOCK_SIZE = new Vec3f(0.5f, 0.5f, 0.5f);
-	@SuppressWarnings("unused")
-	private static final Vec3f BLOCK_SIZE = new Vec3f(1.0f, 1.0f, 1.0f);
+	public static final Vec3f HALF_BLOCK_SIZE = new Vec3f(0.5f, 0.5f, 0.5f);
+	public static final Vec3f BLOCK_SIZE = new Vec3f(1.0f, 1.0f, 1.0f);
 
 	public static final byte ALL_FACES = 0x3f; // 0011 1111
 
 	private boolean _needVisibilityCheck;
 	private byte _faceMask;
+	private boolean _visible;
 
 	private BlockMovementPlugin _movement;
 
@@ -140,7 +140,7 @@ public class DefaultBlock extends Block
 		{
 			checkVisibility();
 		}
-		return _faceMask != 0;
+		return _visible;
 	}
 
 	private synchronized void checkVisibility()
@@ -161,7 +161,7 @@ public class DefaultBlock extends Block
 					if (chunk == null)
 					{
 						/* TODO Solve */
-						setFaceVisible(side, false);
+						setFaceVisible(side, true);
 					} else
 					{
 						Block block = chunk.getBlockAbsolute(getX() + normal.x(), getY() + normal.y(), getZ() + normal.z());
@@ -189,17 +189,18 @@ public class DefaultBlock extends Block
 		}
 		_needVisibilityCheck = false;
 
-		boolean newVisibility = _faceMask != 0;
+		_visible = _faceMask != 0;
 
-		if (newVisibility != preVisibility)
+		if (_visible != preVisibility)
 		{
-			if (newVisibility)
+			if (_visible)
 			{
 				addToVisibilityList();
 			} else
 			{
 				removeFromVisibilityList();
 			}
+			_blockChunk.needsNewVBO();
 		}
 	}
 
@@ -256,5 +257,17 @@ public class DefaultBlock extends Block
 	{
 		return _movement != null && _movement.isFalling();
 	}
+
+	public byte getFaceMask()
+	{
+		return _faceMask;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return _blockType.getName() + " " + _postion.toString();
+	}
+
 
 }

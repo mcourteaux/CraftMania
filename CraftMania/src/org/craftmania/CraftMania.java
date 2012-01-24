@@ -19,6 +19,7 @@ public class CraftMania
 	 */
 	public static void main(String[] args) throws Exception
 	{
+
  
 		loadNativeLibs();
 		initUncaughtExceptionHandler();

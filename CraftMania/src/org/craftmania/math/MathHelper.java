@@ -307,6 +307,19 @@ public class MathHelper
 		return fovy / Game.getInstance().getConfiguration().getHeight() * Game.getInstance().getConfiguration().getWidth();
 	}
 
+	public static int cardinality(byte b)
+	{
+		int count = 0;
+		for (int i = 0; i < 8; ++i)
+		{
+			if (((b >>> i) & 1) == 1)
+			{
+				++count;
+			}
+		}
+		return count;
+	}
+
 
 
 }

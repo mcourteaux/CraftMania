@@ -1,45 +1,6 @@
 package org.craftmania.game;
 
-import static org.lwjgl.opengl.GL11.GL_ALPHA_TEST;
-import static org.lwjgl.opengl.GL11.GL_ALWAYS;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_COLOR_MATERIAL;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_FOG;
-import static org.lwjgl.opengl.GL11.GL_FOG_COLOR;
-import static org.lwjgl.opengl.GL11.GL_FOG_END;
-import static org.lwjgl.opengl.GL11.GL_FOG_HINT;
-import static org.lwjgl.opengl.GL11.GL_FOG_MODE;
-import static org.lwjgl.opengl.GL11.GL_FOG_START;
-import static org.lwjgl.opengl.GL11.GL_LINEAR;
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_NICEST;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_PERSPECTIVE_CORRECTION_HINT;
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.glColor4f;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glFog;
-import static org.lwjgl.opengl.GL11.glFogf;
-import static org.lwjgl.opengl.GL11.glFogi;
-import static org.lwjgl.opengl.GL11.glHint;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glOrtho;
-import static org.lwjgl.opengl.GL11.glVertex2i;
+import static org.lwjgl.opengl.GL11.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,6 +20,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.NVFogDistance;
 
 public class Game
@@ -69,6 +31,8 @@ public class Game
 	private int _sleepTimeMillis;
 	private Configuration _configuration;
 	private static Game __instance;
+	private int _loop1024;
+	private Object _separateGCLock = new Object();
 
 	public static Game getInstance()
 	{
@@ -161,9 +125,12 @@ public class Game
 		this._fps = _configuration.getFPS();
 		try
 		{
-			Display.setTitle("MineCraft");
+			Display.setTitle("CraftMania");
 			setDisplayMode(_configuration.getWidth(), _configuration.getHeight(), _configuration.isFullscreen());
-
+			if (_configuration.getVSync())
+			{
+				Display.setVSyncEnabled(true);
+			}
 			Display.create();
 		} catch (LWJGLException e)
 		{
@@ -194,8 +161,8 @@ public class Game
 		glEnable(GL_TEXTURE_2D);
 		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_ALWAYS);
+		// glEnable(GL_DEPTH_TEST);
+		// glDepthFunc(GL_ALWAYS);
 
 		glEnable(GL_CULL_FACE);
 
@@ -207,6 +174,7 @@ public class Game
 		glFogi(NVFogDistance.GL_FOG_DISTANCE_MODE_NV, NVFogDistance.GL_EYE_RADIAL_NV);
 		glHint(GL_FOG_HINT, GL_NICEST);
 
+		System.out.println("VBO Supported: " + GLUtils.isVBOSupported());
 	}
 
 	public float getFPS()
@@ -236,19 +204,20 @@ public class Game
 		{
 			_world.render();
 		}
-		
+
 		renderOnScreenInfo();
 	}
 
 	private void renderOnScreenInfo()
 	{
 		GLFont infoFont = FontStorage.getFont("Monospaced_20");
-		
+
 		/* Top Left Info */
 		infoFont.print(4, _configuration.getHeight() - 20, "FPS:      " + Game.getInstance().getFPS());
 		infoFont.print(4, _configuration.getHeight() - 20 - 15, "Sleeping: " + String.format("%4d", Game.getInstance().getSleepTime()));
 		infoFont.print(4, _configuration.getHeight() - 20 - 30, "Heap Size: " + MathHelper.bytesToMagaBytes(Runtime.getRuntime().maxMemory()) + " MB");
-		infoFont.print(4, _configuration.getHeight() - 20 - 45, "Heap Use:  " + MathHelper.bytesToMagaBytes(Runtime.getRuntime().maxMemory() - Runtime.getRuntime().freeMemory()) + " MB");
+		infoFont.print(4, _configuration.getHeight() - 20 - 45, "Heap Use:  " + MathHelper.bytesToMagaBytes(Runtime.getRuntime().maxMemory() - Runtime.getRuntime().freeMemory())
+				+ " MB");
 	}
 
 	public void initOverlayRendering()
@@ -279,8 +248,8 @@ public class Game
 
 		glDisable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
-//		glDepthFunc(GL_LEQUAL);
-		 glDepthFunc(GL_ALWAYS);
+		glDepthFunc(GL_LEQUAL);
+		// glDepthFunc(GL_ALWAYS);
 		glEnable(GL_CULL_FACE);
 
 		glMatrixMode(GL_PROJECTION);
@@ -305,13 +274,13 @@ public class Game
 
 	public void startGameLoop()
 	{
-		if (_configuration.getVSync())
-		{
-			Display.setVSyncEnabled(true);
-		}
+
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		while (!Display.isCloseRequested())
 		{
+			_loop1024++;
+			_loop1024 %= 1024;
+			memoryCheck();
 			if (Keyboard.isKeyDown(Keyboard.KEY_LMENU) && Keyboard.isKeyDown(Keyboard.KEY_RETURN))
 			{
 			}
@@ -323,28 +292,37 @@ public class Game
 			long stopTiming = System.nanoTime();
 
 			long frameTimeNanos = (stopTiming - startTiming);
-			long desiredFrameTimeNanos = 1000000000L / _configuration.getFPS();
+			long desiredFrameTimeNanos = 1000000000L;
+			if (_configuration.getVSync())
+			{
+				// desiredFrameTimeNanos /= 1;
+			} else
+			{
+				desiredFrameTimeNanos /= _configuration.getFPS();
+			}
 
 			long diff = desiredFrameTimeNanos - frameTimeNanos;
 			if (frameTimeNanos < desiredFrameTimeNanos)
 			{
-				try
+				if (!_configuration.getVSync())
 				{
-					_sleepTimeMillis = (int) (diff / 1000000L);
-					Thread.sleep(_sleepTimeMillis, (int) (diff % 1000000L));
-				} catch (Exception e)
-				{
-					e.printStackTrace();
+					try
+					{
+						_sleepTimeMillis = (int) (diff / 1000000L);
+						Thread.sleep(_sleepTimeMillis, (int) (diff % 1000000L));
+					} catch (Exception e)
+					{
+						e.printStackTrace();
+					}
 				}
-				_fps = _configuration.getFPS();
 			} else
 			{
-				_fps = (int) (1000000000.0f / frameTimeNanos);
 				_sleepTimeMillis = 0;
 			}
+			_fps = (int) (1000000000.0f / (frameTimeNanos + (_sleepTimeMillis * 1000000L)));
 
 		}
-		
+
 		if (_world != null)
 		{
 			try
@@ -360,6 +338,37 @@ public class Game
 		TextureStorage.release();
 		FontStorage.release();
 		Display.destroy();
+	}
+
+	private void memoryCheck()
+	{
+		if (_loop1024 == 0)
+		{
+			long total = Runtime.getRuntime().maxMemory();
+			long used = Runtime.getRuntime().maxMemory() - Runtime.getRuntime().freeMemory();
+			float ratio = (float) used / (float) total;
+			if (ratio > 0.75f)
+			{
+				seperateGC();
+			}
+		}
+	}
+
+	public void seperateGC()
+	{
+		Thread t = new Thread(new Runnable()
+		{
+			
+			@Override
+			public void run()
+			{
+				synchronized (_separateGCLock)
+				{
+					System.gc();
+				}
+			}
+		});
+		t.start();
 	}
 
 	private void loadTextures() throws IOException
@@ -453,7 +462,7 @@ public class Game
 
 	public static final int FILE_BASE_APPLICATION = 0x01;
 	public static final int FILE_BASE_USER_DATA = 0x02;
-	
+
 	public File getRelativeFile(int fileBase, String string)
 	{
 		string = string.replace("${world}", getWorld().getWorldName());
@@ -471,14 +480,14 @@ public class Game
 	{
 		return new File(System.getProperty("user.home"));
 	}
-	
+
 	private File getUserDataFolder()
 	{
 		String os = System.getProperty("os.name").toLowerCase();
 		File f = null;
 		if (os.contains("mac"))
 		{
-			f = new File(getUserHome(), "Library/Application Support/craftmania");			
+			f = new File(getUserHome(), "Library/Application Support/craftmania");
 		} else if (os.contains("inux") || os.contains("nix"))
 		{
 			f = new File(getUserHome(), ".craftmania");

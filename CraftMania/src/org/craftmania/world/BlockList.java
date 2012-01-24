@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.craftmania.blocks.Block;
+import org.craftmania.utilities.FastArrayList;
 
 /**
  * 
@@ -58,9 +59,9 @@ public class BlockList implements Iterable<Block>
 		};
 	}
 
-	private List<Block> _blocks = new ArrayList<Block>(128);
-	private List<Block> _blocksToRemove = new ArrayList<Block>(128);
-	private List<Block> _blocksToAdd = new ArrayList<Block>(64);
+	private FastArrayList<Block> _blocks = new FastArrayList<Block>(128);
+	private FastArrayList<Block> _blocksToRemove = new FastArrayList<Block>(128);
+	private FastArrayList<Block> _blocksToAdd = new FastArrayList<Block>(64);
 	private boolean _cached;
 
 	public BlockList()
@@ -143,11 +144,11 @@ public class BlockList implements Iterable<Block>
 		_blocks.clear();
 		synchronized (_blocksToAdd)
 		{
-			_blocksToAdd.clear();
+			_blocksToAdd.clear(true);
 		}
 		synchronized (_blocksToRemove)
 		{
-			_blocksToRemove.clear();
+			_blocksToRemove.clear(true);
 		}
 		_cached = false;
 	}
@@ -212,7 +213,7 @@ public class BlockList implements Iterable<Block>
 				{
 					removeBlock(bl);
 				}
-				_blocksToRemove.clear();
+				_blocksToRemove.clear(false);
 			}
 		}
 
@@ -225,7 +226,7 @@ public class BlockList implements Iterable<Block>
 				{
 					addBlock(bl);
 				}
-				_blocksToAdd.clear();
+				_blocksToAdd.clear(false);
 			}
 		}
 	}
@@ -239,5 +240,10 @@ public class BlockList implements Iterable<Block>
 	public int size()
 	{
 		return _blocks.size();
+	}
+
+	public Block getBlockAtIndex(int blockIndex)
+	{
+		return _blocks.get(blockIndex);
 	}
 }
