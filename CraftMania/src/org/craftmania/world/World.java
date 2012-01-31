@@ -70,15 +70,17 @@ public class World
 		_worldProvider.save();
 
 		/* Make sure the BlockChunkLoader is free. */
+		int i = 0;
 		do
 		{
+			++i;
 			try
 			{
 				Thread.sleep(10);
 			} catch (Exception e)
 			{
 			}
-		} while (_chunkManager.isBlockChunkThreadingBusy());
+		} while (_chunkManager.isBlockChunkThreadingBusy() && i < 300);
 
 		/* Save the local chunks, by destroying them */
 		for (BlockChunk chunk : _localChunks)
@@ -410,7 +412,7 @@ public class World
 				if (block.isVisible())
 				{
 					blocksVisible++;
-					if (frustum.intersects(block.getAABB()))
+//					if (frustum.intersects(block.getAABB()))
 					{
 						_visibleBlocks.add(block);
 					}

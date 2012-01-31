@@ -29,7 +29,7 @@ public class CraftMania
 		game.init();
 
 		/* Construct a new World */
-		World world = new World("world", System.nanoTime());
+		World world = new World("world0", System.nanoTime());
 		game.setWorld(world);
 		world.getWorldProvider().load();
 

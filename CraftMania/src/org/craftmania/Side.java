@@ -5,7 +5,13 @@ import org.craftmania.math.Vec3i;
 
 public enum Side
 {
+	
+	
 	BACK(new Vec3i(0, 0, -1)), FRONT(new Vec3i(0, 0, 1)), LEFT(new Vec3i(-1, 0, 0)), RIGHT(new Vec3i(1, 0, 0)), TOP(new Vec3i(0, 1, 0)), BOTTOM(new Vec3i(0, -1, 0));
+
+	
+	private static Side[] _cachedValues;
+	
 	
 	private Vec3i normal;
 	private Vec3f vertices[];
@@ -64,10 +70,24 @@ public enum Side
 		int ordinal = side.ordinal();
 		if ((ordinal & 1) == 0)
 		{
-			return Side.values()[ordinal + 1];
+			return Side.getSides()[ordinal + 1];
 		} else
 		{
-			return Side.values()[ordinal - 1];
+			return Side.getSides()[ordinal - 1];
 		}
+	}
+	
+	public static final Side[] getSides()
+	{
+		if (_cachedValues == null)
+		{
+			_cachedValues = values();
+		}
+		return _cachedValues;
+	}
+	
+	public static final Side getSide(int index)
+	{
+		return getSides()[index];
 	}
 }

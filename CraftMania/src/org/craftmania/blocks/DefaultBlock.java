@@ -26,10 +26,7 @@ public class DefaultBlock extends Block
 	public DefaultBlock(BlockType type, BlockChunk chunk, Vec3i pos)
 	{
 		super(type, chunk, pos);
-		// _faceMask = ALL_FACES;
-		setFaceVisible(Side.TOP, true);
-		setFaceVisible(Side.BOTTOM, true);
-		_aabb = new AABB(new Vec3f(pos).add(HALF_BLOCK_SIZE), HALF_BLOCK_SIZE);
+		_aabb = null;
 		_needVisibilityCheck = true;
 	}
 
@@ -55,7 +52,12 @@ public class DefaultBlock extends Block
 				{
 					/* Start falling */
 					if (!hasMovementPlugin())
+					{
 						createMovementPlugin();
+						addToManualRenderList();
+						_needVisibilityCheck = true;
+						_blockChunk.needsNewVBO();
+					}
 					_movement.setFalling(true);
 					_blockChunk.notifyNeighborsOf(getX(), getY(), getZ());
 				}
@@ -66,6 +68,9 @@ public class DefaultBlock extends Block
 					/* Stop falling */
 					_movement.setFalling(false);
 					_blockChunk.notifyNeighborsOf(getX(), getY(), getZ());
+					removeFromManualRenderList();
+					_needVisibilityCheck = true;
+					_blockChunk.needsNewVBO();
 				}
 			}
 
@@ -88,7 +93,7 @@ public class DefaultBlock extends Block
 			_movement.solveMotion();
 			if (!_movement.isMoving())
 			{
-				/* Destroy the plugin */
+				/* Destroy the plug-in */
 				_movement = null;
 			}
 		} else
@@ -125,6 +130,7 @@ public class DefaultBlock extends Block
 	@Override
 	public void render()
 	{
+		_renderManually = true;
 		_rendering = true;
 		if (isVisible())
 		{
@@ -146,6 +152,7 @@ public class DefaultBlock extends Block
 	private synchronized void checkVisibility()
 	{
 		boolean preVisibility = _faceMask != 0;
+		byte preMask = _faceMask;
 		if (isMoving())
 		{
 			_faceMask = ALL_FACES;
@@ -155,7 +162,7 @@ public class DefaultBlock extends Block
 			{
 				for (int i = 0; i < 6; ++i)
 				{
-					Side side = Side.values()[i];
+					Side side = Side.getSide(i);
 					Vec3i normal = side.getNormal();
 					BlockChunk chunk = _blockChunk.getBlockChunkContaining(getX() + normal.x(), getY() + normal.y(), getZ() + normal.z(), false, false, false);
 					if (chunk == null)
@@ -200,13 +207,21 @@ public class DefaultBlock extends Block
 			{
 				removeFromVisibilityList();
 			}
+			
+			_blockChunk.needsNewVBO();
+		} else if (preMask != _faceMask)
+		{
 			_blockChunk.needsNewVBO();
 		}
 	}
 
 	@Override
-	public AABB getAABB()
+	public synchronized AABB getAABB()
 	{
+		if (_aabb == null)
+		{
+			_aabb = new AABB(new Vec3f(getPosition()).add(HALF_BLOCK_SIZE), HALF_BLOCK_SIZE);
+		}
 		return _aabb;
 	}
 
@@ -236,8 +251,6 @@ public class DefaultBlock extends Block
 		}
 		if (side == Side.BOTTOM && !_blockType.isFixed())
 		{
-			// System.out.println("Support changed for " + _blockType.getName()
-			// + ", add to update list");
 			addToUpdateList();
 		}
 	}
@@ -262,12 +275,11 @@ public class DefaultBlock extends Block
 	{
 		return _faceMask;
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return _blockType.getName() + " " + _postion.toString();
 	}
-
 
 }

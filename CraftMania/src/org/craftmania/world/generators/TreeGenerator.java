@@ -75,9 +75,45 @@ public class TreeGenerator extends Generator
 		}
 	}
 
-	public void generatePinophyta(BlockChunk chunk, int x, int y, int z)
+	public void generatePinophyta(BlockChunk chunk, int _x, int _y, int _z)
 	{
-		// TODO Auto-generated method stub
+		int trunkHeight = _random.randomInt(6, 8);
+		int needlesHeight = _random.randomInt(trunkHeight, trunkHeight + 5);
+		int needlesElevation = _random.randomInt(trunkHeight - 3, trunkHeight - 1);
+		int needlesRadius = _random.randomInt(2, 4);
+		
+		byte wood = BlockManager.getInstance().blockID("wood1");
+		byte needles = BlockManager.getInstance().blockID("needles");
+		
+		for (int h = 0; h <= needlesHeight; ++h)
+		{
+			int radius = (int) ((float) needlesRadius * (1.0f - ((float) h / (float)needlesHeight)));
+			if (h % 2 == 1)
+			{
+				radius--;
+			}
+			if (radius < 0)
+			{
+				radius++;
+			}
+			for (int x = -radius; x <= radius; ++x)
+			{
+				for (int z = -radius; z <= radius; ++z)
+				{
+					if (x == 0 && z == 0 && h + needlesElevation < trunkHeight)
+					{
+						continue;
+					}
+					chunk.setBlockTypeAbsolute(_x + x, _y + h + needlesElevation, _z + z, needles, true, true, false);
+				}
+			}
+		}
+		
+		// Treetrunk of wood
+		for (int i = 0; i < trunkHeight; ++i)
+		{
+			chunk.setBlockTypeAbsolute(_x, _y + i, _z, wood, true, true, false);
+		}
 		
 	}
 }

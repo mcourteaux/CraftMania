@@ -26,14 +26,13 @@ public class ChunkGenerator extends Generator
 	public BlockChunk generateChunk(int _x, int _z)
 	{
 		System.out.println("---------- Generate chunk: " + _x + ", " + _z);
-		
+
 		SmartRandom random = new SmartRandom(new Random(generateSeedForChunk(_worldSeed, _x, _z)));
-		
+
 		/* Access the new chunk */
 		BlockChunk chunk = _chunkManager.getBlockChunk(_x, _z, true, false, false);
 		chunk.setGenerated(true);
 		chunk.setLoading(true);
-		
 
 		/* Build a density map */
 		float densityMap[][][] = new float[BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL + 1][BlockChunk.BLOCKCHUNK_SIZE_VERTICAL + 1][BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL + 1];
@@ -76,7 +75,7 @@ public class ChunkGenerator extends Generator
 					} else if (topBiome == Biome.SNOW && y == baseLevel)
 					{
 						chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("snow"), true, false, false);
-					} else if (topBiome == Biome.FOREST && y == baseLevel)
+					} else if ((topBiome == Biome.FOREST || topBiome == Biome.FIELDS) && y == baseLevel)
 					{
 						chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("grass"), true, false, false);
 					} else
@@ -107,59 +106,72 @@ public class ChunkGenerator extends Generator
 			}
 
 		}
-		
+
 		/* Generate trees */
 		{
-            int treeCount = MathHelper.round((1.0f - random.randomFloat(1.0f)) * 12.0f);
-            TreeGenerator gen = new TreeGenerator(random.randomLong());
-            trees:
-            for (int i = 0; i < treeCount; ++i)
-            {
-                int x = chunk.getAbsoluteX() + random.randomInt(0, BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL);
-                int z = chunk.getAbsoluteZ() + random.randomInt(0, BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL);
+			int treeCount = MathHelper.round((1.0f - random.exponentialRandom(1.0f, 3)) * 12.0f);
+			TreeGenerator gen = new TreeGenerator(random.randomLong());
+			trees: for (int i = 0; i < treeCount; ++i)
+			{
+				int x = chunk.getAbsoluteX() + random.randomInt(0, BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL);
+				int z = chunk.getAbsoluteZ() + random.randomInt(0, BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL);
 
-                /* Check for enough distance from the other trees */
-                for (TreeDefinition treeDef : _worldProvider.getTrees())
-                {
-                    float xDiff = x - treeDef.x;
-                    float zDiff = z - treeDef.z;
+				/* Check for enough distance from the other trees */
+				for (TreeDefinition treeDef : _worldProvider.getTrees())
+				{
+					float xDiff = x - treeDef.x;
+					float zDiff = z - treeDef.z;
 
-                    float distSq = xDiff * xDiff + zDiff * zDiff;
-                    if (distSq < 17)
-                    {
-                        continue trees;
-                    }
-                }
-                int type = -1;
-                int y = _worldProvider.getHeightAt(x, z);
+					float distSq = xDiff * xDiff + zDiff * zDiff;
+					if (distSq < 17)
+					{
+						continue trees;
+					}
+				}
+				int type = -1;
+				int y = _worldProvider.getHeightAt(x, z);
 
-                /* Check if the root of the tree is INSIDE THIS blockchunk, to prevent generating trees for one chunk multiple times */
-//                if (chunk.contains(x, y, z))
-                {
-                    Biome biome = _worldProvider.getBiomeAt(x, y, z);
-                    if (biome == Biome.FOREST)
-                    {
-                        gen.generateBroadLeavedTree(chunk, x, y, z, random.randomInt(3) == 0);
-                        type = 0;
-                    } else if (biome == Biome.DESERT)
-                    {
-                        gen.generateCactus(chunk, x, y + 1, z);
-                        type = 1;
-                    } else if (biome == Biome.SNOW)
-                    {
-                    	gen.generatePinophyta(chunk, x, y, z);
-                    	type = 2;
-                    }
-                    _worldProvider.getTrees().add(new TreeDefinition(x, y, z, type));
-                }
-            }
-        }
-		
+				/*
+				 * Check if the root of the tree is INSIDE THIS blockchunk, to
+				 * prevent generating trees for one chunk multiple times
+				 */
+				// if (chunk.contains(x, y, z))
+				{
+					Biome biome = _worldProvider.getBiomeAt(x, y, z);
+					if (biome == Biome.FIELDS)
+					{
+						continue;
+					}
+					if (biome == Biome.FOREST)
+					{
+						gen.generateBroadLeavedTree(chunk, x, y, z, random.randomInt(3) == 0);
+						type = 0;
+					} else if (biome == Biome.DESERT)
+					{
+						if (random.randomBoolean())
+						{
+							gen.generateCactus(chunk, x, y + 1, z);
+
+							type = 1;
+						}
+					} else if (biome == Biome.SNOW)
+					{
+						gen.generatePinophyta(chunk, x, y, z);
+						type = 2;
+					}
+					if (type != -1)
+					{
+						_worldProvider.getTrees().add(new TreeDefinition(x, y, z, type));
+					}
+				}
+			}
+		}
+
 		/* Make it accessible for the game */
 		chunk.setLoading(false);
 		/* Make sure the neighbors are assigned correctly */
 		_chunkManager.assignNeighbors(chunk);
-		
+
 		return chunk;
 	}
 
@@ -199,7 +211,7 @@ public class ChunkGenerator extends Generator
 		}
 		return random.randomFloat(0.1f, 1.4f) * (float) Math.sqrt(random.randomFloat(1.8f * depth, 2.2f * depth) * depth);
 	}
-	
+
 	private long generateSeedForChunk(long worldSeed, int x, int z)
 	{
 		return (((worldSeed << 3L) * x) ^ 0xF37C1E94L) + (worldSeed >> 1) * z;

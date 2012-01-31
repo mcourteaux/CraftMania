@@ -348,13 +348,17 @@ public class DefaultWorldProvider extends WorldProvider
 			System.out.println();
 		}
 
-		if (temp > 25.0f && humidity < 40.0f)
+		if (temp > 25.0f && humidity < 30.0f)
 		{
 			return Biome.DESERT;
 		}
 		if (temp < 5.0f)
 		{
 			return Biome.SNOW;
+		}
+		if (humidity < 50.0f)
+		{
+			return Biome.FIELDS;
 		}
 		return Biome.FOREST;
 	}
@@ -572,7 +576,7 @@ public class DefaultWorldProvider extends WorldProvider
 
 			if (dr.count == 0)
 			{
-				DataPoint2D data = new DataPoint2D(x, z, _random.randomInt(40, 80));
+				DataPoint2D data = new DataPoint2D(x, z, _random.randomInt(60, 80));
 				_humidities.add(data);
 				return data;
 			} else
@@ -597,7 +601,7 @@ public class DefaultWorldProvider extends WorldProvider
 
 			if (dr.count == 0)
 			{
-				DataPoint2D data = new DataPoint2D(x, z, _random.randomInt(20, 40));
+				DataPoint2D data = new DataPoint2D(x, z, _random.randomInt(20, 30));
 				_temperatures.add(data);
 				return data;
 			} else

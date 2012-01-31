@@ -389,6 +389,7 @@ public class Game
 	private void loadRecipes()
 	{
 		RecipeManager.getInstance().addRecipe(new Recipe("wood0", "planks", 4));
+		RecipeManager.getInstance().addRecipe(new Recipe("wood1", "planks", 4));
 		RecipeManager.getInstance().addRecipe(new Recipe("planks,planks;planks,planks", "crafting_table", 1));
 		RecipeManager.getInstance().addRecipe(new Recipe("planks;planks", "stick", 4));
 		RecipeManager.getInstance().addRecipe(new Recipe("coal;stick", "torch", 4));

@@ -225,6 +225,7 @@ public class ChunkManager
 		/* Clear it from the lists */
 		block.removeFromVisibilityList();
 		block.getBlockChunk().getUpdatingBlocks().rememberToRemoveBlock(block);
+		block.removeFromManualRenderList();
 	}
 
 	public void forgetBlockMovementsForBlock(Block block)

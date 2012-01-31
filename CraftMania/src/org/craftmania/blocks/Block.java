@@ -24,6 +24,7 @@ public abstract class Block implements AABBObject
 	/* List facts */
 	protected boolean _updating;
 	protected boolean _rendering;
+	protected boolean _renderManually;
 
 	public Block(BlockType type, BlockChunk blockChunk, Vec3i pos)
 	{
@@ -71,7 +72,6 @@ public abstract class Block implements AABBObject
 	public boolean inflictDamage(float damage)
 	{
 		_health -= damage;
-		System.out.println(_health);
 		if (_health <= 0)
 		{
 			destory();
@@ -82,8 +82,9 @@ public abstract class Block implements AABBObject
 	
 	public void destory()
 	{
-		
 		Game.getInstance().getWorld().getChunkManager().destroyBlock(this);
+		
+		_blockChunk.needsNewVBO();
 	}
 	
 	public void removeFromVisibilityList()
@@ -92,6 +93,7 @@ public abstract class Block implements AABBObject
 		{
 			_blockChunk.getVisibleBlocks().rememberToRemoveBlock(this);
 			_rendering = false;
+//			removeFromManualRenderList();
 		}
 	}
 	
@@ -110,6 +112,34 @@ public abstract class Block implements AABBObject
 		{
 			_blockChunk.getUpdatingBlocks().rememberToAddBlock(this);
 			_updating = true;
+		}
+	}
+	
+	public synchronized void addToManualRenderList()
+	{
+		System.out.print("Add to list... ");
+//		if (!_renderManually)
+		{
+			_blockChunk.getManualRenderBlocks().rememberToAddBlock(this);
+			_renderManually = true;
+			System.out.println("Done");
+//		} else
+//		{
+//			System.out.println("Refused");
+		}
+	}
+	
+	public synchronized void removeFromManualRenderList()
+	{
+		System.out.print("Remove from list... ");
+//		if (_renderManually)
+		{
+			_blockChunk.getManualRenderBlocks().rememberToRemoveBlock(this);
+			_renderManually = false;
+			System.out.println("Done");
+//		} else
+//		{
+//			System.out.println("Refused");
 		}
 	}
 
@@ -145,6 +175,11 @@ public abstract class Block implements AABBObject
 	public void setBlockChunk(BlockChunk chunk)
 	{
 		_blockChunk = chunk;	
+	}
+
+	public boolean isRenderingManually()
+	{
+		return _renderManually;
 	}
 
 }

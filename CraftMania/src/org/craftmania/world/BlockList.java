@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.craftmania.blocks.Block;
 import org.craftmania.utilities.FastArrayList;
+import org.craftmania.world.BlockList.BlockAcceptor;
 
 /**
  * 
@@ -55,6 +56,15 @@ public class BlockList implements Iterable<Block>
 				boolean v = block.isVisible();
 				block.setRenderingFlag(v);
 				return v;
+			}
+		};
+		public static BlockAcceptor NO_BLOCKS = new BlockAcceptor()
+		{
+			
+			@Override
+			public boolean accept(Block block, int x, int y, int z)
+			{
+				return false;
 			}
 		};
 	}

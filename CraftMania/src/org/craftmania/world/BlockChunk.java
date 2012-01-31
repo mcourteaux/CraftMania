@@ -1,9 +1,5 @@
 package org.craftmania.world;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.BitSet;
-
 import org.craftmania.Side;
 import org.craftmania.blocks.Block;
 import org.craftmania.blocks.BlockConstructor;
@@ -21,8 +17,6 @@ import org.craftmania.rendering.ChunkMeshBuilder;
 import org.craftmania.rendering.ChunkMeshRenderer;
 import org.craftmania.world.BlockList.BlockAcceptor;
 import org.craftmania.world.generators.ChunkGenerator;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
 
 public class BlockChunk implements AABBObject
 {
@@ -47,6 +41,7 @@ public class BlockChunk implements AABBObject
 	private Fast3DArray<Block> _blocks;
 	private BlockList _visibleBlocks;
 	private BlockList _updatingBlocks;
+	private BlockList _manualRenderBlocks;
 
 	/* Neighbors */
 	private BlockChunk[] _neighbors;
@@ -58,6 +53,7 @@ public class BlockChunk implements AABBObject
 		_aabb = createAABBForBlockChunkAt(x, z);
 		_visibleBlocks = new BlockList();
 		_updatingBlocks = new BlockList();
+		_manualRenderBlocks = new BlockList();
 		_generated = false;
 		_neighbors = new BlockChunk[4];
 
@@ -99,6 +95,10 @@ public class BlockChunk implements AABBObject
 		}
 
 		ChunkMeshBuilder.generateChunkMesh(this);
+		if (_mesh.getVBO() <= 0)
+		{
+			_newVboNeeded = true;
+		}
 
 	}
 
@@ -108,6 +108,7 @@ public class BlockChunk implements AABBObject
 			return;
 		_visibleBlocks.cache(this, BlockAcceptor.BLOCK_VISIBLE_ACCEPTOR);
 		_updatingBlocks.cache(this, BlockAcceptor.BLOCK_UPDATE_ACCEPTOR);
+		_manualRenderBlocks.cache(this, BlockAcceptor.NO_BLOCKS);
 		_cached = true;
 	}
 
@@ -115,6 +116,7 @@ public class BlockChunk implements AABBObject
 	{
 		_visibleBlocks.clearCache();
 		_updatingBlocks.clearCache();
+		_manualRenderBlocks.clearCache();
 		_cached = false;
 	}
 
@@ -216,6 +218,11 @@ public class BlockChunk implements AABBObject
 		return _updatingBlocks;
 	}
 
+	public BlockList getManualRenderBlocks()
+	{
+		return _manualRenderBlocks;
+	}
+
 	public void setBlockTypeAbsolute(int x, int y, int z, byte blockType, boolean createIfNecessary, boolean loadIfNecessary, boolean generateIfNecessary)
 	{
 		BlockChunk chunk = getBlockChunkContaining(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
@@ -230,7 +237,7 @@ public class BlockChunk implements AABBObject
 	{
 		for (int i = 0; i < 6; ++i)
 		{
-			Side side = Side.values()[i];
+			Side side = Side.getSide(i);
 			Vec3i normal = side.getNormal();
 			Block block = getBlockAbsolute(x + normal.x(), y + normal.y(), z + normal.z());
 			if (block != null)
@@ -265,8 +272,10 @@ public class BlockChunk implements AABBObject
 
 	public void performListChanges()
 	{
+//		System.out.println("Changes!");
 		_visibleBlocks.updateCacheManagment();
 		_updatingBlocks.updateCacheManagment();
+		_manualRenderBlocks.updateCacheManagment();
 	}
 
 	public BlockChunk getBlockChunkContaining(int x, int y, int z, boolean createIfNecessary, boolean loadIfNecessary, boolean generateIfNecessary)
@@ -473,9 +482,16 @@ public class BlockChunk implements AABBObject
 			createVBO();
 		}
 		ChunkMeshRenderer.renderChunkMesh(this);
+
+		for (int i = 0; i < _manualRenderBlocks.size(); ++i)
+		{
+			System.out.println("Rendering " + _manualRenderBlocks.getBlockAtIndex(i).toString() + " block manually");
+			_manualRenderBlocks.getBlockAtIndex(i).render();
+		}
+
 	}
 
-	public int getNumberOfVisibleFaces()
+	public int getNumberOfVisibleFacesForVBO()
 	{
 		int count = 0;
 		Block block = null;
@@ -483,12 +499,17 @@ public class BlockChunk implements AABBObject
 		for (int i = 0; i < getVisibleBlocks().size(); ++i)
 		{
 			block = getVisibleBlocks().getBlockAtIndex(i);
-			if (block instanceof DefaultBlock)
+			if (!block.isRenderingManually())
 			{
-				defaultBlock = (DefaultBlock) block;
-				count += MathHelper.cardinality(defaultBlock.getFaceMask());
+				if (block instanceof DefaultBlock)
+				{
+					defaultBlock = (DefaultBlock) block;
+					count += MathHelper.cardinality(defaultBlock.getFaceMask());
+				}
 			}
+			
 		}
+		System.out.println();
 		return count;
 	}
 

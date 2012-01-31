@@ -153,4 +153,21 @@
     	</brush>
     	<resistance>100000</resistance>
     </block>
+    
+    <block id="17" name="needles">
+    	<brush>
+    		<allsides>5,8</allsides>
+    	</brush>
+    	<resistance>2</resistance>
+    	<mineResult>null</mineResult>
+    </block>
+    <block id="18" name="wood1">
+    	<brush>
+    		<mantle>4,7</mantle>
+    		<top color="#DDDDDD">5,1</top>
+    		<bottom color="#DDDDDD">5,1</bottom>
+    	</brush>
+    	<resistance>6</resistance>
+    	<blockClass>WOOD</blockClass>
+    </block>
 </root>

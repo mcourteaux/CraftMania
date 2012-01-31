@@ -9,7 +9,7 @@ public class BlockChunkThreading
 	private ThreadPool _generatePool;
 	private ThreadPool _savePool;
 	private ThreadPool _deletePool;
-	private int _threads;
+	private volatile int _threads;
 
 	public BlockChunkThreading(ChunkManager chman)
 	{
@@ -27,7 +27,7 @@ public class BlockChunkThreading
 			@Override
 			public void run()
 			{
-				_threads++;
+				++_threads;
 				synchronized (chunk)
 				{
 					try
@@ -39,7 +39,7 @@ public class BlockChunkThreading
 						e.printStackTrace();
 					}
 				}
-				_threads--;
+				--_threads;
 			}
 		});
 	}
@@ -56,7 +56,7 @@ public class BlockChunkThreading
 			@Override
 			public void run()
 			{
-				_threads++;
+				++_threads;
 				synchronized (chunk)
 				{
 					try
@@ -68,7 +68,7 @@ public class BlockChunkThreading
 						e.printStackTrace();
 					}
 				}
-				_threads--;
+				--_threads;
 			}
 		});
 	}
@@ -81,7 +81,7 @@ public class BlockChunkThreading
 			@Override
 			public void run()
 			{
-				_threads++;
+				++_threads;
 				synchronized (chunk)
 				{
 					try
@@ -93,7 +93,7 @@ public class BlockChunkThreading
 						e.printStackTrace();
 					}
 				}
-				_threads--;
+				--_threads;
 			}
 		});
 	}
@@ -106,7 +106,7 @@ public class BlockChunkThreading
 			@Override
 			public void run()
 			{
-				_threads++;
+				++_threads;
 				synchronized (chunk)
 				{
 					try
@@ -118,7 +118,7 @@ public class BlockChunkThreading
 						e.printStackTrace();
 					}
 				}
-				_threads--;
+				--_threads;
 			}
 		});
 	}
@@ -135,7 +135,7 @@ public class BlockChunkThreading
 			@Override
 			public void run()
 			{
-				_threads++;
+				++_threads;
 				synchronized (chunk)
 				{
 					try
@@ -148,7 +148,7 @@ public class BlockChunkThreading
 						e.printStackTrace();
 					}
 				}
-				_threads--;
+				--_threads;
 			}
 		});
 	}
@@ -166,7 +166,7 @@ public class BlockChunkThreading
 			@Override
 			public void run()
 			{
-				_threads++;
+				++_threads;
 				synchronized (chunk)
 				{
 					try
@@ -179,7 +179,7 @@ public class BlockChunkThreading
 						e.printStackTrace();
 					}
 				}
-				_threads--;
+				--_threads;
 			}
 		});
 	}
