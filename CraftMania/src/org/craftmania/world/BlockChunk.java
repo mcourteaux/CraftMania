@@ -28,6 +28,7 @@ public class BlockChunk implements AABBObject
 	private Vec2i _position;
 	private AABB _aabb;
 	private int _blockCount;
+	private boolean _loaded;
 	private boolean _generated;
 	private boolean _destroying;
 	private boolean _loading;
@@ -125,6 +126,7 @@ public class BlockChunk implements AABBObject
 		if (!_generated)
 		{
 			_generated = true;
+			_loading = true;
 			ChunkGenerator gen = new ChunkGenerator(Game.getInstance().getWorld());
 			gen.generateChunk(getX(), getZ());
 			_loading = false;
@@ -521,5 +523,20 @@ public class BlockChunk implements AABBObject
 			_mesh = null;
 			_newVboNeeded = true;
 		}
+	}
+
+	public void setLoaded(boolean b)
+	{
+		_loaded = b;
+	}
+	
+	public boolean isLoaded()
+	{
+		return _loaded;
+	}
+
+	public void setDestroying(boolean b)
+	{
+		_destroying = b;
 	}
 }

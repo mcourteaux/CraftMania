@@ -50,6 +50,10 @@ public class BlockChunkLoader
 
 		boolean generated = dis.readBoolean();
 		System.out.println("Load Chunk (" + chunk.getX() + ", " + chunk.getZ() + "): generated = " + generated);
+		if (chunk.getX() == -5 && chunk.getZ() == -2)
+		{
+//			Thread.dumpStack();
+		}
 
 		Fast3DArray<Block> blocks = chunk.getBlocks();
 		int size = chunk.getBlocks().size();
@@ -82,7 +86,7 @@ public class BlockChunkLoader
 
 		dis.close();
 		chunk.setGenerated(generated);
-
+		chunk.setLoaded(true);
 		chunk.setLoading(false);
 	}
 

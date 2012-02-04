@@ -11,7 +11,6 @@ import static org.lwjgl.opengl.GL11.glLineWidth;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -23,7 +22,6 @@ import org.craftmania.game.Configuration;
 import org.craftmania.game.FontStorage;
 import org.craftmania.game.Game;
 import org.craftmania.inventory.Inventory;
-import org.craftmania.math.BlockDistanceComparator;
 import org.craftmania.math.MathHelper;
 import org.craftmania.rendering.GLFont;
 import org.craftmania.utilities.FastArrayList;
@@ -36,14 +34,13 @@ public class World
 	private WorldProvider _worldProvider;
 	private ChunkManager _chunkManager;
 	private Player _player;
+	private Sky _sky;
 
 	private List<BlockChunk> _localChunks;
 	private List<BlockChunk> _oldChunkList;
 
-	private FastArrayList<Block> _visibleBlocks;
 	private FastArrayList<BlockChunk> _visibleChunks;
 	private Inventory _activatedInventory;
-	private BlockDistanceComparator _blockDistanceComparator;
 	private int _localBlockCount;
 	private int _updatingBlocks;
 	private long _worldSeed;
@@ -55,14 +52,11 @@ public class World
 		_worldName = name;
 		_worldSeed = seed;
 		_worldProvider = new DefaultWorldProvider(this);
+		_sky = new Sky();
 		_chunkManager = new ChunkManager(this);
 		_localChunks = new ArrayList<BlockChunk>();
 		_oldChunkList = new ArrayList<BlockChunk>();
-		int visibleBlockBufferSize = calculateEstimatedAmountOfVisibleBlocks();
-		System.out.println("Visible Block Buffer Size = " + visibleBlockBufferSize);
-		_visibleBlocks = new FastArrayList<Block>(visibleBlockBufferSize);
 		_visibleChunks = new FastArrayList<BlockChunk>(30);
-		_blockDistanceComparator = new BlockDistanceComparator();
 	}
 
 	public void save() throws Exception
@@ -90,15 +84,6 @@ public class World
 		_localChunks.clear();
 	}
 
-	private int calculateEstimatedAmountOfVisibleBlocks()
-	{
-		float viewingDist = Game.getInstance().getConfiguration().getViewingDistance();
-		float fovy = Game.getInstance().getConfiguration().getFOVY();
-		float fovx = MathHelper.calcFOVX(fovy);
-		float viewingArea = (float) (viewingDist * viewingDist * Math.toRadians(fovx) / 2.0f);
-		return MathHelper.ceil(viewingArea * 6.0f);
-	}
-
 	public void render()
 	{
 		/* Prepare Matrixes */
@@ -107,9 +92,11 @@ public class World
 		/* Look through the camera */
 		_player.getFirstPersonCamera().lookThrough();
 
+		_sky.render();
+
 		/* Select the visible blocks */
 		selectVisibleChunks(_player.getFirstPersonCamera().getViewFrustum());
-		selectVisibleBlocks(_player.getFirstPersonCamera().getViewFrustum());
+//		selectVisibleBlocks(_player.getFirstPersonCamera().getViewFrustum());
 
 		for (BlockChunk ch : _visibleChunks)
 		{
@@ -122,7 +109,8 @@ public class World
 
 		_player.render();
 
-		renderOverlay();
+		if (Game.RENDER_OVERLAY)
+			renderOverlay();
 	}
 
 	private void renderOverlay()
@@ -137,7 +125,7 @@ public class World
 		/* Down Left Info */
 		infoFont.print(4, 4, "CraftMania");
 		infoFont.print(4, 30, _player.coordinatesToString());
-		infoFont.print(4, 45, "Visible Blocks:      " + _visibleBlocks.size());
+		infoFont.print(4, 45, "Visible Chunks:      " + _visibleChunks.size());
 		infoFont.print(4, 60, "Updading Blocks:     " + _updatingBlocks);
 		infoFont.print(4, 75, "Total Chunks in RAM: " + _chunkManager.getTotalBlockChunkCount());
 		infoFont.print(4, 90, "Local Chunks:        " + _localChunks.size());
@@ -219,6 +207,9 @@ public class World
 					}
 					c.getVisibleBlocks().updateCacheManagment();
 				}
+			} else if (Keyboard.getEventKey() == Keyboard.KEY_O && Keyboard.getEventKeyState())
+			{
+				Game.RENDER_OVERLAY = !Game.RENDER_OVERLAY;
 			}
 		}
 		if (_activatedInventory == null)
@@ -267,7 +258,7 @@ public class World
 				int distSq = x * x + z * z;
 				if (distSq <= distanceSq)
 				{
-					if (!generate || (xToGenerate * xToGenerate + zToGenerate * zToGenerate > distanceSq))
+					if (!generate || (xToGenerate * xToGenerate + zToGenerate * zToGenerate > distSq))
 					{
 						AABB aabb = null;
 						if (distSq > 1)
@@ -277,12 +268,7 @@ public class World
 						if (aabb == null || frustum.intersects(aabb))
 						{
 							BlockChunk chunk = _chunkManager.getBlockChunk(centerX + x, centerZ + z, false, false, false);
-							if (chunk == null)
-							{
-								generate = true;
-								xToGenerate = x;
-								zToGenerate = z;
-							} else if (!chunk.isGenerated() && !chunk.isLoading())
+							if (chunk == null || (!chunk.isGenerated() && !chunk.isLoading()))
 							{
 								generate = true;
 								xToGenerate = x;
@@ -295,6 +281,7 @@ public class World
 		}
 		if (generate)
 		{
+			System.out.println("New chunk in sight: " + (centerX + xToGenerate) + ", " + (centerZ + zToGenerate));
 			BlockChunk ch = _chunkManager.getBlockChunk(centerX + xToGenerate, centerZ + zToGenerate, true, false, false);
 			_chunkManager.loadAndGenerateChunk(ch, true);
 		}
@@ -388,53 +375,6 @@ public class World
 		}
 	}
 
-	public void selectVisibleBlocks(ViewFrustum frustum)
-	{
-
-		_visibleBlocks.clear(false);
-
-		int blocksChecked = 0;
-		int blocksVisible = 0;
-		BlockChunk chunk = null;
-		for (int chunkIndex = 0; chunkIndex < _visibleChunks.size(); ++chunkIndex)
-		{
-			chunk = _visibleChunks.get(chunkIndex);
-
-			blocksChecked = 0;
-			blocksVisible = 0;
-
-			BlockList blockList = chunk.getVisibleBlocks();
-			Block block = null;
-			for (int blockIndex = 0; blockIndex < blockList.size(); ++blockIndex)
-			{
-				block = blockList.getBlockAtIndex(blockIndex);
-				blocksChecked++;
-				if (block.isVisible())
-				{
-					blocksVisible++;
-//					if (frustum.intersects(block.getAABB()))
-					{
-						_visibleBlocks.add(block);
-					}
-				} else
-				{
-//					System.out.println("Block which is supposed to be not in the visibility list! " + block.toString());
-					blockList.rememberToRemoveBlock(block);
-				}
-			}
-			if (blocksChecked != blocksVisible)
-			{
-				System.err.println("Chunk (" + chunk.getX() + ", " + chunk.getZ() + "): Blocks Checked: " + blocksChecked + "; Blocks Visible: " + blocksVisible);
-			}
-			blockList.updateCacheManagment();
-
-		}
-
-		_blockDistanceComparator.newID();
-		_blockDistanceComparator.setOrigin(_player.getFirstPersonCamera().getPosition());
-		Collections.sort(_visibleBlocks, _blockDistanceComparator);
-	}
-
 	public Player getPlayer()
 	{
 		return _player;
@@ -453,11 +393,6 @@ public class World
 	public WorldProvider getWorldProvider()
 	{
 		return _worldProvider;
-	}
-
-	public List<Block> visibleBlocks()
-	{
-		return _visibleBlocks;
 	}
 
 	public long getWorldSeed()

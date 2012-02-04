@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import org.craftmania.math.Vec3f;
+
 /**
  * 
  * @author martijncourteaux
@@ -30,9 +32,11 @@ public class Configuration
 	private boolean _vsync;
 	private boolean _updateVisibleOnly;
 	private String _texturePack;
+	private Vec3f _fogColor;
 
 	public Configuration()
 	{
+		_fogColor = new Vec3f(0.8f, 0.9f, 1.0f);
 	}
 
 	public int getWidth()
@@ -77,6 +81,11 @@ public class Configuration
 		return _maxPlayerEditingDistance;
 	}
 
+	public Vec3f getFogColor()
+	{
+		return _fogColor;
+	}
+	
 	public int getFPS()
 	{
 		return _fps;

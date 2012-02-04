@@ -1,6 +1,45 @@
 package org.craftmania.game;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_ALPHA_TEST;
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_COLOR_MATERIAL;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_FOG;
+import static org.lwjgl.opengl.GL11.GL_FOG_COLOR;
+import static org.lwjgl.opengl.GL11.GL_FOG_END;
+import static org.lwjgl.opengl.GL11.GL_FOG_HINT;
+import static org.lwjgl.opengl.GL11.GL_FOG_MODE;
+import static org.lwjgl.opengl.GL11.GL_FOG_START;
+import static org.lwjgl.opengl.GL11.GL_LEQUAL;
+import static org.lwjgl.opengl.GL11.GL_LINEAR;
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+import static org.lwjgl.opengl.GL11.GL_NICEST;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_PERSPECTIVE_CORRECTION_HINT;
+import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glClearColor;
+import static org.lwjgl.opengl.GL11.glColor4f;
+import static org.lwjgl.opengl.GL11.glDepthFunc;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glFog;
+import static org.lwjgl.opengl.GL11.glFogf;
+import static org.lwjgl.opengl.GL11.glFogi;
+import static org.lwjgl.opengl.GL11.glHint;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.lwjgl.opengl.GL11.glOrtho;
+import static org.lwjgl.opengl.GL11.glVertex2i;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +49,7 @@ import java.util.logging.Logger;
 import org.craftmania.blocks.BlockXMLLoader;
 import org.craftmania.items.ItemXMLLoader;
 import org.craftmania.math.MathHelper;
+import org.craftmania.math.Vec3f;
 import org.craftmania.recipes.Recipe;
 import org.craftmania.recipes.RecipeManager;
 import org.craftmania.rendering.GLFont;
@@ -20,7 +60,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.NVFogDistance;
 
 public class Game
@@ -33,6 +73,8 @@ public class Game
 	private static Game __instance;
 	private int _loop1024;
 	private Object _separateGCLock = new Object();
+
+	public static boolean RENDER_OVERLAY = true;
 
 	public static Game getInstance()
 	{
@@ -155,9 +197,11 @@ public class Game
 		glOrtho(0, 800, 600, 0, 1, 300);
 		glMatrixMode(GL_MODELVIEW);
 
-		float color = 0.9f;
+		GL11.glShadeModel(GL11.GL_SMOOTH);
+		
+		Vec3f fog = _configuration.getFogColor();
 
-		glClearColor(color, color, color, color);
+		glClearColor(fog.x(), fog.y(), fog.z(), 1.0f);
 		glEnable(GL_TEXTURE_2D);
 		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
@@ -167,9 +211,9 @@ public class Game
 		glEnable(GL_CULL_FACE);
 
 		glEnable(GL_FOG);
-		glFog(GL_FOG_COLOR, GLUtils.wrapDirect(color, color, color, 1.0f));
-		glFogi(GL_FOG_MODE, GL_LINEAR);
-		glFogf(GL_FOG_START, _configuration.getViewingDistance() * 0.45f);
+		glFog(GL_FOG_COLOR, GLUtils.wrapDirect(fog.x(), fog.y(), fog.z(), 1.0f));
+		glFogi(GL_FOG_MODE, GL11.GL_LINEAR);
+		glFogf(GL_FOG_START, _configuration.getViewingDistance() * 0.55f);
 		glFogf(GL_FOG_END, _configuration.getViewingDistance());
 		glFogi(NVFogDistance.GL_FOG_DISTANCE_MODE_NV, NVFogDistance.GL_EYE_RADIAL_NV);
 		glHint(GL_FOG_HINT, GL_NICEST);
@@ -205,7 +249,8 @@ public class Game
 			_world.render();
 		}
 
-		renderOnScreenInfo();
+		if (RENDER_OVERLAY)
+			renderOnScreenInfo();
 	}
 
 	private void renderOnScreenInfo()
@@ -358,7 +403,7 @@ public class Game
 	{
 		Thread t = new Thread(new Runnable()
 		{
-			
+
 			@Override
 			public void run()
 			{
@@ -375,7 +420,7 @@ public class Game
 	{
 		TextureStorage.setTexturePack(_configuration.getTexturePack());
 		TextureStorage.loadTexture("terrain", "PNG", "terrain.png");
-		TextureStorage.loadTexture("items", "PNG", "items.png");
+		TextureStorage.loadTexture("items", "PNG", "gui/items.png");
 		TextureStorage.loadTexture("gui.inventory", "PNG", "gui/inventory.png");
 		TextureStorage.loadTexture("gui.crafting", "PNG", "gui/crafting.png");
 	}

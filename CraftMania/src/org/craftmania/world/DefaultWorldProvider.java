@@ -601,7 +601,7 @@ public class DefaultWorldProvider extends WorldProvider
 
 			if (dr.count == 0)
 			{
-				DataPoint2D data = new DataPoint2D(x, z, _random.randomInt(20, 30));
+				DataPoint2D data = new DataPoint2D(x, z, _random.randomInt(25, 32));
 				_temperatures.add(data);
 				return data;
 			} else

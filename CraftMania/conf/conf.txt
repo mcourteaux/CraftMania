@@ -1,19 +1,14 @@
 
 ### Graphics
 fullscreen=false
-width=800
+width=1000
 height=600
 fovy=65
-fps=60
-viewing_distance=40
+fps=50
+viewing_distance=90
 vsync=false
 
 ### Texture Pack
 texture_pack=GoodMorningCraftv3.2
 #texture_pack=CUBISM1.00
 #texture_pack=QuantumCraft [3.1]
-
-
-### This specifies if only visible blocks need to be updated, or nearby blocks
-### which might be out of sight
-update_visible_only=false

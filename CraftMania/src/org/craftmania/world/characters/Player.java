@@ -179,7 +179,7 @@ public class Player extends GameObject
 			if (button != -1)
 			{
 				/* Create OR Do Action */
-				if (button == 0 && Mouse.getEventButtonState()) 
+				if (button == 0 && Mouse.getEventButtonState())
 				{
 					if (_aimedBlock != null)
 					{
@@ -421,7 +421,7 @@ public class Player extends GameObject
 		{
 			if (onGround)
 			{
-				ySpeed = 7f;
+				ySpeed = 10f;
 				onGround = false;
 			} else if (_flying)
 			{
@@ -457,7 +457,7 @@ public class Player extends GameObject
 		{
 			if (!_flying)
 			{
-				ySpeed -= step * 20f;
+				ySpeed -= step * 26f;
 			} else
 			{
 				float newSpeedY = ySpeed * 0.1f;
@@ -490,47 +490,54 @@ public class Player extends GameObject
 	private void rayCastBlock()
 	{
 		float rayLenSquared = _rayCastLength * _rayCastLength;
+		int ceiledLength = MathHelper.ceil(_rayCastLength);
 
 		Vec3f rayDirection = _camera.getLookDirection();
 		Vec3f rayOrigin = _camera.getPosition();
-
-		List<Block> visibleBlocks = Game.getInstance().getWorld().visibleBlocks();
+		
+		int pX = MathHelper.floor(_position.x());
+		int pY = MathHelper.floor(_position.y());
+		int pZ = MathHelper.floor(_position.z());
 
 		RayBlockIntersection.Intersection closestIntersection = null;
 		Block closestBlock = null;
 
 		/* Iterate over all posible candidates for the raycast */
 		Vec3f v = new Vec3f();
-		for (Block bl : new ReverseIterator<Block>(visibleBlocks))
-		{
-			if (bl.isMoving())
-			{
-				continue;
-			}
-
-			v.set(bl.getAABB().getPosition());
-
-			v.sub(getPosition());
-			float lenSquared = v.lengthSquared();
-			if (lenSquared < rayLenSquared)
-			{
-				/* Perform the raycast */
-				List<RayBlockIntersection.Intersection> intersections = RayBlockIntersection.executeIntersection(bl.getX(), bl.getY(), bl.getZ(), bl.getAABB(), rayOrigin,
-						rayDirection);
-				if (!intersections.isEmpty())
+		Block bl = null;
+		for (int x = -ceiledLength; x <= ceiledLength; ++x)
+			for (int y = -ceiledLength; y <= ceiledLength; ++y)
+				for (int z = -ceiledLength; z <= ceiledLength; ++z)
 				{
-					if (closestIntersection == null || intersections.get(0).getDistance() < closestIntersection.getDistance())
+					bl = Game.getInstance().getWorld().getChunkManager().getBlock(pX + x, pY + y, pZ + z, false, false, false);
+					if (bl == null)
+						continue;
+					
+					if (bl.isMoving())
 					{
-						closestIntersection = intersections.get(0);
-						closestBlock = bl;
+						continue;
 					}
-				}
-			} else
-			{
-				break;
-			}
 
-		}
+					v.set(bl.getAABB().getPosition());
+
+					v.sub(getPosition());
+					float lenSquared = v.lengthSquared();
+					if (lenSquared < rayLenSquared)
+					{
+						/* Perform the raycast */
+						List<RayBlockIntersection.Intersection> intersections = RayBlockIntersection.executeIntersection(bl.getX(), bl.getY(), bl.getZ(), bl.getAABB(), rayOrigin,
+								rayDirection);
+						if (!intersections.isEmpty())
+						{
+							if (closestIntersection == null || intersections.get(0).getDistance() < closestIntersection.getDistance())
+							{
+								closestIntersection = intersections.get(0);
+								closestBlock = bl;
+							}
+						}
+					}
+
+				}
 
 		_aimedBlock = closestBlock;
 		_aimedAdjacentBlockPosition = _aimedBlock == null ? null : closestIntersection.calcAdjacentBlockPos();

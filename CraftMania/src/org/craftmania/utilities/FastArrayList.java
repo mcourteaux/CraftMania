@@ -359,7 +359,6 @@ public class FastArrayList<E> extends AbstractList<E> implements List<E>, Random
 	 */
 	public E get(int index)
 	{
-		RangeCheck(index);
 
 		return (E) elementData[index];
 	}
@@ -378,7 +377,6 @@ public class FastArrayList<E> extends AbstractList<E> implements List<E>, Random
 	 */
 	public E set(int index, E element)
 	{
-		RangeCheck(index);
 
 		E oldValue = (E) elementData[index];
 		elementData[index] = element;
@@ -434,7 +432,6 @@ public class FastArrayList<E> extends AbstractList<E> implements List<E>, Random
 	 */
 	public E remove(int index)
 	{
-		RangeCheck(index);
 
 		modCount++;
 		E oldValue = (E) elementData[index];

@@ -34,6 +34,7 @@
         </brush>
         <resistance>10</resistance>
         <blockClass>STONE</blockClass>
+        <mineResult>19</mineResult>
     </block>
     
     <block id="4" name="wood0">
@@ -169,5 +170,12 @@
     	</brush>
     	<resistance>6</resistance>
     	<blockClass>WOOD</blockClass>
+    </block>
+    <block id="19" name="cobbelstone">
+    	<brush>
+    		<allsides>0,1</allsides>
+    	</brush>
+    	<resistance>9</resistance>
+    	<blockClass>STONE</blockClass>
     </block>
 </root>

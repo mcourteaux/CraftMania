@@ -63,7 +63,7 @@ public class ChunkManager
 		int zInChunk = z - superZ * Chunk.CHUNK_SIZE_X;
 
 		Chunk<BlockChunk> superChunk = getSuperChunk(superX, superZ);
-//		synchronized (superChunk)
+		// synchronized (superChunk)
 		{
 
 			BlockChunk blockChunk = superChunk.get(xInChunk, zInChunk);
@@ -72,18 +72,16 @@ public class ChunkManager
 				blockChunk = new BlockChunk(x, z);
 				assignNeighbors(blockChunk);
 				superChunk.set(xInChunk, zInChunk, blockChunk);
-				if (loadIfNecessary)
+			}
+			if (blockChunk != null && !blockChunk.isLoaded() && loadIfNecessary && !blockChunk.isLoading() && !blockChunk.isDestroying())
+			{
+				try
 				{
-					try
-					{
-						_blockChunkLoader.loadChunk(blockChunk);
-					} catch (IOException e)
-					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					_blockChunkLoader.loadChunk(blockChunk);
+				} catch (IOException e)
+				{
+					e.printStackTrace();
 				}
-
 			}
 			if (blockChunk != null && generateIfNecessary && !blockChunk.isLoading() && !blockChunk.isGenerated() && !blockChunk.isDestroying())
 			{

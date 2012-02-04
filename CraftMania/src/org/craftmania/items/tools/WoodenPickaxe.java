@@ -9,6 +9,6 @@ public class WoodenPickaxe extends Tool
 
 	public WoodenPickaxe()
 	{
-		super("wooden_pickaxe", BlockClass.STONE, Material.WOOD, new Vec2i(6, 0), 7.5f);
+		super("wooden_pickaxe", BlockClass.STONE, Material.WOOD, new Vec2i(0, 6), 7.5f);
 	}
 }
