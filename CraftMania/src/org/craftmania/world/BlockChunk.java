@@ -123,14 +123,15 @@ public class BlockChunk implements AABBObject
 
 	public void generate()
 	{
+		_loading = true;
 		if (!_generated)
 		{
 			_generated = true;
-			_loading = true;
 			ChunkGenerator gen = new ChunkGenerator(Game.getInstance().getWorld());
 			gen.generateChunk(getX(), getZ());
-			_loading = false;
+//			cache();
 		}
+		_loading = false;
 	}
 
 	public boolean isGenerated()
@@ -274,7 +275,7 @@ public class BlockChunk implements AABBObject
 
 	public void performListChanges()
 	{
-//		System.out.println("Changes!");
+		// System.out.println("Changes!");
 		_visibleBlocks.updateCacheManagment();
 		_updatingBlocks.updateCacheManagment();
 		_manualRenderBlocks.updateCacheManagment();
@@ -329,36 +330,32 @@ public class BlockChunk implements AABBObject
 		{
 			Block oldBlock = chunk._blocks.set(x - chunk.getAbsoluteX(), y, z - chunk.getAbsoluteZ(), block);
 
-			if (chunk._cached)
+			if (oldBlock != null)
 			{
-
-				if (oldBlock != null)
+				/* Remove old Block from the lists */
+				oldBlock.removeFromVisibilityList();
+				oldBlock.setRenderingFlag(false);
+				if (oldBlock.getBlockType().wantsToBeUpdated())
 				{
-					/* Remove old Block from the lists */
-					oldBlock.removeFromVisibilityList();
-					oldBlock.setRenderingFlag(false);
-					if (oldBlock.getBlockType().wantsToBeUpdated())
-					{
-						chunk._updatingBlocks.rememberToRemoveBlock(oldBlock);
-						oldBlock.setUpdatingFlag(false);
-					}
+					chunk._updatingBlocks.rememberToRemoveBlock(oldBlock);
+					oldBlock.setUpdatingFlag(false);
 				}
-
-				if (block != null)
-				{
-					/* Add Block to the lists */
-					block.forceVisiblilityCheck();
-					if (block.isVisible())
-					{
-						block.addToVisibilityList();
-					}
-					if (block.getBlockType().wantsToBeUpdated())
-					{
-						block.addToUpdateList();
-					}
-				}
-
 			}
+
+			if (block != null)
+			{
+				/* Add Block to the lists */
+				block.forceVisiblilityCheck();
+				if (block.isVisible())
+				{
+					block.addToVisibilityList();
+				}
+				if (block.getBlockType().wantsToBeUpdated())
+				{
+					block.addToUpdateList();
+				}
+			}
+
 			if (block != null && oldBlock == null && y >= 0 && y < BLOCKCHUNK_SIZE_VERTICAL)
 				chunk._blockCount++;
 			if (block == null && oldBlock != null)
@@ -509,7 +506,7 @@ public class BlockChunk implements AABBObject
 					count += MathHelper.cardinality(defaultBlock.getFaceMask());
 				}
 			}
-			
+
 		}
 		System.out.println();
 		return count;
@@ -529,7 +526,7 @@ public class BlockChunk implements AABBObject
 	{
 		_loaded = b;
 	}
-	
+
 	public boolean isLoaded()
 	{
 		return _loaded;

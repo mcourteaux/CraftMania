@@ -42,6 +42,8 @@ public class BlockChunkLoader
 		File file = getChunkFile(chunk);
 		if (!file.exists())
 		{
+			/* The chunk is totally new, so set it as "loaded" */
+			chunk.setLoaded(true);
 			return;
 		}
 
@@ -50,10 +52,6 @@ public class BlockChunkLoader
 
 		boolean generated = dis.readBoolean();
 		System.out.println("Load Chunk (" + chunk.getX() + ", " + chunk.getZ() + "): generated = " + generated);
-		if (chunk.getX() == -5 && chunk.getZ() == -2)
-		{
-//			Thread.dumpStack();
-		}
 
 		Fast3DArray<Block> blocks = chunk.getBlocks();
 		int size = chunk.getBlocks().size();
@@ -70,24 +68,15 @@ public class BlockChunkLoader
 				int bz = blockPos.z();
 				chunk.setBlockTypeRelative(bx, by, bz, b, false, false, false);
 			}
-
-//			if (i % 512 == 0)
-//			{
-//				try
-//				{
-//					Thread.sleep(1);
-//				} catch (InterruptedException e)
-//				{
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//			}
 		}
 
 		dis.close();
+		
+		chunk.cache();
+		
 		chunk.setGenerated(generated);
-		chunk.setLoaded(true);
 		chunk.setLoading(false);
+		chunk.setLoaded(true);
 	}
 
 	protected void saveChunk(BlockChunk blockChunk) throws Exception

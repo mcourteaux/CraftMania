@@ -96,7 +96,7 @@ public class World
 
 		/* Select the visible blocks */
 		selectVisibleChunks(_player.getFirstPersonCamera().getViewFrustum());
-//		selectVisibleBlocks(_player.getFirstPersonCamera().getViewFrustum());
+		// selectVisibleBlocks(_player.getFirstPersonCamera().getViewFrustum());
 
 		for (BlockChunk ch : _visibleChunks)
 		{
@@ -176,6 +176,8 @@ public class World
 		 */
 		if (Game.getInstance().getFPS() < 3)
 			return;
+
+		_sky.update();
 
 		while (Keyboard.next())
 		{
@@ -299,17 +301,17 @@ public class World
 		_updatingBlocks = 0;
 		for (BlockChunk chunk : _localChunks)
 		{
-			// synchronized (chunk)
-			// {
+//			synchronized (chunk)
+//			{
 
-			for (Iterator<Block> it = chunk.getUpdatingBlocks().iterator(); it.hasNext();)
-			{
-				Block b = it.next();
-				b.update(it);
-			}
-			_updatingBlocks += chunk.getUpdatingBlocks().size();
-			chunk.performListChanges();
-			// }
+				for (Iterator<Block> it = chunk.getUpdatingBlocks().iterator(); it.hasNext();)
+				{
+					Block b = it.next();
+					b.update(it);
+				}
+				_updatingBlocks += chunk.getUpdatingBlocks().size();
+				chunk.performListChanges();
+//			}
 		}
 	}
 
@@ -350,7 +352,7 @@ public class World
 		/* Make sure every local chunk is cached */
 		for (BlockChunk chunk : _localChunks)
 		{
-			if (chunk.isDestroying() || chunk.isLoading())
+			if (chunk.isDestroying() || chunk.isLoading() || !chunk.isLoaded())
 				continue;
 			chunk.cache();
 			_localBlockCount += chunk.getBlockCount();

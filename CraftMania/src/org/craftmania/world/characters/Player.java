@@ -18,6 +18,7 @@ import java.util.List;
 import org.craftmania.GameObject;
 import org.craftmania.blocks.Block;
 import org.craftmania.blocks.BlockType;
+import org.craftmania.datastructures.AABB;
 import org.craftmania.game.Game;
 import org.craftmania.inventory.DefaultPlayerInventory;
 import org.craftmania.inventory.Inventory.InventoryPlace;
@@ -28,7 +29,6 @@ import org.craftmania.math.MathHelper;
 import org.craftmania.math.RayBlockIntersection;
 import org.craftmania.math.Vec3f;
 import org.craftmania.math.Vec3i;
-import org.craftmania.utilities.ReverseIterator;
 import org.craftmania.world.BlockChunk;
 import org.craftmania.world.Camera;
 import org.craftmania.world.ChunkManager;
@@ -64,6 +64,7 @@ public class Player extends GameObject
 	private float _rayCastLength;
 	private Block _aimedBlock;
 	private Vec3i _aimedAdjacentBlockPosition;
+	private AABB _rayAABB;
 	private ChunkManager _chunkManager;
 	private InventoryItem _selectedItem;
 	private int _selectedInventoryItemIndex = 0;
@@ -75,7 +76,7 @@ public class Player extends GameObject
 
 	public Player(float x, float y, float z)
 	{
-
+		_rayAABB = new AABB(new Vec3f(), new Vec3f());
 		_position = new Vec3f(x, y, z);
 		_rayCastLength = Game.getInstance().getConfiguration().getMaximumPlayerEditingDistance();
 		_chunkManager = Game.getInstance().getWorld().getChunkManager();
@@ -490,29 +491,39 @@ public class Player extends GameObject
 	private void rayCastBlock()
 	{
 		float rayLenSquared = _rayCastLength * _rayCastLength;
-		int ceiledLength = MathHelper.ceil(_rayCastLength);
 
 		Vec3f rayDirection = _camera.getLookDirection();
 		Vec3f rayOrigin = _camera.getPosition();
-		
-		int pX = MathHelper.floor(_position.x());
-		int pY = MathHelper.floor(_position.y());
-		int pZ = MathHelper.floor(_position.z());
+
+		rayDirection.normalise();
+
+		/* Construct the AABB for the ray cast */
+		_rayAABB.getPosition().set(rayOrigin);
+		_rayAABB.getPosition().addFactor(rayDirection, _rayCastLength * 0.5f);
+		_rayAABB.getDimensions().set(Math.abs(rayDirection.x()), Math.abs(rayDirection.y()), Math.abs(rayDirection.z()));
+		_rayAABB.getDimensions().scale(_rayCastLength * 0.5f);
+
+		int aabbX = MathHelper.round(_rayAABB.getPosition().x());
+		int aabbY = MathHelper.round(_rayAABB.getPosition().y());
+		int aabbZ = MathHelper.round(_rayAABB.getPosition().z());
 
 		RayBlockIntersection.Intersection closestIntersection = null;
 		Block closestBlock = null;
 
-		/* Iterate over all posible candidates for the raycast */
+		/* Iterate over all possible candidates for the raycast */
 		Vec3f v = new Vec3f();
 		Block bl = null;
-		for (int x = -ceiledLength; x <= ceiledLength; ++x)
-			for (int y = -ceiledLength; y <= ceiledLength; ++y)
-				for (int z = -ceiledLength; z <= ceiledLength; ++z)
+		BlockChunk chunk = Game.getInstance().getWorld().getChunkManager().getBlockChunkContaining(aabbX, aabbY, aabbZ, false, false, false);
+		if (chunk == null) return;
+		
+		for (int x = MathHelper.floor(_rayAABB.minX()); x <= MathHelper.ceil(_rayAABB.maxX()); ++x)
+			for (int y = MathHelper.floor(_rayAABB.minY()); y <= MathHelper.ceil(_rayAABB.maxY()); ++y)
+				for (int z = MathHelper.floor(_rayAABB.minZ()); z <= MathHelper.ceil(_rayAABB.maxZ()); ++z)
 				{
-					bl = Game.getInstance().getWorld().getChunkManager().getBlock(pX + x, pY + y, pZ + z, false, false, false);
+					bl = chunk.getBlockAbsolute(x, y, z);
 					if (bl == null)
 						continue;
-					
+
 					if (bl.isMoving())
 					{
 						continue;

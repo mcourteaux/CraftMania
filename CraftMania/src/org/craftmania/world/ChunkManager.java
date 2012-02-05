@@ -141,7 +141,7 @@ public class ChunkManager
 				if (distSq <= distanceSq)
 				{
 					BlockChunk chunk = getBlockChunk(centerX + x, centerZ + z, false, false, false);
-					if (chunk != null && !chunk.isDestroying() && !chunk.isLoading())
+					if (chunk != null && !chunk.isDestroying() && !chunk.isLoading() && chunk.isLoaded())
 					{
 						chunks.add(chunk);
 					}

@@ -213,4 +213,11 @@ public class Vec3f
 		return this;
 	}
 
+	public float normalise()
+	{
+		float len = length();
+		scale(1.0f / len);
+		return len;
+	}
+
 }

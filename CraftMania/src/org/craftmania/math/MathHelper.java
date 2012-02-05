@@ -320,6 +320,21 @@ public class MathHelper
 		return count;
 	}
 
+	public static float simplify(float val, float interval)
+	{
+		while (val >= interval)
+		{
+			val -= interval;
+		}
+		
+		while (val < 0)
+		{
+			val += interval;
+		}
+		
+		return val;
+	}
+
 
 
 }

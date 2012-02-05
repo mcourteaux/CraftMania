@@ -14,7 +14,6 @@ import static org.lwjgl.opengl.GL11.GL_FOG_HINT;
 import static org.lwjgl.opengl.GL11.GL_FOG_MODE;
 import static org.lwjgl.opengl.GL11.GL_FOG_START;
 import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_NICEST;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
@@ -423,6 +422,7 @@ public class Game
 		TextureStorage.loadTexture("items", "PNG", "gui/items.png");
 		TextureStorage.loadTexture("gui.inventory", "PNG", "gui/inventory.png");
 		TextureStorage.loadTexture("gui.crafting", "PNG", "gui/crafting.png");
+		TextureStorage.loadTexture("environment.clouds", "PNG", "environment/clouds.png");
 	}
 
 	private void loadFonts() throws IOException
@@ -539,7 +539,7 @@ public class Game
 			f = new File(getUserHome(), ".craftmania");
 		} else if (os.contains("win"))
 		{
-			f = new File(getUserHome(), ".craftmania");
+			f = new File(new File(System.getenv("APPDATA")), ".craftmania");
 		}
 		f.mkdir();
 		return f;

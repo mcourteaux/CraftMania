@@ -1,12 +1,9 @@
 package org.craftmania.world;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import org.craftmania.blocks.Block;
 import org.craftmania.utilities.FastArrayList;
-import org.craftmania.world.BlockList.BlockAcceptor;
 
 /**
  * 
@@ -96,7 +93,17 @@ public class BlockList implements Iterable<Block>
 
 	public void cache(BlockChunk blockChunk, BlockAcceptor acceptor)
 	{
+//		if (true)
+//		{
+//			_cached = true;
+//			return;
+//		}
 		clearCache();
+		if (acceptor == BlockAcceptor.NO_BLOCKS)
+		{
+			_cached = true;
+			return;
+		}
 		int count = 0;
 		for (int x = 0; x < BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL; ++x)
 		{
