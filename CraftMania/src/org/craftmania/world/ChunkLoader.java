@@ -15,7 +15,7 @@ import org.craftmania.game.Game;
 import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3i;
 
-public class BlockChunkLoader
+public class ChunkLoader
 {
 
 	private long getUniquePositionID(int x, int z)
@@ -32,12 +32,12 @@ public class BlockChunkLoader
 		return f;
 	}
 
-	private File getChunkFile(BlockChunk ch)
+	private File getChunkFile(Chunk ch)
 	{
 		return getChunkFile(ch.getX(), ch.getZ());
 	}
 
-	public void loadChunk(BlockChunk chunk) throws IOException
+	public void loadChunk(Chunk chunk) throws IOException
 	{
 		File file = getChunkFile(chunk);
 		if (!file.exists())
@@ -79,7 +79,7 @@ public class BlockChunkLoader
 		chunk.setLoaded(true);
 	}
 
-	protected void saveChunk(BlockChunk blockChunk) throws Exception
+	protected void saveChunk(Chunk blockChunk) throws Exception
 	{
 		File file = getChunkFile(blockChunk.getX(), blockChunk.getZ());
 

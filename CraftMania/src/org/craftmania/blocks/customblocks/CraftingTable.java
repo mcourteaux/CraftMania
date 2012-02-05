@@ -5,14 +5,14 @@ import org.craftmania.blocks.DefaultBlock;
 import org.craftmania.game.Game;
 import org.craftmania.inventory.CraftingTableInventory;
 import org.craftmania.math.Vec3i;
-import org.craftmania.world.BlockChunk;
+import org.craftmania.world.Chunk;
 
 public class CraftingTable extends DefaultBlock
 {
 
 	private CraftingTableInventory _inventory;
 	
-	public CraftingTable(BlockChunk chunk, Vec3i pos)
+	public CraftingTable(Chunk chunk, Vec3i pos)
 	{
 		super(BlockManager.getInstance().getBlockType(BlockManager.getInstance().blockID("crafting_table")), chunk, pos);
 		_inventory = new CraftingTableInventory();

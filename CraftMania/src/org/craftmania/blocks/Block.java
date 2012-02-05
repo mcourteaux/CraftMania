@@ -8,13 +8,13 @@ import org.craftmania.datastructures.AABBObject;
 import org.craftmania.game.Game;
 import org.craftmania.inventory.InventoryItem;
 import org.craftmania.math.Vec3i;
-import org.craftmania.world.BlockChunk;
+import org.craftmania.world.Chunk;
 
 public abstract class Block implements AABBObject
 {
 	protected BlockType _blockType;
 	protected Vec3i _postion;
-	protected BlockChunk _blockChunk;
+	protected Chunk _blockChunk;
 	protected AABB _aabb;
 	protected float _health;
 	
@@ -26,7 +26,7 @@ public abstract class Block implements AABBObject
 	protected boolean _rendering;
 	protected boolean _renderManually;
 
-	public Block(BlockType type, BlockChunk blockChunk, Vec3i pos)
+	public Block(BlockType type, Chunk blockChunk, Vec3i pos)
 	{
 		_postion = pos;
 		_blockType = type;
@@ -44,7 +44,7 @@ public abstract class Block implements AABBObject
 		return _blockType;
 	}
 	
-	public BlockChunk getBlockChunk()
+	public Chunk getBlockChunk()
 	{
 		return _blockChunk;
 	}
@@ -172,7 +172,7 @@ public abstract class Block implements AABBObject
 		_rendering = v;
 	}
 
-	public void setBlockChunk(BlockChunk chunk)
+	public void setBlockChunk(Chunk chunk)
 	{
 		_blockChunk = chunk;	
 	}

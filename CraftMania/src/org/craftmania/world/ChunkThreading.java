@@ -2,7 +2,7 @@ package org.craftmania.world;
 
 import org.craftmania.utilities.ThreadPool;
 
-public class BlockChunkThreading
+public class ChunkThreading
 {
 
 	private ChunkManager _chunkManager;
@@ -11,7 +11,7 @@ public class BlockChunkThreading
 	private ThreadPool _deletePool;
 	private volatile int _threads;
 
-	public BlockChunkThreading(ChunkManager chman)
+	public ChunkThreading(ChunkManager chman)
 	{
 		_chunkManager = chman;
 		_generatePool = new ThreadPool(1);
@@ -19,7 +19,7 @@ public class BlockChunkThreading
 		_deletePool = new ThreadPool(1);
 	}
 
-	public void saveChunk(final BlockChunk chunk)
+	public void saveChunk(final Chunk chunk)
 	{
 		_savePool.addThread(new Runnable()
 		{
@@ -44,7 +44,7 @@ public class BlockChunkThreading
 		});
 	}
 	
-	public void deleteChunk(final BlockChunk chunk)
+	public void deleteChunk(final Chunk chunk)
 	{
 		chunk.setDestroying(true);
 		/* Mesh has to be deleted in the main thread, because of OpenGL */
@@ -74,7 +74,7 @@ public class BlockChunkThreading
 		});
 	}
 	
-	public void loadChunk(final BlockChunk chunk)
+	public void loadChunk(final Chunk chunk)
 	{
 		chunk.setLoading(true);
 		_generatePool.addThread(new Runnable()
@@ -100,7 +100,7 @@ public class BlockChunkThreading
 		});
 	}
 
-	public void generateChunk(final BlockChunk chunk)
+	public void generateChunk(final Chunk chunk)
 	{
 		chunk.setLoading(true);
 		_generatePool.addThread(new Runnable()
@@ -126,7 +126,7 @@ public class BlockChunkThreading
 		});
 	}
 
-	public void saveAndUnloadChunk(final BlockChunk chunk)
+	public void saveAndUnloadChunk(final Chunk chunk)
 	{
 		/* Mesh has to be deleted in the main thread, because of OpenGL */
 		chunk.destroyMesh();
@@ -161,7 +161,7 @@ public class BlockChunkThreading
 		return _threads > 0;
 	}
 
-	public void loadAndGenerateChunk(final BlockChunk chunk)
+	public void loadAndGenerateChunk(final Chunk chunk)
 	{
 		chunk.setLoading(true);
 		_generatePool.addThread(new Runnable()

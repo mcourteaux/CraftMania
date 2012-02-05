@@ -91,7 +91,7 @@ public class BlockList implements Iterable<Block>
 		}
 	}
 
-	public void cache(BlockChunk blockChunk, BlockAcceptor acceptor)
+	public void cache(Chunk blockChunk, BlockAcceptor acceptor)
 	{
 //		if (true)
 //		{
@@ -105,11 +105,11 @@ public class BlockList implements Iterable<Block>
 			return;
 		}
 		int count = 0;
-		for (int x = 0; x < BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL; ++x)
+		for (int x = 0; x < Chunk.BLOCKCHUNK_SIZE_HORIZONTAL; ++x)
 		{
-			for (int y = 0; y < BlockChunk.BLOCKCHUNK_SIZE_VERTICAL; ++y)
+			for (int y = 0; y < Chunk.BLOCKCHUNK_SIZE_VERTICAL; ++y)
 			{
-				for (int z = 0; z < BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL; ++z)
+				for (int z = 0; z < Chunk.BLOCKCHUNK_SIZE_HORIZONTAL; ++z)
 				{
 					Block block = blockChunk.getBlockRelative(x, y, z);
 					if (block == null)

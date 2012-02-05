@@ -6,7 +6,7 @@ import org.craftmania.blocks.BlockManager;
 import org.craftmania.math.MathHelper;
 import org.craftmania.utilities.SmartRandom;
 import org.craftmania.world.Biome;
-import org.craftmania.world.BlockChunk;
+import org.craftmania.world.Chunk;
 import org.craftmania.world.World;
 import org.craftmania.world.WorldProvider;
 import org.craftmania.world.WorldProvider.TreeDefinition;
@@ -23,25 +23,25 @@ public class ChunkGenerator extends Generator
 		_worldProvider = world.getWorldProvider();
 	}
 
-	public BlockChunk generateChunk(int _x, int _z)
+	public Chunk generateChunk(int _x, int _z)
 	{
 		System.out.println("---------- Generate chunk: " + _x + ", " + _z);
 
 		SmartRandom random = new SmartRandom(new Random(generateSeedForChunk(_worldSeed, _x, _z)));
 
 		/* Access the new chunk */
-		BlockChunk chunk = _chunkManager.getBlockChunk(_x, _z, true, false, false);
+		Chunk chunk = _chunkManager.getBlockChunk(_x, _z, true, false, false);
 		chunk.setGenerated(true);
 		chunk.setLoading(true);
 
 		/* Build a density map */
-		float densityMap[][][] = new float[BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL + 1][BlockChunk.BLOCKCHUNK_SIZE_VERTICAL + 1][BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL + 1];
+		float densityMap[][][] = new float[Chunk.BLOCKCHUNK_SIZE_HORIZONTAL + 1][Chunk.BLOCKCHUNK_SIZE_VERTICAL + 1][Chunk.BLOCKCHUNK_SIZE_HORIZONTAL + 1];
 
-		for (int x = 0; x < BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL + 1; x += SAMPLE_RATE_HORIZONTAL_DENSITY)
+		for (int x = 0; x < Chunk.BLOCKCHUNK_SIZE_HORIZONTAL + 1; x += SAMPLE_RATE_HORIZONTAL_DENSITY)
 		{
-			for (int z = 0; z < BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL + 1; z += SAMPLE_RATE_HORIZONTAL_DENSITY)
+			for (int z = 0; z < Chunk.BLOCKCHUNK_SIZE_HORIZONTAL + 1; z += SAMPLE_RATE_HORIZONTAL_DENSITY)
 			{
-				for (int y = 0; y < BlockChunk.BLOCKCHUNK_SIZE_VERTICAL + 1; y += SAMPLE_RATE_VERTICAL_DENSITY)
+				for (int y = 0; y < Chunk.BLOCKCHUNK_SIZE_VERTICAL + 1; y += SAMPLE_RATE_VERTICAL_DENSITY)
 				{
 					densityMap[x][y][z] = generateDensity(random, x + chunk.getAbsoluteX(), y, z + chunk.getAbsoluteZ());
 				}
@@ -52,15 +52,15 @@ public class ChunkGenerator extends Generator
 		triLerpDensityMap(densityMap);
 
 		/* Create the blocks using the density map */
-		for (int x = 0; x < BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL; x++)
+		for (int x = 0; x < Chunk.BLOCKCHUNK_SIZE_HORIZONTAL; x++)
 		{
-			for (int z = 0; z < BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL; z++)
+			for (int z = 0; z < Chunk.BLOCKCHUNK_SIZE_HORIZONTAL; z++)
 			{
 				int baseLevel = _worldProvider.getHeightAt(x + chunk.getAbsoluteX(), z + chunk.getAbsoluteZ());
 
 				Biome topBiome = _worldProvider.getBiomeAt(x + chunk.getAbsoluteX(), baseLevel, z + chunk.getAbsoluteZ());
 
-				for (int y = 0; y < BlockChunk.BLOCKCHUNK_SIZE_VERTICAL && y <= baseLevel; y++)
+				for (int y = 0; y < Chunk.BLOCKCHUNK_SIZE_VERTICAL && y <= baseLevel; y++)
 				{
 					if (y < 4)
 					{
@@ -113,8 +113,8 @@ public class ChunkGenerator extends Generator
 			TreeGenerator gen = new TreeGenerator(random.randomLong());
 			trees: for (int i = 0; i < treeCount; ++i)
 			{
-				int x = chunk.getAbsoluteX() + random.randomInt(0, BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL);
-				int z = chunk.getAbsoluteZ() + random.randomInt(0, BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL);
+				int x = chunk.getAbsoluteX() + random.randomInt(0, Chunk.BLOCKCHUNK_SIZE_HORIZONTAL);
+				int z = chunk.getAbsoluteZ() + random.randomInt(0, Chunk.BLOCKCHUNK_SIZE_HORIZONTAL);
 
 				/* Check for enough distance from the other trees */
 				for (TreeDefinition treeDef : _worldProvider.getTrees())
@@ -177,11 +177,11 @@ public class ChunkGenerator extends Generator
 
 	protected void triLerpDensityMap(float[][][] densityMap)
 	{
-		for (int x = 0; x < BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL; x++)
+		for (int x = 0; x < Chunk.BLOCKCHUNK_SIZE_HORIZONTAL; x++)
 		{
-			for (int y = 0; y < BlockChunk.BLOCKCHUNK_SIZE_VERTICAL; y++)
+			for (int y = 0; y < Chunk.BLOCKCHUNK_SIZE_VERTICAL; y++)
 			{
-				for (int z = 0; z < BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL; z++)
+				for (int z = 0; z < Chunk.BLOCKCHUNK_SIZE_HORIZONTAL; z++)
 				{
 					if (!(x % SAMPLE_RATE_HORIZONTAL_DENSITY == 0 && y % SAMPLE_RATE_VERTICAL_DENSITY == 0 && z % SAMPLE_RATE_HORIZONTAL_DENSITY == 0))
 					{

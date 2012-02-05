@@ -1,7 +1,7 @@
 package org.craftmania.rendering;
 
 import org.craftmania.game.TextureStorage;
-import org.craftmania.world.BlockChunk;
+import org.craftmania.world.Chunk;
 import org.lwjgl.opengl.ARBVertexBufferObject;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -17,7 +17,7 @@ public class ChunkMeshRenderer
 	public static int TEX_COORD_OFFSET = COLOR_OFFSET + COLOR_SIZE;
 	public static int FLOAT_SIZE = 4;
 
-	public static void renderChunkMesh(BlockChunk chunk)
+	public static void renderChunkMesh(Chunk chunk)
 	{
 		if (chunk.getMesh().getVBO() <= 0)
 		{

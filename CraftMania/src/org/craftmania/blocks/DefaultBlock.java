@@ -8,7 +8,7 @@ import org.craftmania.game.Game;
 import org.craftmania.inventory.InventoryItem;
 import org.craftmania.math.Vec3f;
 import org.craftmania.math.Vec3i;
-import org.craftmania.world.BlockChunk;
+import org.craftmania.world.Chunk;
 
 public class DefaultBlock extends Block
 {
@@ -23,7 +23,7 @@ public class DefaultBlock extends Block
 
 	private BlockMovementPlugin _movement;
 
-	public DefaultBlock(BlockType type, BlockChunk chunk, Vec3i pos)
+	public DefaultBlock(BlockType type, Chunk chunk, Vec3i pos)
 	{
 		super(type, chunk, pos);
 		_aabb = null;
@@ -164,7 +164,7 @@ public class DefaultBlock extends Block
 				{
 					Side side = Side.getSide(i);
 					Vec3i normal = side.getNormal();
-					BlockChunk chunk = _blockChunk.getBlockChunkContaining(getX() + normal.x(), getY() + normal.y(), getZ() + normal.z(), false, false, false);
+					Chunk chunk = _blockChunk.getBlockChunkContaining(getX() + normal.x(), getY() + normal.y(), getZ() + normal.z(), false, false, false);
 					if (chunk == null)
 					{
 						/* TODO Solve */

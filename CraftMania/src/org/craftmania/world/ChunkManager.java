@@ -17,26 +17,26 @@ public class ChunkManager
 {
 	@SuppressWarnings("unused")
 	private World _world;
-	private Map<Integer, Chunk<BlockChunk>> _superChunks;
+	private Map<Integer, AbstractChunk<Chunk>> _superChunks;
 	private List<BlockMovement> _blocksToMove;
-	private BlockChunkLoader _blockChunkLoader;
-	private BlockChunkThreading _blockChunkThreading;
+	private ChunkLoader _blockChunkLoader;
+	private ChunkThreading _blockChunkThreading;
 
 	public ChunkManager(World world)
 	{
 		_world = world;
-		_superChunks = new HashMap<Integer, Chunk<BlockChunk>>();
+		_superChunks = new HashMap<Integer, AbstractChunk<Chunk>>();
 		_blocksToMove = new ArrayList<ChunkManager.BlockMovement>();
-		_blockChunkLoader = new BlockChunkLoader();
-		_blockChunkThreading = new BlockChunkThreading(this);
+		_blockChunkLoader = new ChunkLoader();
+		_blockChunkThreading = new ChunkThreading(this);
 	}
 
-	public Collection<Chunk<BlockChunk>> getAllSuperChunks()
+	public Collection<AbstractChunk<Chunk>> getAllSuperChunks()
 	{
 		return _superChunks.values();
 	}
 
-	public Chunk<BlockChunk> getSuperChunk(int x, int z)
+	public AbstractChunk<Chunk> getSuperChunk(int x, int z)
 	{
 		/* Map to positive integers */
 		int posX = MathHelper.mapToPositive(x);
@@ -45,31 +45,31 @@ public class ChunkManager
 		/* Apply Cantor's method */
 		Integer cantorize = Integer.valueOf(MathHelper.cantorize(posX, posZ));
 
-		Chunk<BlockChunk> superChunk = _superChunks.get(cantorize);
+		AbstractChunk<Chunk> superChunk = _superChunks.get(cantorize);
 		if (superChunk == null)
 		{
-			superChunk = new Chunk<BlockChunk>(x, z);
+			superChunk = new AbstractChunk<Chunk>(x, z);
 			_superChunks.put(cantorize, superChunk);
 		}
 		return superChunk;
 	}
 
-	public BlockChunk getBlockChunk(int x, int z, boolean createIfNecessary, boolean loadIfNecessary, boolean generateIfNecessary)
+	public Chunk getBlockChunk(int x, int z, boolean createIfNecessary, boolean loadIfNecessary, boolean generateIfNecessary)
 	{
-		int superX = MathHelper.floorDivision(x, Chunk.CHUNK_SIZE_X);
-		int superZ = MathHelper.floorDivision(z, Chunk.CHUNK_SIZE_Z);
+		int superX = MathHelper.floorDivision(x, AbstractChunk.CHUNK_SIZE_X);
+		int superZ = MathHelper.floorDivision(z, AbstractChunk.CHUNK_SIZE_Z);
 
-		int xInChunk = x - superX * Chunk.CHUNK_SIZE_X;
-		int zInChunk = z - superZ * Chunk.CHUNK_SIZE_X;
+		int xInChunk = x - superX * AbstractChunk.CHUNK_SIZE_X;
+		int zInChunk = z - superZ * AbstractChunk.CHUNK_SIZE_X;
 
-		Chunk<BlockChunk> superChunk = getSuperChunk(superX, superZ);
+		AbstractChunk<Chunk> superChunk = getSuperChunk(superX, superZ);
 		// synchronized (superChunk)
 		{
 
-			BlockChunk blockChunk = superChunk.get(xInChunk, zInChunk);
+			Chunk blockChunk = superChunk.get(xInChunk, zInChunk);
 			if (blockChunk == null && createIfNecessary)
 			{
-				blockChunk = new BlockChunk(x, z);
+				blockChunk = new Chunk(x, z);
 				assignNeighbors(blockChunk);
 				superChunk.set(xInChunk, zInChunk, blockChunk);
 			}
@@ -91,7 +91,7 @@ public class ChunkManager
 		}
 	}
 
-	public void assignNeighbors(BlockChunk blockChunk)
+	public void assignNeighbors(Chunk blockChunk)
 	{
 		int x = blockChunk.getX();
 		int z = blockChunk.getZ();
@@ -103,7 +103,7 @@ public class ChunkManager
 
 	public Block getBlock(int x, int y, int z, boolean createIfNecessary, boolean loadIfNecessary, boolean generateIfNecessary)
 	{
-		BlockChunk blockChunk = getBlockChunkContaining(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
+		Chunk blockChunk = getBlockChunkContaining(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
 		if (blockChunk == null)
 			return null;
 		return blockChunk.getBlockAbsolute(x, y, z);
@@ -111,7 +111,7 @@ public class ChunkManager
 
 	public void setBlock(int x, int y, int z, byte blockType, boolean createIfNecessary, boolean loadIfNecessary, boolean generateIfNecessary)
 	{
-		BlockChunk blockChunk = getBlockChunkContaining(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
+		Chunk blockChunk = getBlockChunkContaining(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
 		if (blockChunk == null)
 		{
 			System.out.println("BlockChunk not found for " + x + " " + z);
@@ -120,16 +120,16 @@ public class ChunkManager
 		blockChunk.setBlockTypeAbsolute(x, y, z, blockType, createIfNecessary, loadIfNecessary, generateIfNecessary);
 	}
 
-	public List<BlockChunk> getApproximateChunks(Vec3f position, float viewingDistance, List<BlockChunk> chunks)
+	public List<Chunk> getApproximateChunks(Vec3f position, float viewingDistance, List<Chunk> chunks)
 	{
-		viewingDistance /= BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL;
+		viewingDistance /= Chunk.BLOCKCHUNK_SIZE_HORIZONTAL;
 		viewingDistance += 1.1f;
 
 		int distance = MathHelper.ceil(viewingDistance);
 		int distanceSq = distance * distance;
 
-		int centerX = MathHelper.floor(position.x() / BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL);
-		int centerZ = MathHelper.floor(position.z() / BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL);
+		int centerX = MathHelper.floor(position.x() / Chunk.BLOCKCHUNK_SIZE_HORIZONTAL);
+		int centerZ = MathHelper.floor(position.z() / Chunk.BLOCKCHUNK_SIZE_HORIZONTAL);
 
 		chunks.clear();
 
@@ -140,7 +140,7 @@ public class ChunkManager
 				int distSq = x * x + z * z;
 				if (distSq <= distanceSq)
 				{
-					BlockChunk chunk = getBlockChunk(centerX + x, centerZ + z, false, false, false);
+					Chunk chunk = getBlockChunk(centerX + x, centerZ + z, false, false, false);
 					if (chunk != null && !chunk.isDestroying() && !chunk.isLoading() && chunk.isLoaded())
 					{
 						chunks.add(chunk);
@@ -152,9 +152,9 @@ public class ChunkManager
 		return chunks;
 	}
 
-	public BlockChunk getBlockChunkContaining(int x, int y, int z, boolean createIfNecessary, boolean loadIfNeccessary, boolean generateIfNecessary)
+	public Chunk getBlockChunkContaining(int x, int y, int z, boolean createIfNecessary, boolean loadIfNeccessary, boolean generateIfNecessary)
 	{
-		return getBlockChunk(MathHelper.floorDivision(x, BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL), MathHelper.floorDivision(z, BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL),
+		return getBlockChunk(MathHelper.floorDivision(x, Chunk.BLOCKCHUNK_SIZE_HORIZONTAL), MathHelper.floorDivision(z, Chunk.BLOCKCHUNK_SIZE_HORIZONTAL),
 				createIfNecessary, loadIfNeccessary, generateIfNecessary);
 	}
 
@@ -167,8 +167,8 @@ public class ChunkManager
 	 */
 	public void moveBlockTo(Block block, int srcX, int srcY, int srcZ, int dstX, int dstY, int dstZ)
 	{
-		BlockChunk oldChunk = block.getBlockChunk();
-		BlockChunk newChunk = oldChunk.getBlockChunkContaining(dstX, dstY, dstZ, true, true, false);
+		Chunk oldChunk = block.getBlockChunk();
+		Chunk newChunk = oldChunk.getBlockChunkContaining(dstX, dstY, dstZ, true, true, false);
 
 		oldChunk.setBlockAbsolute(srcX, srcY, srcZ, null, false, false, false);
 		newChunk.setBlockAbsolute(dstX, dstY, dstZ, block, true, true, false);
@@ -242,14 +242,14 @@ public class ChunkManager
 	public int getTotalBlockChunkCount()
 	{
 		int count = 0;
-		for (Chunk<BlockChunk> ch : getAllSuperChunks())
+		for (AbstractChunk<Chunk> ch : getAllSuperChunks())
 		{
 			count += ch.objectCount();
 		}
 		return count;
 	}
 
-	public void saveAndUnloadChunk(BlockChunk chunk, boolean seperateThread)
+	public void saveAndUnloadChunk(Chunk chunk, boolean seperateThread)
 	{
 		if (seperateThread)
 		{
@@ -268,7 +268,7 @@ public class ChunkManager
 		}
 	}
 
-	public void generateChunk(BlockChunk chunk, boolean seperateThread)
+	public void generateChunk(Chunk chunk, boolean seperateThread)
 	{
 		if (seperateThread)
 		{
@@ -279,7 +279,7 @@ public class ChunkManager
 		}
 	}
 
-	public BlockChunkLoader getBlockChunkLoader()
+	public ChunkLoader getBlockChunkLoader()
 	{
 		return _blockChunkLoader;
 	}
@@ -289,7 +289,7 @@ public class ChunkManager
 		return _blockChunkThreading.isTreadingBusy();
 	}
 
-	public void loadAndGenerateChunk(BlockChunk chunk, boolean separateThread)
+	public void loadAndGenerateChunk(Chunk chunk, boolean separateThread)
 	{
 		if (separateThread)
 		{

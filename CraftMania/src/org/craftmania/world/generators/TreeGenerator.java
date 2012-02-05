@@ -5,7 +5,7 @@ import java.util.Random;
 import org.craftmania.blocks.BlockManager;
 import org.craftmania.math.Vec3f;
 import org.craftmania.utilities.SmartRandom;
-import org.craftmania.world.BlockChunk;
+import org.craftmania.world.Chunk;
 
 public class TreeGenerator extends Generator
 {
@@ -17,7 +17,7 @@ public class TreeGenerator extends Generator
 		_random = new SmartRandom(new Random(seed));
 	}
 
-	public void generateBroadLeavedTree(BlockChunk targetChunk, int _x, int _y, int _z, boolean flatBottom)
+	public void generateBroadLeavedTree(Chunk targetChunk, int _x, int _y, int _z, boolean flatBottom)
 	{
 		String leafType = "leafs" + _random.randomInt(2);
 		int height = _random.randomInt(9, 13);
@@ -66,7 +66,7 @@ public class TreeGenerator extends Generator
 
 	}
 
-	public void generateCactus(BlockChunk targetChunk, int x, int y, int z)
+	public void generateCactus(Chunk targetChunk, int x, int y, int z)
 	{
 		int height = _random.randomInt(3, 5);
 		for (int i = 0; i < height; ++i)
@@ -75,7 +75,7 @@ public class TreeGenerator extends Generator
 		}
 	}
 
-	public void generatePinophyta(BlockChunk chunk, int _x, int _y, int _z)
+	public void generatePinophyta(Chunk chunk, int _x, int _y, int _z)
 	{
 		int trunkHeight = _random.randomInt(6, 8);
 		int needlesHeight = _random.randomInt(trunkHeight, trunkHeight + 5);

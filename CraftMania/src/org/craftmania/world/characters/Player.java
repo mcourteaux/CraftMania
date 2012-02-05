@@ -29,7 +29,7 @@ import org.craftmania.math.MathHelper;
 import org.craftmania.math.RayBlockIntersection;
 import org.craftmania.math.Vec3f;
 import org.craftmania.math.Vec3i;
-import org.craftmania.world.BlockChunk;
+import org.craftmania.world.Chunk;
 import org.craftmania.world.Camera;
 import org.craftmania.world.ChunkManager;
 import org.lwjgl.input.Keyboard;
@@ -202,7 +202,7 @@ public class Player extends GameObject
 								// Player is where the block has to come
 							} else
 							{
-								BlockChunk bc = _chunkManager.getBlockChunkContaining(bX, bY, bZ, true, true, true);
+								Chunk bc = _chunkManager.getBlockChunkContaining(bX, bY, bZ, true, true, true);
 								Block currentBlock = bc.getBlockAbsolute(bX, bY, bZ);
 								if (currentBlock == null)
 								{
@@ -363,7 +363,7 @@ public class Player extends GameObject
 		x += xStep;
 		z += zStep;
 
-		BlockChunk bc = null;
+		Chunk bc = null;
 
 		Block wall = null;
 		Block wall2 = null;
@@ -513,7 +513,7 @@ public class Player extends GameObject
 		/* Iterate over all possible candidates for the raycast */
 		Vec3f v = new Vec3f();
 		Block bl = null;
-		BlockChunk chunk = Game.getInstance().getWorld().getChunkManager().getBlockChunkContaining(aabbX, aabbY, aabbZ, false, false, false);
+		Chunk chunk = Game.getInstance().getWorld().getChunkManager().getBlockChunkContaining(aabbX, aabbY, aabbZ, false, false, false);
 		if (chunk == null) return;
 		
 		for (int x = MathHelper.floor(_rayAABB.minX()); x <= MathHelper.ceil(_rayAABB.maxX()); ++x)

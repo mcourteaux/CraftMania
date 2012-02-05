@@ -36,10 +36,10 @@ public class World
 	private Player _player;
 	private Sky _sky;
 
-	private List<BlockChunk> _localChunks;
-	private List<BlockChunk> _oldChunkList;
+	private List<Chunk> _localChunks;
+	private List<Chunk> _oldChunkList;
 
-	private FastArrayList<BlockChunk> _visibleChunks;
+	private FastArrayList<Chunk> _visibleChunks;
 	private Inventory _activatedInventory;
 	private int _localBlockCount;
 	private int _updatingBlocks;
@@ -54,9 +54,9 @@ public class World
 		_worldProvider = new DefaultWorldProvider(this);
 		_sky = new Sky();
 		_chunkManager = new ChunkManager(this);
-		_localChunks = new ArrayList<BlockChunk>();
-		_oldChunkList = new ArrayList<BlockChunk>();
-		_visibleChunks = new FastArrayList<BlockChunk>(30);
+		_localChunks = new ArrayList<Chunk>();
+		_oldChunkList = new ArrayList<Chunk>();
+		_visibleChunks = new FastArrayList<Chunk>(30);
 	}
 
 	public void save() throws Exception
@@ -77,7 +77,7 @@ public class World
 		} while (_chunkManager.isBlockChunkThreadingBusy() && i < 300);
 
 		/* Save the local chunks, by destroying them */
-		for (BlockChunk chunk : _localChunks)
+		for (Chunk chunk : _localChunks)
 		{
 			_chunkManager.saveAndUnloadChunk(chunk, false);
 		}
@@ -98,7 +98,7 @@ public class World
 		selectVisibleChunks(_player.getFirstPersonCamera().getViewFrustum());
 		// selectVisibleBlocks(_player.getFirstPersonCamera().getViewFrustum());
 
-		for (BlockChunk ch : _visibleChunks)
+		for (Chunk ch : _visibleChunks)
 		{
 			ch.render();
 		}
@@ -195,7 +195,7 @@ public class World
 				_player.toggleFlying();
 			} else if (Keyboard.getEventKey() == Keyboard.KEY_C && Keyboard.getEventKeyState())
 			{
-				for (BlockChunk c : _localChunks)
+				for (Chunk c : _localChunks)
 				{
 					Fast3DArray<Block> blocks = c.getBlocks();
 					for (int i = 0; i < blocks.size(); ++i)
@@ -240,13 +240,13 @@ public class World
 	private void checkForNewVisibleChunks()
 	{
 		float viewingDistance = Game.getInstance().getConfiguration().getViewingDistance();
-		viewingDistance /= BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL;
+		viewingDistance /= Chunk.BLOCKCHUNK_SIZE_HORIZONTAL;
 		// viewingDistance += 1.0f;
 		int distance = MathHelper.ceil(viewingDistance);
 		int distanceSq = distance * distance;
 
-		int centerX = MathHelper.floor(getPlayer().getPosition().x() / BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL);
-		int centerZ = MathHelper.floor(getPlayer().getPosition().z() / BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL);
+		int centerX = MathHelper.floor(getPlayer().getPosition().x() / Chunk.BLOCKCHUNK_SIZE_HORIZONTAL);
+		int centerZ = MathHelper.floor(getPlayer().getPosition().z() / Chunk.BLOCKCHUNK_SIZE_HORIZONTAL);
 
 		ViewFrustum frustum = getPlayer().getFirstPersonCamera().getViewFrustum();
 
@@ -265,11 +265,11 @@ public class World
 						AABB aabb = null;
 						if (distSq > 1)
 						{
-							aabb = BlockChunk.createAABBForBlockChunkAt(centerX + x, centerZ + z);
+							aabb = Chunk.createAABBForBlockChunkAt(centerX + x, centerZ + z);
 						}
 						if (aabb == null || frustum.intersects(aabb))
 						{
-							BlockChunk chunk = _chunkManager.getBlockChunk(centerX + x, centerZ + z, false, false, false);
+							Chunk chunk = _chunkManager.getBlockChunk(centerX + x, centerZ + z, false, false, false);
 							if (chunk == null || (!chunk.isGenerated() && !chunk.isLoading()))
 							{
 								generate = true;
@@ -284,7 +284,7 @@ public class World
 		if (generate)
 		{
 			System.out.println("New chunk in sight: " + (centerX + xToGenerate) + ", " + (centerZ + zToGenerate));
-			BlockChunk ch = _chunkManager.getBlockChunk(centerX + xToGenerate, centerZ + zToGenerate, true, false, false);
+			Chunk ch = _chunkManager.getBlockChunk(centerX + xToGenerate, centerZ + zToGenerate, true, false, false);
 			_chunkManager.loadAndGenerateChunk(ch, true);
 		}
 
@@ -299,7 +299,7 @@ public class World
 	private void updateLocalChunks()
 	{
 		_updatingBlocks = 0;
-		for (BlockChunk chunk : _localChunks)
+		for (Chunk chunk : _localChunks)
 		{
 //			synchronized (chunk)
 //			{
@@ -321,20 +321,20 @@ public class World
 		float viewingDistance = Game.getInstance().getConfiguration().getViewingDistance();
 
 		/* Swap the lists */
-		List<BlockChunk> temp = _localChunks;
+		List<Chunk> temp = _localChunks;
 		_localChunks = _oldChunkList;
 		_oldChunkList = temp;
 
-		_chunkManager.getApproximateChunks(_player.getPosition(), viewingDistance + BlockChunk.BLOCKCHUNK_SIZE_HORIZONTAL, _localChunks);
+		_chunkManager.getApproximateChunks(_player.getPosition(), viewingDistance + Chunk.BLOCKCHUNK_SIZE_HORIZONTAL, _localChunks);
 
 		if (!_oldChunkList.isEmpty())
 		{
 			/* Check for chunks getting out of sight to clear the cache */
 			outer: for (int i = 0; i < _oldChunkList.size(); ++i)
 			{
-				BlockChunk chunkI = _oldChunkList.get(i);
+				Chunk chunkI = _oldChunkList.get(i);
 				/* Check if the old chunk is also in the new list */
-				for (BlockChunk chunkJ : _localChunks)
+				for (Chunk chunkJ : _localChunks)
 				{
 
 					if (chunkI == chunkJ)
@@ -350,7 +350,7 @@ public class World
 		}
 
 		/* Make sure every local chunk is cached */
-		for (BlockChunk chunk : _localChunks)
+		for (Chunk chunk : _localChunks)
 		{
 			if (chunk.isDestroying() || chunk.isLoading() || !chunk.isLoaded())
 				continue;
@@ -362,7 +362,7 @@ public class World
 	private void selectVisibleChunks(ViewFrustum frustum)
 	{
 		_visibleChunks.clear(false);
-		BlockChunk chunk = null;
+		Chunk chunk = null;
 		for (int chunkIndex = 0; chunkIndex < _localChunks.size(); ++chunkIndex)
 		{
 			chunk = _localChunks.get(chunkIndex);

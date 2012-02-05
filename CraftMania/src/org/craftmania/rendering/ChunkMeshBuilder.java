@@ -10,7 +10,7 @@ import org.craftmania.blocks.DefaultBlock;
 import org.craftmania.blocks.DefaultBlockBrush;
 import org.craftmania.math.Vec2f;
 import org.craftmania.math.Vec3f;
-import org.craftmania.world.BlockChunk;
+import org.craftmania.world.Chunk;
 import org.craftmania.world.BlockList;
 import org.lwjgl.opengl.ARBVertexBufferObject;
 import org.lwjgl.opengl.GL11;
@@ -31,7 +31,7 @@ public class ChunkMeshBuilder
 	
 	private static int USED_SIZE = 0;
 
-	public static void generateChunkMesh(BlockChunk chunk)
+	public static void generateChunkMesh(Chunk chunk)
 	{
 		synchronized (GLUtils.getOpenGLLock())
 		{
