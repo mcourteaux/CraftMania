@@ -48,7 +48,7 @@ public class ChunkMesh
 			{
 				ARBVertexBufferObject.glDeleteBuffersARB(_vbo);
 			}
-			System.out.println("Delete VBO: " + _vbo);
+//			System.out.println("Delete VBO: " + _vbo);
 			_vbo = 0;
 		}
 	}

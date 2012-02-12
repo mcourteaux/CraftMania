@@ -104,4 +104,9 @@ public class BlockManager
 		_blockTypes[blockType.getID()] = blockType;
 		_typeStrings.put(blockType.getType(), blockType.getID());
 	}
+
+	public BlockType getBlockType(String string)
+	{
+		return getBlockType(blockID(string));
+	}
 }

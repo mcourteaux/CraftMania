@@ -19,7 +19,13 @@ public class CraftMania
 	 */
 	public static void main(String[] args) throws Exception
 	{
-
+//		try
+//		{
+//			Thread.sleep(10000);
+//		} catch (Exception e)
+//		{
+//			// TODO: handle exception
+//		}
  
 		loadNativeLibs();
 		initUncaughtExceptionHandler();
@@ -29,7 +35,7 @@ public class CraftMania
 		game.init();
 
 		/* Construct a new World */
-		World world = new World("world0", System.nanoTime());
+		World world = new World("world", System.nanoTime());
 		game.setWorld(world);
 		world.getWorldProvider().load();
 

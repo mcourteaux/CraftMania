@@ -27,9 +27,9 @@ public abstract class InventoryItem extends GameObject
         this._animationSpeed = animationSpeed;
     }
 
-    public abstract float calcDamageFactorToBlock(Block block);
+    public abstract float calcDamageFactorToBlock(byte block);
 
-    public abstract float calcDamageInflictedByBlock(Block block);
+    public abstract float calcDamageInflictedByBlock(byte block);
 
     public abstract short getInventoryTypeID();
 

@@ -11,7 +11,7 @@ import static org.lwjgl.opengl.GL11.glTexCoord2f;
 import static org.lwjgl.opengl.GL11.glVertex2f;
 
 import org.craftmania.inventory.InventoryItem;
-import org.lwjgl.util.vector.Vector3f;
+import org.craftmania.math.Vec3f;
 import org.newdawn.slick.opengl.Texture;
 
 public final class BlockType extends InventoryItem
@@ -21,7 +21,7 @@ public final class BlockType extends InventoryItem
 	private byte id;
 	private DefaultBlockBrush brush;
 	private Texture inventoryTexture;
-	private Vector3f dimensions;
+	private Vec3f dimensions;
 	private boolean solid;
 	private boolean fixed;
 	private boolean transculent;
@@ -30,6 +30,7 @@ public final class BlockType extends InventoryItem
 	private int mineResult;
 	private int mineResultCount;
 	private String customClass;
+	private boolean hasSpecialAction;
 
 	public enum BlockClass
 	{
@@ -46,7 +47,7 @@ public final class BlockType extends InventoryItem
 		this.type = name;
 		this.id = (byte) id;
 		this.brush = BlockBrushStorage.get(name);
-		dimensions = new Vector3f(1, 1, 1);
+		dimensions = new Vec3f(0.5f, 0.5f, 0.5f);
 		solid = true;
 		fixed = true;
 		transculent = false;
@@ -111,13 +112,13 @@ public final class BlockType extends InventoryItem
 	}
 
 	@Override
-	public float calcDamageFactorToBlock(Block block)
+	public float calcDamageFactorToBlock(byte block)
 	{
 		return 1.0f;
 	}
 
 	@Override
-	public float calcDamageInflictedByBlock(Block block)
+	public float calcDamageInflictedByBlock(byte block)
 	{
 		return 0.0f;
 	}
@@ -153,7 +154,7 @@ public final class BlockType extends InventoryItem
 		return brush;
 	}
 
-	public Vector3f getDimensions()
+	public Vec3f getDimensions()
 	{
 		return dimensions;
 	}
@@ -207,4 +208,10 @@ public final class BlockType extends InventoryItem
 	{
 		return (!fixed) || (customClass != null);
 	}
+
+	public boolean hasSpecialAction()
+	{
+		return hasSpecialAction;
+	}
+
 }

@@ -20,12 +20,6 @@ public class CraftingTable extends DefaultBlock
 	}
 	
 	@Override
-	public boolean hasSpecialAction()
-	{
-		return true;
-	}
-	
-	@Override
 	public void performSpecialAction()
 	{
 		Game.getInstance().getWorld().setActivatedInventory(_inventory);

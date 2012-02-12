@@ -3,6 +3,7 @@ package org.craftmania.world.generators;
 import java.util.Random;
 
 import org.craftmania.blocks.BlockManager;
+import org.craftmania.blocks.BlockType;
 import org.craftmania.math.Vec3f;
 import org.craftmania.utilities.SmartRandom;
 import org.craftmania.world.Chunk;
@@ -27,14 +28,14 @@ public class TreeGenerator extends Generator
 		height -= (flatBottom ? 1 : 0);
 
 		// Treetrunk of wood
+		BlockType trunk = BlockManager.getInstance().getBlockType("wood0");
 		for (int i = 0; i < height - 1; ++i)
 		{
-			byte bl = BlockManager.getInstance().blockID("wood0");
-			targetChunk.setBlockTypeAbsolute(_x, _y + i, _z, bl, true, true, false);
+			targetChunk.setDefaultBlockAbsolute(_x, _y + i, _z, trunk, (byte) 0, true, true, false);
 		}
 
 		// Leafs
-		byte blLeafs = BlockManager.getInstance().blockID(leafType);
+		BlockType blLeafs = BlockManager.getInstance().getBlockType(leafType);
 		for (int x = -radius; x < radius; ++x)
 		{
 			for (int y = -radius; y < radius; ++y)
@@ -58,20 +59,22 @@ public class TreeGenerator extends Generator
 						 * chunks, that contains tree which invokes the
 						 * generation of a new chunk.
 						 */
-						targetChunk.setBlockTypeAbsolute(_x + x, _y + height - radius + y, _z + z, blLeafs, true, true, false);
+						targetChunk.setDefaultBlockAbsolute(_x + x, _y + height - radius + y, _z + z, blLeafs, (byte) 0, true, true, false);
 					}
 				}
 			}
 		}
+		
 
 	}
 
 	public void generateCactus(Chunk targetChunk, int x, int y, int z)
 	{
 		int height = _random.randomInt(3, 5);
+		BlockType bt = BlockManager.getInstance().getBlockType("cactus");
 		for (int i = 0; i < height; ++i)
 		{
-			targetChunk.setBlockTypeAbsolute(x, y + i, z, BlockManager.getInstance().blockID("cactus"), true, true, false);
+			targetChunk.setDefaultBlockAbsolute(x, y + i, z, bt, (byte) 0, true, true, false);
 		}
 	}
 
@@ -82,8 +85,8 @@ public class TreeGenerator extends Generator
 		int needlesElevation = _random.randomInt(trunkHeight - 3, trunkHeight - 1);
 		int needlesRadius = _random.randomInt(2, 4);
 		
-		byte wood = BlockManager.getInstance().blockID("wood1");
-		byte needles = BlockManager.getInstance().blockID("needles");
+		BlockType wood = BlockManager.getInstance().getBlockType("wood1");
+		BlockType needles = BlockManager.getInstance().getBlockType("needles");
 		
 		for (int h = 0; h <= needlesHeight; ++h)
 		{
@@ -104,7 +107,7 @@ public class TreeGenerator extends Generator
 					{
 						continue;
 					}
-					chunk.setBlockTypeAbsolute(_x + x, _y + h + needlesElevation, _z + z, needles, true, true, false);
+					chunk.setDefaultBlockAbsolute(_x + x, _y + h + needlesElevation, _z + z, needles, (byte) 0, true, true, false);
 				}
 			}
 		}
@@ -112,7 +115,7 @@ public class TreeGenerator extends Generator
 		// Treetrunk of wood
 		for (int i = 0; i < trunkHeight; ++i)
 		{
-			chunk.setBlockTypeAbsolute(_x, _y + i, _z, wood, true, true, false);
+			chunk.setDefaultBlockAbsolute(_x, _y + i, _z, wood, (byte) 0, true, true, false);
 		}
 		
 	}

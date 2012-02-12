@@ -41,13 +41,13 @@ public abstract class TexturedItem extends InventoryItem
     }
 
     @Override
-    public float calcDamageFactorToBlock(Block block)
+    public float calcDamageFactorToBlock(byte block)
     {
         return 1.1f;
     }
 
     @Override
-    public float calcDamageInflictedByBlock(Block block)
+    public float calcDamageInflictedByBlock(byte block)
     {
         return 0.0f;
     }

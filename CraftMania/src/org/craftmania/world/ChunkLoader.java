@@ -10,7 +10,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.craftmania.blocks.Block;
-import org.craftmania.datastructures.Fast3DArray;
+import org.craftmania.blocks.BlockConstructor;
+import org.craftmania.blocks.BlockManager;
+import org.craftmania.blocks.BlockType;
 import org.craftmania.game.Game;
 import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3i;
@@ -53,27 +55,34 @@ public class ChunkLoader
 		boolean generated = dis.readBoolean();
 		System.out.println("Load Chunk (" + chunk.getX() + ", " + chunk.getZ() + "): generated = " + generated);
 
-		Fast3DArray<Block> blocks = chunk.getBlocks();
-		int size = chunk.getBlocks().size();
+		int size = Chunk.BLOCK_COUNT;
 
+		BlockType type = null;
 		Vec3i blockPos = new Vec3i();
 		for (int i = 0; i < size; ++i)
 		{
 			byte b = dis.readByte();
+			byte metadata = dis.readByte();
 			if (b != 0)
 			{
-				blocks.rawIndexToVec3i(i, blockPos);
+				type = BlockManager.getInstance().getBlockType(b);
+				ChunkData.indexToPosition(i, blockPos);
 				int bx = blockPos.x();
 				int by = blockPos.y();
 				int bz = blockPos.z();
-				chunk.setBlockTypeRelative(bx, by, bz, b, false, false, false);
+				if (type.getCustomClass() == null)
+				{
+					chunk.setDefaultBlockRelative(bx, by, bz, type, metadata, false, false, false);
+				} else
+				{
+					Block block = BlockConstructor.construct(bx, by, bz, chunk, b, metadata);
+					chunk.setSpecialBlockRelative(bx, by, bz, block, false, false, false);
+				}
 			}
 		}
 
 		dis.close();
-		
-		chunk.cache();
-		
+
 		chunk.setGenerated(generated);
 		chunk.setLoading(false);
 		chunk.setLoaded(true);
@@ -89,31 +98,19 @@ public class ChunkLoader
 		dos.writeBoolean(blockChunk.isGenerated());
 		System.out.println("Save Chunk (" + blockChunk.getX() + ", " + blockChunk.getZ() + "): generated = " + blockChunk.isGenerated());
 
-		Fast3DArray<Block> blocks = blockChunk.getBlocks();
-		int size = blocks.size();
+		ChunkData data = blockChunk.getChunkData();
 
-		for (int i = 0; i < size; ++i)
+		for (int i = 0; i < Chunk.BLOCK_COUNT; ++i)
 		{
-			Block b = blocks.getRawObject(i);
-			if (b == null)
+			byte b = data.getBlockType(i);
+			if (b == 0)
 			{
-				dos.writeByte(0);
+				dos.writeShort(0);
 			} else
 			{
-				dos.writeByte(b.getBlockType().getID());
+				dos.writeByte(b);
+				dos.writeByte(data.getMetaData(i));
 			}
-//			if (i % 512 == 0)
-//			{
-//				try
-//				{
-//					Thread.sleep(1);
-//				} catch (InterruptedException e)
-//				{
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//			}
-
 		}
 
 		dos.flush();

@@ -334,6 +334,17 @@ public class MathHelper
 		
 		return val;
 	}
+	
+	public static byte setBit(byte b, int bit, boolean value)
+	{
+		if (value)
+		{
+			return (byte) (b | (1 << bit));
+		} else
+		{
+			return (byte) (b & ~(1 << bit));
+		}
+	}
 
 
 

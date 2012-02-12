@@ -37,11 +37,12 @@ public class Vec3f
 		this(0.0f, 0.0f, 0.0f);
 	}
 
-	public void set(float x, float y, float z)
+	public Vec3f set(float x, float y, float z)
 	{
 		this.x = x;
 		this.y = y;
 		this.z = z;
+		return this;
 	}
 
 	/**
@@ -70,6 +71,19 @@ public class Vec3f
 		return this;
 	}
 
+	/**
+	 * Adds the passed vector to this vector
+	 * 
+	 * @param v
+	 *            the vector to add
+	 * @return {@code this}
+	 */
+	public Vec3f add(Vec3i v)
+	{
+		set(x + v.x(), y + v.y(), z + v.z());
+		return this;
+	}
+	
 	/**
 	 * Performs a scalar product on this vector
 	 * 
@@ -219,5 +233,7 @@ public class Vec3f
 		scale(1.0f / len);
 		return len;
 	}
+
+
 
 }

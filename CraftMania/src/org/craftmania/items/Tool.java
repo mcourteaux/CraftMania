@@ -46,10 +46,9 @@ public abstract class Tool extends TexturedItem
     }
 
     @Override
-    public float calcDamageFactorToBlock(Block block)
+    public float calcDamageFactorToBlock(byte block)
     {
-        byte blockTypeByte = block.getBlockType().getID();
-        BlockType bt = BlockManager.getInstance().getBlockType(blockTypeByte);
+        BlockType bt = BlockManager.getInstance().getBlockType(block);
 
         if (bt.getBlockClass() == getBlockClass())
         {
@@ -59,10 +58,9 @@ public abstract class Tool extends TexturedItem
     }
 
     @Override
-    public float calcDamageInflictedByBlock(Block block)
+    public float calcDamageInflictedByBlock(byte block)
     {
-        byte blockTypeByte = block.getBlockType().getID();
-        BlockType bt = BlockManager.getInstance().getBlockType(blockTypeByte);
+        BlockType bt = BlockManager.getInstance().getBlockType(block);
         float materialResistance = (0.2f / (float) Math.pow(_material.ordinal(), 1.2d));
         if (bt.getBlockClass() == getBlockClass())
         {
@@ -70,6 +68,8 @@ public abstract class Tool extends TexturedItem
         }
         return bt.getResistance() * materialResistance;
     }
+    
+    
 
     @Override
     public void renderHoldableObject()

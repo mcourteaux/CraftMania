@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.craftmania.blocks.Block;
+import org.craftmania.blocks.BlockManager;
 import org.craftmania.game.Game;
 import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3f;
@@ -392,9 +392,9 @@ public class DefaultWorldProvider extends WorldProvider
 			int z = random.randomInt(-5 * i, 5 * i);
 			int y = getHeightAt(x, z);
 
-			_spawnPoint = new Vec3f(x + 0.5f, y + 1, z + 0.5f);
-			Block spawnPointBlock = null;
-			while (spawnPointBlock == null)
+			_spawnPoint = new Vec3f(x + 0.5f, y + 1.5f, z + 0.5f);
+			byte spawnPointBlock = 0;
+			while (spawnPointBlock == 0)
 			{
 				spawnPointBlock = _world.getChunkManager().getBlock(x, y, z, true, true, true);
 				try
@@ -404,13 +404,13 @@ public class DefaultWorldProvider extends WorldProvider
 				{
 				}
 			}
-			if (spawnPointBlock.getBlockType().getName().equals("grass"))
+			if (BlockManager.getInstance().getBlockType(spawnPointBlock).getName().equals("grass"))
 			{
-				Block above = _world.getChunkManager().getBlock(x, y + 1, z, true, true, true);
-				if (above == null)
+				byte above = _world.getChunkManager().getBlock(x, y + 1, z, true, true, true);
+				if (above == 0)
 				{
 					above = _world.getChunkManager().getBlock(x, y + 2, z, true, true, true);
-					if (above == null)
+					if (above == 0)
 					{
 						break;
 					}
@@ -624,6 +624,8 @@ public class DefaultWorldProvider extends WorldProvider
 
 		DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
 
+		dos.writeFloat(_world.getTime());
+		
 		_initialSpawnPoint = new Vec3f(_world.getPlayer().getPosition());
 		writeVec3f(dos, _spawnPoint);
 		writeVec3f(dos, _initialSpawnPoint);
@@ -669,6 +671,8 @@ public class DefaultWorldProvider extends WorldProvider
 
 		DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
 
+		_world.setTime(dis.readFloat());
+		
 		_spawnPoint = new Vec3f();
 		_initialSpawnPoint = new Vec3f();
 		readVec3f(dis, _spawnPoint);

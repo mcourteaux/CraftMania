@@ -30,18 +30,18 @@ public class ChunkGenerator extends Generator
 		SmartRandom random = new SmartRandom(new Random(generateSeedForChunk(_worldSeed, _x, _z)));
 
 		/* Access the new chunk */
-		Chunk chunk = _chunkManager.getBlockChunk(_x, _z, true, false, false);
+		Chunk chunk = _chunkManager.getChunk(_x, _z, true, false, false);
 		chunk.setGenerated(true);
 		chunk.setLoading(true);
 
 		/* Build a density map */
-		float densityMap[][][] = new float[Chunk.BLOCKCHUNK_SIZE_HORIZONTAL + 1][Chunk.BLOCKCHUNK_SIZE_VERTICAL + 1][Chunk.BLOCKCHUNK_SIZE_HORIZONTAL + 1];
+		float densityMap[][][] = new float[Chunk.CHUNK_SIZE_HORIZONTAL + 1][Chunk.CHUNK_SIZE_VERTICAL + 1][Chunk.CHUNK_SIZE_HORIZONTAL + 1];
 
-		for (int x = 0; x < Chunk.BLOCKCHUNK_SIZE_HORIZONTAL + 1; x += SAMPLE_RATE_HORIZONTAL_DENSITY)
+		for (int x = 0; x < Chunk.CHUNK_SIZE_HORIZONTAL + 1; x += SAMPLE_RATE_HORIZONTAL_DENSITY)
 		{
-			for (int z = 0; z < Chunk.BLOCKCHUNK_SIZE_HORIZONTAL + 1; z += SAMPLE_RATE_HORIZONTAL_DENSITY)
+			for (int z = 0; z < Chunk.CHUNK_SIZE_HORIZONTAL + 1; z += SAMPLE_RATE_HORIZONTAL_DENSITY)
 			{
-				for (int y = 0; y < Chunk.BLOCKCHUNK_SIZE_VERTICAL + 1; y += SAMPLE_RATE_VERTICAL_DENSITY)
+				for (int y = 0; y < Chunk.CHUNK_SIZE_VERTICAL + 1; y += SAMPLE_RATE_VERTICAL_DENSITY)
 				{
 					densityMap[x][y][z] = generateDensity(random, x + chunk.getAbsoluteX(), y, z + chunk.getAbsoluteZ());
 				}
@@ -52,53 +52,53 @@ public class ChunkGenerator extends Generator
 		triLerpDensityMap(densityMap);
 
 		/* Create the blocks using the density map */
-		for (int x = 0; x < Chunk.BLOCKCHUNK_SIZE_HORIZONTAL; x++)
+		for (int x = 0; x < Chunk.CHUNK_SIZE_HORIZONTAL; x++)
 		{
-			for (int z = 0; z < Chunk.BLOCKCHUNK_SIZE_HORIZONTAL; z++)
+			for (int z = 0; z < Chunk.CHUNK_SIZE_HORIZONTAL; z++)
 			{
 				int baseLevel = _worldProvider.getHeightAt(x + chunk.getAbsoluteX(), z + chunk.getAbsoluteZ());
 
 				Biome topBiome = _worldProvider.getBiomeAt(x + chunk.getAbsoluteX(), baseLevel, z + chunk.getAbsoluteZ());
 
-				for (int y = 0; y < Chunk.BLOCKCHUNK_SIZE_VERTICAL && y <= baseLevel; y++)
+				for (int y = 0; y < Chunk.CHUNK_SIZE_VERTICAL && y <= baseLevel; y++)
 				{
 					if (y < 4)
 					{
 						/* Create a bedrock layer */
-						chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("bedrock"), true, false, false);
+						chunk.setDefaultBlockRelative(x, y, z, BlockManager.getInstance().getBlockType("bedrock"), (byte) 0, true, false, false);
 						continue;
 					}
 					int depth = baseLevel - y;
 					if (topBiome == Biome.DESERT && y >= baseLevel - 3)
 					{
-						chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("sand"), true, false, false);
+						chunk.setDefaultBlockRelative(x, y, z, BlockManager.getInstance().getBlockType("sand"), (byte) 0, true, false, false);
 					} else if (topBiome == Biome.SNOW && y == baseLevel)
 					{
-						chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("snow"), true, false, false);
+						chunk.setDefaultBlockRelative(x, y, z, BlockManager.getInstance().getBlockType("snow"), (byte) 0, true, false, false);
 					} else if ((topBiome == Biome.FOREST || topBiome == Biome.FIELDS) && y == baseLevel)
 					{
-						chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("grass"), true, false, false);
+						chunk.setDefaultBlockRelative(x, y, z, BlockManager.getInstance().getBlockType("grass"), (byte) 0, true, false, false);
 					} else
 					{
 						float density = densityMap[x][y][z];
 						if (density < 7.3f && depth > 8)
 						{
-							chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("gravel"), true, false, false);
+							chunk.setDefaultBlockRelative(x, y, z, BlockManager.getInstance().getBlockType("gravel"), (byte) 0, true, false, false);
 						} else if (density < 6.3f)
 						{
-							chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("dirt"), true, false, false);
+							chunk.setDefaultBlockRelative(x, y, z, BlockManager.getInstance().getBlockType("dirt"), (byte) 0, true, false, false);
 						} else if (density < 9.0f)
 						{
-							chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("stone"), true, false, false);
+							chunk.setDefaultBlockRelative(x, y, z, BlockManager.getInstance().getBlockType("stone"), (byte) 0, true, false, false);
 						} else if (density < 9.5f && depth > 5)
 						{
-							chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("coal_ore"), true, false, false);
+							chunk.setDefaultBlockRelative(x, y, z, BlockManager.getInstance().getBlockType("coal_ore"), (byte) 0, true, false, false);
 						} else if (density < 10.0f && depth > 10)
 						{
-							chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("iron_ore"), true, false, false);
+							chunk.setDefaultBlockRelative(x, y, z, BlockManager.getInstance().getBlockType("iron_ore"), (byte) 0, true, false, false);
 						} else
 						{
-							chunk.setBlockTypeRelative(x, y, z, BlockManager.getInstance().blockID("stone"), true, false, false);
+							chunk.setDefaultBlockRelative(x, y, z, BlockManager.getInstance().getBlockType("stone"), (byte) 0, true, false, false);
 
 						}
 					}
@@ -113,8 +113,8 @@ public class ChunkGenerator extends Generator
 			TreeGenerator gen = new TreeGenerator(random.randomLong());
 			trees: for (int i = 0; i < treeCount; ++i)
 			{
-				int x = chunk.getAbsoluteX() + random.randomInt(0, Chunk.BLOCKCHUNK_SIZE_HORIZONTAL);
-				int z = chunk.getAbsoluteZ() + random.randomInt(0, Chunk.BLOCKCHUNK_SIZE_HORIZONTAL);
+				int x = chunk.getAbsoluteX() + random.randomInt(0, Chunk.CHUNK_SIZE_HORIZONTAL);
+				int z = chunk.getAbsoluteZ() + random.randomInt(0, Chunk.CHUNK_SIZE_HORIZONTAL);
 
 				/* Check for enough distance from the other trees */
 				for (TreeDefinition treeDef : _worldProvider.getTrees())
@@ -177,11 +177,11 @@ public class ChunkGenerator extends Generator
 
 	protected void triLerpDensityMap(float[][][] densityMap)
 	{
-		for (int x = 0; x < Chunk.BLOCKCHUNK_SIZE_HORIZONTAL; x++)
+		for (int x = 0; x < Chunk.CHUNK_SIZE_HORIZONTAL; x++)
 		{
-			for (int y = 0; y < Chunk.BLOCKCHUNK_SIZE_VERTICAL; y++)
+			for (int y = 0; y < Chunk.CHUNK_SIZE_VERTICAL; y++)
 			{
-				for (int z = 0; z < Chunk.BLOCKCHUNK_SIZE_HORIZONTAL; z++)
+				for (int z = 0; z < Chunk.CHUNK_SIZE_HORIZONTAL; z++)
 				{
 					if (!(x % SAMPLE_RATE_HORIZONTAL_DENSITY == 0 && y % SAMPLE_RATE_VERTICAL_DENSITY == 0 && z % SAMPLE_RATE_HORIZONTAL_DENSITY == 0))
 					{

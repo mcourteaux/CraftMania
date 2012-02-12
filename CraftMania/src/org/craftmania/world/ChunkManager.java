@@ -4,12 +4,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.craftmania.Side;
 import org.craftmania.blocks.Block;
+import org.craftmania.blocks.BlockManager;
+import org.craftmania.blocks.BlockType;
 import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3f;
 
@@ -17,6 +18,7 @@ public class ChunkManager
 {
 	@SuppressWarnings("unused")
 	private World _world;
+	private BlockManager _blockManager;
 	private Map<Integer, AbstractChunk<Chunk>> _superChunks;
 	private List<BlockMovement> _blocksToMove;
 	private ChunkLoader _blockChunkLoader;
@@ -29,6 +31,7 @@ public class ChunkManager
 		_blocksToMove = new ArrayList<ChunkManager.BlockMovement>();
 		_blockChunkLoader = new ChunkLoader();
 		_blockChunkThreading = new ChunkThreading(this);
+		_blockManager = BlockManager.getInstance();
 	}
 
 	public Collection<AbstractChunk<Chunk>> getAllSuperChunks()
@@ -54,7 +57,7 @@ public class ChunkManager
 		return superChunk;
 	}
 
-	public Chunk getBlockChunk(int x, int z, boolean createIfNecessary, boolean loadIfNecessary, boolean generateIfNecessary)
+	public Chunk getChunk(int x, int z, boolean createIfNecessary, boolean loadIfNecessary, boolean generateIfNecessary)
 	{
 		int superX = MathHelper.floorDivision(x, AbstractChunk.CHUNK_SIZE_X);
 		int superZ = MathHelper.floorDivision(z, AbstractChunk.CHUNK_SIZE_Z);
@@ -95,44 +98,62 @@ public class ChunkManager
 	{
 		int x = blockChunk.getX();
 		int z = blockChunk.getZ();
-		blockChunk.setNeighborBlockChunk(Side.BACK, getBlockChunk(x, z - 1, false, false, false));
-		blockChunk.setNeighborBlockChunk(Side.FRONT, getBlockChunk(x, z + 1, false, false, false));
-		blockChunk.setNeighborBlockChunk(Side.LEFT, getBlockChunk(x - 1, z, false, false, false));
-		blockChunk.setNeighborBlockChunk(Side.RIGHT, getBlockChunk(x + 1, z, false, false, false));
+		blockChunk.setNeighborBlockChunk(Side.BACK, getChunk(x, z - 1, false, false, false));
+		blockChunk.setNeighborBlockChunk(Side.FRONT, getChunk(x, z + 1, false, false, false));
+		blockChunk.setNeighborBlockChunk(Side.LEFT, getChunk(x - 1, z, false, false, false));
+		blockChunk.setNeighborBlockChunk(Side.RIGHT, getChunk(x + 1, z, false, false, false));
 	}
 
-	public Block getBlock(int x, int y, int z, boolean createIfNecessary, boolean loadIfNecessary, boolean generateIfNecessary)
+	public byte getBlock(int x, int y, int z, boolean createIfNecessary, boolean loadIfNecessary, boolean generateIfNecessary)
 	{
-		Chunk blockChunk = getBlockChunkContaining(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
+		Chunk blockChunk = getChunkContaining(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
 		if (blockChunk == null)
-			return null;
-		return blockChunk.getBlockAbsolute(x, y, z);
+			return -1;
+		return blockChunk.getBlockTypeAbsolute(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
 	}
 
-	public void setBlock(int x, int y, int z, byte blockType, boolean createIfNecessary, boolean loadIfNecessary, boolean generateIfNecessary)
+	public void setDefaultBlock(int x, int y, int z, BlockType type, byte metadata, boolean createIfNecessary, boolean loadIfNecessary, boolean generateIfNecessary)
 	{
-		Chunk blockChunk = getBlockChunkContaining(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
+		Chunk blockChunk = getChunkContaining(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
 		if (blockChunk == null)
 		{
 			System.out.println("BlockChunk not found for " + x + " " + z);
 			return;
 		}
-		blockChunk.setBlockTypeAbsolute(x, y, z, blockType, createIfNecessary, loadIfNecessary, generateIfNecessary);
+		blockChunk.setDefaultBlockAbsolute(x, y, z, type, metadata, createIfNecessary, loadIfNecessary, generateIfNecessary);
+	}
+
+	public Block getSpecialBlock(int x, int y, int z)
+	{
+		Chunk c = getChunkContaining(x, y, z, false, false, false);
+		return c.getChunkData().getSpecialBlock(ChunkData.positionToIndex(x - c.getAbsoluteX(), y, z - c.getAbsoluteZ()));
+	}
+	
+
+	public void removeBlock(int x, int y, int z)
+	{
+		Chunk blockChunk = getChunkContaining(x, y, z, false, false, false);
+		if (blockChunk != null)
+		{
+			blockChunk.removeBlockAbsolute(x, y, z);
+		}
 	}
 
 	public List<Chunk> getApproximateChunks(Vec3f position, float viewingDistance, List<Chunk> chunks)
 	{
-		viewingDistance /= Chunk.BLOCKCHUNK_SIZE_HORIZONTAL;
+		viewingDistance /= Chunk.CHUNK_SIZE_HORIZONTAL;
 		viewingDistance += 1.1f;
 
 		int distance = MathHelper.ceil(viewingDistance);
 		int distanceSq = distance * distance;
 
-		int centerX = MathHelper.floor(position.x() / Chunk.BLOCKCHUNK_SIZE_HORIZONTAL);
-		int centerZ = MathHelper.floor(position.z() / Chunk.BLOCKCHUNK_SIZE_HORIZONTAL);
+		int centerX = MathHelper.floor(position.x() / Chunk.CHUNK_SIZE_HORIZONTAL);
+		int centerZ = MathHelper.floor(position.z() / Chunk.CHUNK_SIZE_HORIZONTAL);
 
 		chunks.clear();
 
+
+		
 		for (int x = -distance; x <= distance; ++x)
 		{
 			for (int z = -distance; z <= distance; ++z)
@@ -140,7 +161,7 @@ public class ChunkManager
 				int distSq = x * x + z * z;
 				if (distSq <= distanceSq)
 				{
-					Chunk chunk = getBlockChunk(centerX + x, centerZ + z, false, false, false);
+					Chunk chunk = getChunk(centerX + x, centerZ + z, false, false, false);
 					if (chunk != null && !chunk.isDestroying() && !chunk.isLoading() && chunk.isLoaded())
 					{
 						chunks.add(chunk);
@@ -152,10 +173,11 @@ public class ChunkManager
 		return chunks;
 	}
 
-	public Chunk getBlockChunkContaining(int x, int y, int z, boolean createIfNecessary, boolean loadIfNeccessary, boolean generateIfNecessary)
+	public Chunk getChunkContaining(int x, int y, int z, boolean createIfNecessary, boolean loadIfNeccessary, boolean generateIfNecessary)
 	{
-		return getBlockChunk(MathHelper.floorDivision(x, Chunk.BLOCKCHUNK_SIZE_HORIZONTAL), MathHelper.floorDivision(z, Chunk.BLOCKCHUNK_SIZE_HORIZONTAL),
-				createIfNecessary, loadIfNeccessary, generateIfNecessary);
+		return getChunk(MathHelper.floorDivision(x, Chunk.CHUNK_SIZE_HORIZONTAL),
+							 MathHelper.floorDivision(z, Chunk.CHUNK_SIZE_HORIZONTAL),
+							 createIfNecessary,	loadIfNeccessary, generateIfNecessary);
 	}
 
 	/**
@@ -165,18 +187,34 @@ public class ChunkManager
 	 * @param block
 	 * @param newChunk
 	 */
-	public void moveBlockTo(Block block, int srcX, int srcY, int srcZ, int dstX, int dstY, int dstZ)
+	public void moveBlockTo(int srcX, int srcY, int srcZ, int dstX, int dstY, int dstZ)
 	{
-		Chunk oldChunk = block.getBlockChunk();
-		Chunk newChunk = oldChunk.getBlockChunkContaining(dstX, dstY, dstZ, true, true, false);
+		Chunk oldChunk = getChunkContaining(srcX, srcY, srcZ, false, false, false);
+		Chunk newChunk = oldChunk.getChunkContaining(dstX, dstY, dstZ, true, true, false);
 
-		oldChunk.setBlockAbsolute(srcX, srcY, srcZ, null, false, false, false);
-		newChunk.setBlockAbsolute(dstX, dstY, dstZ, block, true, true, false);
+		int oldIndex = ChunkData.positionToIndex(srcX - oldChunk.getAbsoluteX(), srcY, srcZ - oldChunk.getAbsoluteZ());
+		int newIndex = ChunkData.positionToIndex(dstX - newChunk.getAbsoluteX(), dstY, dstZ - newChunk.getAbsoluteZ());
+
+		int blockData = oldChunk.getChunkData().getBlockData(oldIndex);
+		boolean special = ChunkData.dataIsSpecial(blockData);
+
+		if (special)
+		{
+			Block block = oldChunk.getChunkData().getSpecialBlock(oldIndex);
+			oldChunk.removeBlockAbsolute(srcX, srcY, srcZ);
+			newChunk.setSpecialBlockAbsolute(dstX, dstY, dstZ, block, false, false, false);
+		} else
+		{
+			byte metadata = ChunkData.dataGetMetadata(blockData);
+			BlockType type = _blockManager.getBlockType(oldChunk.getChunkData().getBlockType(oldIndex));
+			oldChunk.setDefaultBlockAbsolute(srcX, srcY, srcZ, null, (byte) 0, true, true, false);
+			newChunk.setDefaultBlockAbsolute(dstX, dstY, dstZ, type, metadata, true, true, false);
+		}
 	}
 
-	public void rememberBlockMovement(Block block, int srcX, int srcY, int srcZ, int dstX, int dstY, int dstZ)
+	public void rememberBlockMovement(int srcX, int srcY, int srcZ, int dstX, int dstY, int dstZ)
 	{
-		_blocksToMove.add(new BlockMovement(block, srcX, srcY, srcZ, dstX, dstY, dstZ));
+		_blocksToMove.add(new BlockMovement(srcX, srcY, srcZ, dstX, dstY, dstZ));
 	}
 
 	public void performRememberedBlockChanges()
@@ -184,7 +222,7 @@ public class ChunkManager
 		for (BlockMovement bm : _blocksToMove)
 		{
 			// System.out.println(bm);
-			moveBlockTo(bm.block, bm.srcX, bm.srcY, bm.srcZ, bm.dstX, bm.dstY, bm.dstZ);
+			moveBlockTo(bm.srcX, bm.srcY, bm.srcZ, bm.dstX, bm.dstY, bm.dstZ);
 		}
 		_blocksToMove.clear();
 	}
@@ -192,13 +230,11 @@ public class ChunkManager
 	private class BlockMovement
 	{
 
-		public Block block;
 		public int srcX, srcY, srcZ;
 		public int dstX, dstY, dstZ;
 
-		public BlockMovement(Block block, int srcX, int srcY, int srcZ, int dstX, int dstY, int dstZ)
+		public BlockMovement(int srcX, int srcY, int srcZ, int dstX, int dstY, int dstZ)
 		{
-			this.block = block;
 			this.srcX = srcX;
 			this.srcY = srcY;
 			this.srcZ = srcZ;
@@ -210,32 +246,7 @@ public class ChunkManager
 		@Override
 		public String toString()
 		{
-			return "BlockMovement{" + "block=" + block + ", srcX=" + srcX + ", srcY=" + srcY + ", srcZ=" + srcZ + ", dstX=" + dstX + ", dstY=" + dstY + ", dstZ=" + dstZ + '}';
-		}
-	}
-
-	public void destroyBlock(Block block)
-	{
-		block.getBlockChunk().setBlockTypeAbsolute(block.getX(), block.getY(), block.getZ(), (byte) 0, false, false, false);
-
-		forgetBlockMovementsForBlock(block);
-
-		/* Clear it from the lists */
-		block.removeFromVisibilityList();
-		block.getBlockChunk().getUpdatingBlocks().rememberToRemoveBlock(block);
-		block.removeFromManualRenderList();
-	}
-
-	public void forgetBlockMovementsForBlock(Block block)
-	{
-		/* Forget all remember block actions (i.e.: movements) */
-		for (Iterator<BlockMovement> it = _blocksToMove.iterator(); it.hasNext();)
-		{
-			BlockMovement bm = it.next();
-			if (bm.block == block)
-			{
-				it.remove();
-			}
+			return "BlockMovement{" + "srcX=" + srcX + ", srcY=" + srcY + ", srcZ=" + srcZ + ", dstX=" + dstX + ", dstY=" + dstY + ", dstZ=" + dstZ + '}';
 		}
 	}
 
@@ -307,4 +318,6 @@ public class ChunkManager
 			chunk.generate();
 		}
 	}
+
+
 }

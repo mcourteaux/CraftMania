@@ -14,8 +14,8 @@ public class ChunkThreading
 	public ChunkThreading(ChunkManager chman)
 	{
 		_chunkManager = chman;
-		_generatePool = new ThreadPool(1);
-		_savePool = new ThreadPool(1);
+		_generatePool = new ThreadPool(2);
+		_savePool = new ThreadPool(2);
 		_deletePool = new ThreadPool(1);
 	}
 

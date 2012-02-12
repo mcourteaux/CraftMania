@@ -402,4 +402,11 @@ public class AABB
 			_vertices[7].set(minX(), maxY(), minZ());
 		}
 	}
+
+	public void set(AABB aabb)
+	{
+		getPosition().set(aabb.getPosition());
+		getDimensions().set(aabb.getDimensions());
+		recalcVertices();
+	}
 }

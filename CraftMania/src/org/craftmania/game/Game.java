@@ -70,8 +70,8 @@ public class Game
 	private int _sleepTimeMillis;
 	private Configuration _configuration;
 	private static Game __instance;
-	private int _loop1024;
-	private Object _separateGCLock = new Object();
+	private int[] _fpsDataBuffer;
+	private float _averageFPS;
 
 	public static boolean RENDER_OVERLAY = true;
 
@@ -163,6 +163,7 @@ public class Game
 	public void init() throws IOException
 	{
 		loadConfiguration();
+		this._fpsDataBuffer = new int[16];
 		this._fps = _configuration.getFPS();
 		try
 		{
@@ -257,10 +258,10 @@ public class Game
 		GLFont infoFont = FontStorage.getFont("Monospaced_20");
 
 		/* Top Left Info */
-		infoFont.print(4, _configuration.getHeight() - 20, "FPS:      " + Game.getInstance().getFPS());
+		infoFont.print(4, _configuration.getHeight() - 20, String.format("FPS: %5.1f", getAverageFPS()));
 		infoFont.print(4, _configuration.getHeight() - 20 - 15, "Sleeping: " + String.format("%4d", Game.getInstance().getSleepTime()));
-		infoFont.print(4, _configuration.getHeight() - 20 - 30, "Heap Size: " + MathHelper.bytesToMagaBytes(Runtime.getRuntime().maxMemory()) + " MB");
-		infoFont.print(4, _configuration.getHeight() - 20 - 45, "Heap Use:  " + MathHelper.bytesToMagaBytes(Runtime.getRuntime().maxMemory() - Runtime.getRuntime().freeMemory())
+		infoFont.print(4, _configuration.getHeight() - 20 - 30, "Heap Size: " + MathHelper.bytesToMagaBytes(Runtime.getRuntime().totalMemory()) + " MB");
+		infoFont.print(4, _configuration.getHeight() - 20 - 45, "Heap Use:  " + MathHelper.bytesToMagaBytes(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())
 				+ " MB");
 	}
 
@@ -322,9 +323,6 @@ public class Game
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		while (!Display.isCloseRequested())
 		{
-			_loop1024++;
-			_loop1024 %= 1024;
-			memoryCheck();
 			if (Keyboard.isKeyDown(Keyboard.KEY_LMENU) && Keyboard.isKeyDown(Keyboard.KEY_RETURN))
 			{
 			}
@@ -364,7 +362,19 @@ public class Game
 				_sleepTimeMillis = 0;
 			}
 			_fps = (int) (1000000000.0f / (frameTimeNanos + (_sleepTimeMillis * 1000000L)));
-
+			
+			/* Average FPS System */
+			float fpsSum = _fps;
+			for (int i = 0; i < _fpsDataBuffer.length - 1; ++i)
+			{
+				_fpsDataBuffer[i] = _fpsDataBuffer[i + 1];
+				fpsSum += _fpsDataBuffer[i];
+			}
+			_fpsDataBuffer[_fpsDataBuffer.length - 1] = _fps;
+			fpsSum /= _fpsDataBuffer.length;
+			_averageFPS = fpsSum;
+			
+			
 		}
 
 		if (_world != null)
@@ -382,37 +392,6 @@ public class Game
 		TextureStorage.release();
 		FontStorage.release();
 		Display.destroy();
-	}
-
-	private void memoryCheck()
-	{
-		if (_loop1024 == 0)
-		{
-			long total = Runtime.getRuntime().maxMemory();
-			long used = Runtime.getRuntime().maxMemory() - Runtime.getRuntime().freeMemory();
-			float ratio = (float) used / (float) total;
-			if (ratio > 0.75f)
-			{
-				seperateGC();
-			}
-		}
-	}
-
-	public void seperateGC()
-	{
-		Thread t = new Thread(new Runnable()
-		{
-
-			@Override
-			public void run()
-			{
-				synchronized (_separateGCLock)
-				{
-					System.gc();
-				}
-			}
-		});
-		t.start();
 	}
 
 	private void loadTextures() throws IOException
@@ -504,6 +483,11 @@ public class Game
 	public int getSleepTime()
 	{
 		return _sleepTimeMillis;
+	}
+	
+	public float getAverageFPS()
+	{
+		return _averageFPS;
 	}
 
 	public static final int FILE_BASE_APPLICATION = 0x01;

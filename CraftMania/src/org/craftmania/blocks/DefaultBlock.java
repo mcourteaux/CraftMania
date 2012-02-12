@@ -1,7 +1,5 @@
 package org.craftmania.blocks;
 
-import java.util.Iterator;
-
 import org.craftmania.Side;
 import org.craftmania.datastructures.AABB;
 import org.craftmania.game.Game;
@@ -41,12 +39,12 @@ public class DefaultBlock extends Block
 	}
 
 	@Override
-	public void update(Iterator<Block> updateIterator)
+	public void update()
 	{
 		if (!_blockType.isFixed())
 		{
-			Block supportingBlock = _blockChunk.getBlockAbsolute(getX(), getY() - 1, getZ());
-			if (supportingBlock == null)
+			byte supportingBlock = _blockChunk.getBlockTypeAbsolute(getX(), getY() - 1, getZ(), false, false, false);
+			if (supportingBlock == 0)
 			{
 				if (!isFalling())
 				{
@@ -99,8 +97,7 @@ public class DefaultBlock extends Block
 		} else
 		{
 			/* Remove this block from the update list */
-			updateIterator.remove();
-			_updating = false;
+			removeFromUpdateList();
 		}
 	}
 
@@ -164,17 +161,17 @@ public class DefaultBlock extends Block
 				{
 					Side side = Side.getSide(i);
 					Vec3i normal = side.getNormal();
-					Chunk chunk = _blockChunk.getBlockChunkContaining(getX() + normal.x(), getY() + normal.y(), getZ() + normal.z(), false, false, false);
+					Chunk chunk = _blockChunk.getChunkContaining(getX() + normal.x(), getY() + normal.y(), getZ() + normal.z(), false, false, false);
 					if (chunk == null)
 					{
 						/* TODO Solve */
 						setFaceVisible(side, true);
 					} else
 					{
-						Block block = chunk.getBlockAbsolute(getX() + normal.x(), getY() + normal.y(), getZ() + normal.z());
-						if (block != null)
+						byte block = chunk.getBlockTypeAbsolute(getX() + normal.x(), getY() + normal.y(), getZ() + normal.z(), false, false, false);
+						if (block != 0)
 						{
-							if (block.isMoving() || !block.getBlockType().hasNormalAABB())
+							if (false || !BlockManager.getInstance().getBlockType(block).hasNormalAABB())
 							{
 								setFaceVisible(side, true);
 							} else
@@ -226,19 +223,8 @@ public class DefaultBlock extends Block
 	}
 
 	@Override
-	public boolean smash(InventoryItem item)
+	public void smash(InventoryItem item)
 	{
-		float damage;
-		if (item == null)
-		{
-			damage = 0.9f;
-		} else
-		{
-			damage = item.calcDamageFactorToBlock(this);
-		}
-		damage *= 9.0f;
-
-		return inflictDamage(damage * Game.getInstance().getStep());
 	}
 
 	@Override

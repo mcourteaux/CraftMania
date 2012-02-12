@@ -25,6 +25,7 @@ public abstract class Block implements AABBObject
 	protected boolean _updating;
 	protected boolean _rendering;
 	protected boolean _renderManually;
+	protected int _specialBlockPoolIndex;
 
 	public Block(BlockType type, Chunk blockChunk, Vec3i pos)
 	{
@@ -32,6 +33,16 @@ public abstract class Block implements AABBObject
 		_blockType = type;
 		_blockChunk = blockChunk;
 		_health = type.getResistance();
+	}
+	
+	public void setSpecialBlockPoolIndex(int specialBlockPoolIndex)
+	{
+		this._specialBlockPoolIndex = specialBlockPoolIndex;
+	}
+	
+	public int getSpecialBlockPoolIndex()
+	{
+		return _specialBlockPoolIndex;
 	}
 	
 	public Vec3i getPosition()
@@ -82,7 +93,7 @@ public abstract class Block implements AABBObject
 	
 	public void destory()
 	{
-		Game.getInstance().getWorld().getChunkManager().destroyBlock(this);
+		Game.getInstance().getWorld().getChunkManager().removeBlock(getX(), getY(), getZ());
 		
 		_blockChunk.needsNewVBO();
 	}
@@ -91,7 +102,7 @@ public abstract class Block implements AABBObject
 	{
 		if (_rendering)
 		{
-			_blockChunk.getVisibleBlocks().rememberToRemoveBlock(this);
+			_blockChunk.getVisibleBlocks().bufferRemove(_specialBlockPoolIndex);
 			_rendering = false;
 //			removeFromManualRenderList();
 		}
@@ -101,7 +112,7 @@ public abstract class Block implements AABBObject
 	{
 		if (!_rendering)
 		{
-			_blockChunk.getVisibleBlocks().rememberToAddBlock(this);
+			_blockChunk.getVisibleBlocks().bufferAdd(_specialBlockPoolIndex);
 			_rendering = true;
 		}
 	}
@@ -110,8 +121,17 @@ public abstract class Block implements AABBObject
 	{
 		if (!_updating)
 		{
-			_blockChunk.getUpdatingBlocks().rememberToAddBlock(this);
+			_blockChunk.getUpdatingBlocks().bufferAdd(_specialBlockPoolIndex);
 			_updating = true;
+		}
+	}
+	
+	public synchronized void removeFromUpdateList()
+	{
+		if (_updating)
+		{
+			_blockChunk.getUpdatingBlocks().bufferRemove(_specialBlockPoolIndex);
+			_updating = false;
 		}
 	}
 	
@@ -120,7 +140,7 @@ public abstract class Block implements AABBObject
 		System.out.print("Add to list... ");
 //		if (!_renderManually)
 		{
-			_blockChunk.getManualRenderBlocks().rememberToAddBlock(this);
+			_blockChunk.getManualRenderingBlocks().bufferAdd(_specialBlockPoolIndex);
 			_renderManually = true;
 			System.out.println("Done");
 //		} else
@@ -134,7 +154,7 @@ public abstract class Block implements AABBObject
 		System.out.print("Remove from list... ");
 //		if (_renderManually)
 		{
-			_blockChunk.getManualRenderBlocks().rememberToRemoveBlock(this);
+			_blockChunk.getManualRenderingBlocks().bufferRemove(_specialBlockPoolIndex);
 			_renderManually = false;
 			System.out.println("Done");
 //		} else
@@ -143,18 +163,13 @@ public abstract class Block implements AABBObject
 		}
 	}
 
-	public abstract void update(Iterator<Block> updatingIterator);
+	public abstract void update();
 	public abstract void render();
 	public abstract void forceVisiblilityCheck();
 	public abstract boolean isVisible();
 	public abstract AABB getAABB();
-	public abstract boolean smash(InventoryItem item);
+	public abstract void smash(InventoryItem item);
 	public abstract void neighborChanged(Side side);
-	
-	public boolean hasSpecialAction()
-	{
-		return false;
-	}
 	
 	public void performSpecialAction()
 	{

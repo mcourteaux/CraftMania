@@ -197,6 +197,20 @@ public class Vec3i
 	}
 
 	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == this) return true;
+		if (obj == null) return false;
+		
+		if (obj instanceof Vec3i)
+		{
+			Vec3i v = (Vec3i) obj;
+			return v.x == x && v.y == y && v.z == z;
+		}
+		return false;
+	}
+	
+	@Override
 	public String toString()
 	{
 		return "Vec3i [x=" + x + ", y=" + y + ", z=" + z + "]";

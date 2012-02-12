@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.craftmania.GameObject;
 import org.craftmania.blocks.Block;
+import org.craftmania.blocks.BlockManager;
 import org.craftmania.blocks.BlockType;
 import org.craftmania.datastructures.AABB;
 import org.craftmania.game.Game;
@@ -31,6 +32,7 @@ import org.craftmania.math.Vec3f;
 import org.craftmania.math.Vec3i;
 import org.craftmania.world.Chunk;
 import org.craftmania.world.Camera;
+import org.craftmania.world.Chunk.LightType;
 import org.craftmania.world.ChunkManager;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -41,6 +43,8 @@ import org.lwjgl.input.Mouse;
  */
 public class Player extends GameObject
 {
+
+	private static BlockManager _blockManager = BlockManager.getInstance();
 
 	private Camera _camera;
 	/** Postion of the player absolute in the world */
@@ -62,8 +66,12 @@ public class Player extends GameObject
 	private CharacterBody _body;
 	/* Editing */
 	private float _rayCastLength;
-	private Block _aimedBlock;
+	private AABB _intersectionTestingAABB;
+	private AABB _aimedBlockAABB;
+	private byte _aimedBlockType;
+	private Vec3i _aimedBlockPosition;
 	private Vec3i _aimedAdjacentBlockPosition;
+	private float _aimedBlockHealth;
 	private AABB _rayAABB;
 	private ChunkManager _chunkManager;
 	private InventoryItem _selectedItem;
@@ -76,9 +84,7 @@ public class Player extends GameObject
 
 	public Player(float x, float y, float z)
 	{
-		_rayAABB = new AABB(new Vec3f(), new Vec3f());
 		_position = new Vec3f(x, y, z);
-		_rayCastLength = Game.getInstance().getConfiguration().getMaximumPlayerEditingDistance();
 		_chunkManager = Game.getInstance().getWorld().getChunkManager();
 		_body = new CharacterBody();
 
@@ -91,6 +97,12 @@ public class Player extends GameObject
 		_inventory = new DefaultPlayerInventory();
 		_sharedInventoryContent = new SharedInventoryContent(4 * 9);
 		_inventory.setSharedContent(_sharedInventoryContent);
+
+		_rayCastLength = Game.getInstance().getConfiguration().getMaximumPlayerEditingDistance();
+		_rayAABB = new AABB(new Vec3f(), new Vec3f());
+		_aimedBlockPosition = new Vec3i(0, -1, 0);
+		_aimedBlockAABB = new AABB(new Vec3f(), new Vec3f());
+		_intersectionTestingAABB = new AABB(new Vec3f(), new Vec3f());
 
 		setSelectedInventoryItemIndex(0);
 	}
@@ -127,12 +139,12 @@ public class Player extends GameObject
 		glEnable(GL_BLEND);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		if (_aimedBlock != null)
+		if (_aimedBlockPosition.y() != -1)
 		{
 			glClear(GL_DEPTH_BUFFER_BIT);
 			glDisable(GL_TEXTURE_2D);
 
-			_aimedBlock.getAABB().render(0.0f, 0.0f, 0.0f, 0.1f);
+			_aimedBlockAABB.render(0.0f, 0.0f, 0.0f, 0.1f);
 			glEnable(GL_TEXTURE_2D);
 		}
 
@@ -182,11 +194,12 @@ public class Player extends GameObject
 				/* Create OR Do Action */
 				if (button == 0 && Mouse.getEventButtonState())
 				{
-					if (_aimedBlock != null)
+					if (_aimedBlockPosition.y() != -1)
 					{
-						if (_aimedBlock.hasSpecialAction())
+						if (getAimedBlockType().hasSpecialAction())
 						{
-							_aimedBlock.performSpecialAction();
+							Block block = _chunkManager.getSpecialBlock(_aimedBlockPosition.x(), _aimedBlockPosition.y(), _aimedAdjacentBlockPosition.z());
+							block.performSpecialAction();
 						} else if (_selectedItem instanceof BlockType)
 						{
 							int bX = _aimedAdjacentBlockPosition.x();
@@ -202,11 +215,11 @@ public class Player extends GameObject
 								// Player is where the block has to come
 							} else
 							{
-								Chunk bc = _chunkManager.getBlockChunkContaining(bX, bY, bZ, true, true, true);
-								Block currentBlock = bc.getBlockAbsolute(bX, bY, bZ);
-								if (currentBlock == null)
+								Chunk bc = _chunkManager.getChunkContaining(bX, bY, bZ, true, true, true);
+								byte currentBlock = bc.getBlockTypeAbsolute(bX, bY, bZ, false, false, false);
+								if (currentBlock == 0)
 								{
-									bc.setBlockTypeAbsolute(bX, bY, bZ, ((BlockType) _selectedItem).getID(), true, true, true);
+									bc.setDefaultBlockAbsolute(bX, bY, bZ, ((BlockType) _selectedItem), (byte) 0, true, true, true);
 									_inventory.getInventoryPlace(_selectedInventoryItemIndex).getStack().decreaseItemCount();
 									setSelectedInventoryItemIndex(_selectedInventoryItemIndex);
 								}
@@ -228,28 +241,33 @@ public class Player extends GameObject
 		{
 			if (Mouse.isButtonDown(1)) // Destroy
 			{
-				if (_aimedBlock != null)
+				if (_aimedBlockType != 0)
 				{
 					_destroying = true;
 					float toolDamage = 0.0f;
 					if (_selectedItem != null)
 					{
 						_body.enableUsingRightHand();
-						toolDamage = _selectedItem.calcDamageInflictedByBlock(_aimedBlock);
-					}
-
-					boolean destroyed = _aimedBlock.smash(_selectedItem);
-					if (destroyed)
+						toolDamage = _selectedItem.calcDamageInflictedByBlock(_aimedBlockType);
+						_aimedBlockHealth -= _selectedItem.calcDamageFactorToBlock(_aimedBlockType) * Game.getInstance().getStep() * 5.0f;
+					} else
 					{
+						_aimedBlockHealth -= Game.getInstance().getStep() * 5.0f;
+					}
+					boolean destroy = _aimedBlockHealth <= 0.0f;
+					if (destroy)
+					{
+						_chunkManager.removeBlock(_aimedBlockPosition.x(), _aimedBlockPosition.y(), _aimedBlockPosition.z());
+
 						/* Add block to the inventory */
-						int mineResult = _aimedBlock.getBlockType().getMineResult();
-						int mineResultCount = _aimedBlock.getBlockType().getMineResultCount();
+						int mineResult = getAimedBlockType().getMineResult();
+						int mineResultCount = getAimedBlockType().getMineResultCount();
 						if (mineResult != 0)
 						{
 							for (int i = 0; i < mineResultCount; ++i)
 							{
 								boolean added = _inventory.addToInventory(ItemManager.getInstance().getInventoryItem(
-										(short) (mineResult == -1 ? _aimedBlock.getBlockType().getInventoryTypeID() : mineResult)));
+										(short) (mineResult == -1 ? getAimedBlockType().getInventoryTypeID() : mineResult)));
 
 								if (added)
 								{
@@ -257,7 +275,9 @@ public class Player extends GameObject
 								}
 							}
 						}
-						_aimedBlock = null;
+						_aimedBlockPosition.set(0, -1, 0);
+						_aimedAdjacentBlockPosition = null;
+						_aimedBlockType = 0;
 						if (_selectedItem != null)
 						{
 							_selectedItem.inflictDamage(toolDamage);
@@ -365,31 +385,31 @@ public class Player extends GameObject
 
 		Chunk bc = null;
 
-		Block wall = null;
-		Block wall2 = null;
+		byte wall = 0;
+		byte wall2 = 0;
 		{
 			int xx = MathHelper.floor(x), yy = MathHelper.floor(y + 0.1f), zz = MathHelper.floor(z);
-			bc = _chunkManager.getBlockChunkContaining(xx, yy, zz, false, true, true);
+			bc = _chunkManager.getChunkContaining(xx, yy, zz, false, true, true);
 			if (bc != null)
 			{
-				wall = bc.getBlockAbsolute(xx, yy, zz);
+				wall = bc.getBlockTypeAbsolute(xx, yy, zz, false, false, false);
 			}
 		}
 		{
 			int xx = MathHelper.floor(x), yy = MathHelper.floor(y + 0.1f) + 1, zz = MathHelper.floor(z);
 			if (bc != null)
 			{
-				wall2 = bc.getBlockAbsolute(xx, yy, zz);
+				wall2 = bc.getBlockTypeAbsolute(xx, yy, zz, false, false, false);
 			} else
 			{
-				bc = _chunkManager.getBlockChunkContaining(xx, yy, zz, false, true, true);
+				bc = _chunkManager.getChunkContaining(xx, yy, zz, false, true, true);
 				if (bc != null)
 				{
-					wall2 = bc.getBlockAbsolute(xx, yy, zz);
+					wall2 = bc.getBlockTypeAbsolute(xx, yy, zz, false, false, false);
 				}
 			}
 		}
-		if ((wall != null && wall.getBlockType().isSolid()) || (wall2 != null && wall2.getBlockType().isSolid()))
+		if ((wall > 0 && BlockManager.getInstance().getBlockType(wall).isSolid()) || (wall2 > 0 && BlockManager.getInstance().getBlockType(wall2).isSolid()))
 		{
 
 			x -= xStep;
@@ -414,15 +434,15 @@ public class Player extends GameObject
 	{
 		float step = Game.getInstance().getStep();
 		ChunkManager chunkManager = Game.getInstance().getWorld().getChunkManager();
-		Block support = chunkManager.getBlock(MathHelper.floor(x), MathHelper.floor(y - 0.1f), MathHelper.floor(z), false, false, false);
-		Block subSupport = chunkManager.getBlock(MathHelper.floor(x), MathHelper.floor(y - 0.1f) - 1, MathHelper.floor(z), false, false, false);
+		byte support = chunkManager.getBlock(MathHelper.floor(x), MathHelper.floor(y) - 1, MathHelper.floor(z), false, false, false);
+		byte subSupport = chunkManager.getBlock(MathHelper.floor(x), MathHelper.floor(y) - 2, MathHelper.floor(z), false, false, false);
 		float supportHeight = Float.NEGATIVE_INFINITY;
 
 		if (Keyboard.isKeyDown(Keyboard.KEY_SPACE))
 		{
 			if (onGround)
 			{
-				ySpeed = 10f;
+				ySpeed = 14f;
 				onGround = false;
 			} else if (_flying)
 			{
@@ -433,18 +453,18 @@ public class Player extends GameObject
 			ySpeed -= 14f * step;
 		}
 
-		if (support != null)
+		if (support > 0)
 		{
-			if (support.getBlockType().isSolid())
+			if (BlockManager.getInstance().getBlockType(support).isSolid())
 			{
-				supportHeight = support.getAABB().maxY();
+				supportHeight = MathHelper.floor(y);
 				onGround = false;
 			}
-		} else if (subSupport != null)
+		} else if (subSupport > 0)
 		{
-			if (subSupport.getBlockType().isSolid())
+			if (BlockManager.getInstance().getBlockType(subSupport).isSolid())
 			{
-				supportHeight = subSupport.getAABB().maxY();
+				supportHeight = MathHelper.floor(y) - 1;
 				onGround = false;
 			}
 		}
@@ -458,7 +478,7 @@ public class Player extends GameObject
 		{
 			if (!_flying)
 			{
-				ySpeed -= step * 26f;
+				ySpeed -= step * 55f;
 			} else
 			{
 				float newSpeedY = ySpeed * 0.1f;
@@ -469,8 +489,8 @@ public class Player extends GameObject
 			if (ySpeed > 0.0f)
 			{
 				int headbangY = MathHelper.floor(y + 0.1f) + 2;
-				Block headbang = chunkManager.getBlock(MathHelper.floor(x), headbangY, MathHelper.floor(z), false, false, false);
-				if (headbang != null && (headbangY < y + playerHeight))
+				byte headbang = chunkManager.getBlock(MathHelper.floor(x), headbangY, MathHelper.floor(z), false, false, false);
+				if (headbang > 0 && (headbangY < y + playerHeight))
 				{
 					y = (float) headbangY - playerHeight;
 					ySpeed = 0.0f;
@@ -508,52 +528,73 @@ public class Player extends GameObject
 		int aabbZ = MathHelper.round(_rayAABB.getPosition().z());
 
 		RayBlockIntersection.Intersection closestIntersection = null;
-		Block closestBlock = null;
+		byte closestBlock = 0;
 
 		/* Iterate over all possible candidates for the raycast */
 		Vec3f v = new Vec3f();
-		Block bl = null;
-		Chunk chunk = Game.getInstance().getWorld().getChunkManager().getBlockChunkContaining(aabbX, aabbY, aabbZ, false, false, false);
-		if (chunk == null) return;
-		
+		Vec3i newAimedBlockPosition = new Vec3i();
+		byte bl = 0;
+		Chunk chunk = Game.getInstance().getWorld().getChunkManager().getChunkContaining(aabbX, aabbY, aabbZ, false, false, false);
+		if (chunk == null)
+			return;
+
 		for (int x = MathHelper.floor(_rayAABB.minX()); x <= MathHelper.ceil(_rayAABB.maxX()); ++x)
 			for (int y = MathHelper.floor(_rayAABB.minY()); y <= MathHelper.ceil(_rayAABB.maxY()); ++y)
 				for (int z = MathHelper.floor(_rayAABB.minZ()); z <= MathHelper.ceil(_rayAABB.maxZ()); ++z)
 				{
-					bl = chunk.getBlockAbsolute(x, y, z);
-					if (bl == null)
+					bl = chunk.getBlockTypeAbsolute(x, y, z, false, false, false);
+					if (bl == 0 || bl == -1)
 						continue;
 
-					if (bl.isMoving())
-					{
-						continue;
-					}
+					// if (bl.isMoving())
+					// {
+					// continue;
+					// }
 
-					v.set(bl.getAABB().getPosition());
+					v.set(x + 0.5f, y + 0.5f, z + 0.5f);
 
 					v.sub(getPosition());
 					float lenSquared = v.lengthSquared();
 					if (lenSquared < rayLenSquared)
 					{
+						_intersectionTestingAABB.getPosition().set(x + 0.5f, y + 0.5f, z + 0.5f);
+						_intersectionTestingAABB.getDimensions().set(_blockManager.getBlockType(bl).getDimensions());
+						_intersectionTestingAABB.recalcVertices();
 						/* Perform the raycast */
-						List<RayBlockIntersection.Intersection> intersections = RayBlockIntersection.executeIntersection(bl.getX(), bl.getY(), bl.getZ(), bl.getAABB(), rayOrigin,
-								rayDirection);
+						List<RayBlockIntersection.Intersection> intersections = RayBlockIntersection
+								.executeIntersection(x, y, z, _intersectionTestingAABB, rayOrigin, rayDirection);
 						if (!intersections.isEmpty())
 						{
 							if (closestIntersection == null || intersections.get(0).getDistance() < closestIntersection.getDistance())
 							{
 								closestIntersection = intersections.get(0);
 								closestBlock = bl;
+								newAimedBlockPosition.set(x, y, z);
 							}
 						}
 					}
 
 				}
 
-		_aimedBlock = closestBlock;
-		_aimedAdjacentBlockPosition = _aimedBlock == null ? null : closestIntersection.calcAdjacentBlockPos();
-
-		if (_selectedItem != null && _aimedBlock != null)
+		if (closestIntersection != null)
+		{
+			if (!_aimedBlockPosition.equals(newAimedBlockPosition))
+			{
+				_aimedBlockHealth = _blockManager.getBlockType(closestBlock).getResistance();
+				_aimedBlockPosition.set(newAimedBlockPosition);
+				_aimedBlockType = closestBlock;
+				_aimedBlockAABB.getPosition().set(_aimedBlockPosition.x() + 0.5f, _aimedBlockPosition.y() + 0.5f, _aimedBlockPosition.z() + 0.5f);
+				_aimedBlockAABB.getDimensions().set(_blockManager.getBlockType(_aimedBlockType).getDimensions());
+				_aimedBlockAABB.recalcVertices();
+				_aimedAdjacentBlockPosition = closestIntersection.calcAdjacentBlockPos();
+			}
+		} else
+		{
+			_aimedBlockPosition.setY(-1);
+			_aimedAdjacentBlockPosition = null;
+			_aimedBlockType = 0;
+		}
+		if (closestIntersection != null && _selectedItem != null && _aimedBlockPosition.y() != -1)
 		{
 			_body.setBlockDistance(closestIntersection.getDistance());
 		} else
@@ -611,8 +652,41 @@ public class Player extends GameObject
 		return _sharedInventoryContent;
 	}
 
+	public BlockType getAimedBlockType()
+	{
+		return BlockManager.getInstance().getBlockType(_aimedBlockType);
+	}
+
 	public void toggleFlying()
 	{
 		_flying = !_flying;
+	}
+
+	public void spreadLight()
+	{
+		if (_aimedBlockType != 0)
+		{
+			System.out.println("Spread Light! (" + _aimedAdjacentBlockPosition.x() + ", " + _aimedAdjacentBlockPosition.y() + ", " + _aimedAdjacentBlockPosition.z() + ")");
+			Chunk chunk = Game.getInstance().getWorld().getChunkManager()
+					.getChunkContaining(_aimedAdjacentBlockPosition.x(), _aimedAdjacentBlockPosition.y(), _aimedAdjacentBlockPosition.z(), false, false, false);
+			chunk.spreadLight(_aimedAdjacentBlockPosition.x(), _aimedAdjacentBlockPosition.y(), _aimedAdjacentBlockPosition.z(), (byte) 15, LightType.BLOCK);
+			// chunk.spreadSunlight(MathHelper.floor(getPosition().x()),
+			// MathHelper.floor(getPosition().z()));
+
+		}
+	}
+
+	public void unspreadLight()
+	{
+		if (_aimedBlockType != 0)
+		{
+			System.out.println("Spread Light! (" + _aimedAdjacentBlockPosition.x() + ", " + _aimedAdjacentBlockPosition.y() + ", " + _aimedAdjacentBlockPosition.z() + ")");
+			Chunk chunk = Game.getInstance().getWorld().getChunkManager()
+					.getChunkContaining(_aimedAdjacentBlockPosition.x(), _aimedAdjacentBlockPosition.y(), _aimedAdjacentBlockPosition.z(), false, false, false);
+			chunk.unspreadLight(_aimedAdjacentBlockPosition.x(), _aimedAdjacentBlockPosition.y(), _aimedAdjacentBlockPosition.z(), (byte) 15, LightType.BLOCK);
+			// chunk.spreadSunlight(MathHelper.floor(getPosition().x()),
+			// MathHelper.floor(getPosition().z()));
+
+		}
 	}
 }

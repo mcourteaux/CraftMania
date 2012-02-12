@@ -7,9 +7,11 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.nio.IntBuffer;
 
 import org.craftmania.game.TextureStorage;
 import org.craftmania.math.MathHelper;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
 
@@ -450,10 +452,13 @@ public class GLFont
 			texture.bind();
 			// draw the text
 			GL11.glTranslatef(x, y, 0); // Position The Text (in pixel coords)
+			IntBuffer buffer = BufferUtils.createIntBuffer(msg.length());
 			for (int i = 0; i < msg.length(); i++)
 			{
-				GL11.glCallList(fontListBase + (msg.charAt(i) - 32));
+				buffer.put(fontListBase + (msg.charAt(i) - 32));
 			}
+			buffer.flip();
+			GL11.glCallLists(buffer);
 			GL11.glPopMatrix();
 
 		}
