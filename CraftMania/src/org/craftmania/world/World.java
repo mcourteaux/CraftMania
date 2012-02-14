@@ -37,7 +37,7 @@ import org.lwjgl.opengl.GL11;
 public class World
 {
 
-	private static final float SECONDS_IN_DAY = 3600f * 24f;
+	private static final float SECONDS_IN_DAY = 60f * 9f; // 15 minutes / day
 
 	private WorldProvider _worldProvider;
 	private ChunkManager _chunkManager;
@@ -221,18 +221,18 @@ public class World
 		if (Game.getInstance().getFPS() < 5)
 			return;
 
-		_time += Game.getInstance().getStep() * 100;
-		_tick = MathHelper.floor(_time / 100);
+		_time += Game.getInstance().getStep();
+		_tick = MathHelper.floor(_time);
 
 		float todNew = MathHelper.simplify(_time, SECONDS_IN_DAY) / SECONDS_IN_DAY;
 
-		int oldSunlight = MathHelper.round(_sunlight);
+		int oldSunlight = MathHelper.floor(_sunlight);
 
 		_sunlight = -MathHelper.cos(todNew * MathHelper.f_2PI) * 0.5f + 0.5f;
 		_sunlight = Math.max(0.2f, _sunlight);
-		_sunlight *= 15.0f;
+		_sunlight *= 14.99f;
 
-		if (oldSunlight != MathHelper.round(_sunlight))
+		if (oldSunlight != MathHelper.floor(_sunlight))
 		{
 			/* Update chunk lights */
 			for (Chunk c : _localChunks)
@@ -306,9 +306,8 @@ public class World
 		
 		if (!_chunksToBeSetDirty.isEmpty())
 		{
-			_chunksToBeSetDirty.remove(0).setSunlightDirty(true);
+			_chunksToBeSetDirty.remove(0).regenerateSunlight();
 		}
-
 		selectLocalChunks();
 		updateLocalChunks();
 		checkForNewVisibleChunks();

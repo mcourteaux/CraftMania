@@ -459,6 +459,9 @@ public class Chunk implements AABBObject
 				chunk.needsNewVBO();
 				return;
 			}
+			
+			/* Unspread the sunlight */
+			unspreadSunlight(x, z);
 
 			/* Set it in the chunk data */
 			chunk._chunkData.setDefaultBlock(index, type.getID(), (byte) 0, metadata);
@@ -473,7 +476,9 @@ public class Chunk implements AABBObject
 				chunk._chunkData.clearLight(index);
 				/* Unspread light */
 				unspreadLight(x, y, z, blocklight, LightType.BLOCK);
-				unspreadSunlight(x, z);
+				unspreadLight(x, y, z, sunlight, LightType.SUN);
+				/* Respread sunlight */
+				spreadSunlight(x, z);
 			}
 
 		}
@@ -545,6 +550,7 @@ public class Chunk implements AABBObject
 			}
 
 			chunk.spreadLight(x, y, z, (byte) (blocklight - 1), LightType.BLOCK);
+			chunk.spreadLight(x, y, z, (byte) (sunlight - 1), LightType.SUN);
 			chunk.spreadSunlight(x, z);
 		}
 	}
@@ -626,11 +632,7 @@ public class Chunk implements AABBObject
 	{
 		if (_sunlightDirty)
 		{
-			for (int i = 0; i < BLOCK_COUNT; ++i)
-			{
-				_chunkData.setSunlight(i, (byte) 0);
-			}
-			generateSunlight();
+			regenerateSunlight();
 		}
 		if (_newVboNeeded)
 		{
@@ -711,6 +713,15 @@ public class Chunk implements AABBObject
 	{
 		_newVboNeeded = false;
 	}
+	
+	public void markChunkForNewVBO(int x, int z)
+	{
+		Chunk c = getChunk(x, z, false, false, false);
+		if (c != null)
+		{
+			c.needsNewVBO();
+		}
+	}
 
 	public byte getLightAbsolute(int x, int y, int z, LightType type)
 	{
@@ -753,9 +764,41 @@ public class Chunk implements AABBObject
 		{
 			return;
 		}
-		int index = ChunkData.positionToIndex(x - chunk.getAbsoluteX(), y, z - chunk.getAbsoluteZ());
+		int relX = x - chunk.getAbsoluteX();
+		int relZ = z - chunk.getAbsoluteZ();
+		int index = ChunkData.positionToIndex(relX, y, relZ);
 		chunk._chunkData.setLight(index, light, type);
 		chunk.needsNewVBO();
+		
+		if (relX == 0)
+		{
+			if (relZ == 0)
+			{
+				markChunkForNewVBO(chunk.getX() - 1, chunk.getZ() - 1);
+			} else if (relZ == CHUNK_SIZE_HORIZONTAL - 1)
+			{
+				markChunkForNewVBO(chunk.getX() - 1, chunk.getZ() + 1);
+			}
+			markChunkForNewVBO(chunk.getX() - 1, chunk.getZ());
+		}
+		if (relX == CHUNK_SIZE_HORIZONTAL - 1)
+		{
+			if (relZ == 0)
+			{
+				markChunkForNewVBO(chunk.getX() + 1, chunk.getZ() - 1);
+			} else if (relZ == CHUNK_SIZE_HORIZONTAL - 1)
+			{
+				markChunkForNewVBO(chunk.getX() + 1, chunk.getZ() + 1);
+			}
+			markChunkForNewVBO(chunk.getX() + 1, chunk.getZ());
+		}
+		if (relZ == 0)
+		{
+			markChunkForNewVBO(chunk.getX(), chunk.getZ() - 1);
+		} else if (relZ == CHUNK_SIZE_HORIZONTAL - 1)
+		{
+			markChunkForNewVBO(chunk.getX(), chunk.getZ() + 1);
+		}
 	}
 
 	public byte getTotalLightAbsolute(int x, int y, int z)
@@ -781,7 +824,7 @@ public class Chunk implements AABBObject
 	public void spreadSunlight(int x, int z)
 	{
 		Chunk chunk = getChunkContaining(x, 0, z, false, false, false);
-		if (chunk._loading)
+		if (chunk == null || chunk._loading)
 			return;
 
 		boolean spreading = false;
@@ -983,6 +1026,15 @@ public class Chunk implements AABBObject
 			}
 		}
 		_sunlightDirty = false;
+	}
+	
+	public void regenerateSunlight()
+	{
+		for (int i = 0; i < BLOCK_COUNT; ++i)
+		{
+			_chunkData.setSunlight(i, (byte) 0);
+		}
+		generateSunlight();
 	}
 	
 
