@@ -160,8 +160,8 @@ public class DefaultWorldProvider extends WorldProvider
 		int lowerX = x;
 		int lowerZ = z;
 
-		lowerX = MathHelper.floor((float) x / SAMPLE_RATE_HORIZONTAL) * SAMPLE_RATE_HORIZONTAL;
-		lowerZ = MathHelper.floor((float) z / SAMPLE_RATE_HORIZONTAL) * SAMPLE_RATE_HORIZONTAL;
+		lowerX = MathHelper.floorDivision(x, SAMPLE_RATE_HORIZONTAL) * SAMPLE_RATE_HORIZONTAL;
+		lowerZ = MathHelper.floorDivision(z, SAMPLE_RATE_HORIZONTAL) * SAMPLE_RATE_HORIZONTAL;
 
 		int upperX = lowerX + SAMPLE_RATE_HORIZONTAL;
 		int upperZ = lowerZ + SAMPLE_RATE_HORIZONTAL;

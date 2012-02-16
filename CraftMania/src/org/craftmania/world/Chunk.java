@@ -6,6 +6,7 @@ import org.craftmania.Side;
 import org.craftmania.blocks.Block;
 import org.craftmania.blocks.BlockManager;
 import org.craftmania.blocks.BlockType;
+import org.craftmania.blocks.DefaultBlock;
 import org.craftmania.datastructures.AABB;
 import org.craftmania.datastructures.AABBObject;
 import org.craftmania.game.Game;
@@ -422,7 +423,12 @@ public class Chunk implements AABBObject
 				return faceMask;
 			} else
 			{
-				// TODO
+				Block block = chunk._chunkData.getSpecialBlock(index);
+				block.checkVisibility();
+				if (block instanceof DefaultBlock)
+				{
+					return ((DefaultBlock) block).getFaceMask();
+				}
 				return -2;
 			}
 		}
@@ -647,15 +653,29 @@ public class Chunk implements AABBObject
 		int count = 0;
 		int blockIndex = 0;
 		int blockData = 0;
+		boolean special;
+		Block block = null;
 		for (int i = 0; i < _visibleBlocks.size(); ++i)
 		{
 			blockIndex = _visibleBlocks.get(i);
 			blockData = _chunkData.getBlockData(blockIndex);
-			if (!ChunkData.dataIsSpecial(blockData))
+			special = ChunkData.dataIsSpecial(blockData);
+			if (!special)
 			{
 				byte faceMask = ChunkData.dataGetFaceMask(blockData);
 				count += MathHelper.cardinality(faceMask);
+			} else
+			{
+				System.out.println("Block Data = " + Integer.toHexString(blockData));
+				block = _chunkData.getSpecialBlock(blockIndex);
+				if (block instanceof DefaultBlock && !block.isRenderingManually())
+				{
+					System.out.println(block);
+					byte faceMask = ((DefaultBlock) block).getFaceMask();
+					count += MathHelper.cardinality(faceMask);
+				}
 			}
+			
 		}
 		return count;
 	}

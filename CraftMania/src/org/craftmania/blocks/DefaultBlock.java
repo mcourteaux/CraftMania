@@ -27,7 +27,7 @@ public class DefaultBlock extends Block
 		_aabb = null;
 		_needVisibilityCheck = true;
 	}
-
+	
 	private void createMovementPlugin()
 	{
 		_movement = new BlockMovementPlugin(this);
@@ -146,7 +146,7 @@ public class DefaultBlock extends Block
 		return _visible;
 	}
 
-	private synchronized void checkVisibility()
+	public void checkVisibility()
 	{
 		boolean preVisibility = _faceMask != 0;
 		byte preMask = _faceMask;
@@ -164,8 +164,7 @@ public class DefaultBlock extends Block
 					Chunk chunk = _blockChunk.getChunkContaining(getX() + normal.x(), getY() + normal.y(), getZ() + normal.z(), false, false, false);
 					if (chunk == null)
 					{
-						/* TODO Solve */
-						setFaceVisible(side, true);
+						setFaceVisible(side, false);
 					} else
 					{
 						byte block = chunk.getBlockTypeAbsolute(getX() + normal.x(), getY() + normal.y(), getZ() + normal.z(), false, false, false);
@@ -259,6 +258,10 @@ public class DefaultBlock extends Block
 
 	public byte getFaceMask()
 	{
+		if (_needVisibilityCheck)
+		{
+			checkVisibility();
+		}
 		return _faceMask;
 	}
 

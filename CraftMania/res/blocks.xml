@@ -89,6 +89,7 @@
         <resistance>9</resistance>
         <blockClass>WOOD</blockClass>
         <customClass>org.craftmania.blocks.customblocks.CraftingTable</customClass>
+        <hasSpecialAction>true</hasSpecialAction>
     </block>
     
     <block id="10" name="snow">

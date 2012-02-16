@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import org.craftmania.Side;
+import org.craftmania.blocks.Block;
 import org.craftmania.blocks.BlockManager;
 import org.craftmania.blocks.BlockType;
 import org.craftmania.blocks.DefaultBlock;
@@ -47,7 +48,6 @@ public class ChunkMeshBuilder
 
 			/* Compute vertex count */
 			int vertexCount = chunk.getNumberOfVisibleFacesForVBO() * 4;
-
 			/*
 			 * If there are no faces visible yet (because of generating busy),
 			 * don't create a buffer
@@ -96,22 +96,32 @@ public class ChunkMeshBuilder
 			byte blockType = 0;
 			boolean special;
 			Vec3i vec = new Vec3i();
+			BlockType type;
+			Block block = null;
 			byte[][][] lightBuffer = new byte[3][3][3];
-			byte faceMask;
+			byte faceMask = 0;
 			for (int i = 0; i < blockList.size(); ++i)
 			{
 				blockIndex = blockList.get(i);
 				blockType = chunk.getChunkData().getBlockType(blockIndex);
-				special = chunk.getChunkData().isSpecial(blockIndex);
 				if (blockType == 0)
 					continue;
+				special = chunk.getChunkData().isSpecial(blockIndex);
+				type = _blockManager.getBlockType(blockType);
 				if (special)
 				{
-					// TODO: Do not include moving blocks, they should be
-					// rendered afterwards.
+					block = chunk.getChunkData().getSpecialBlock(blockIndex);
 				} else
 				{
 					faceMask = chunk.getChunkData().getFaceMask(blockIndex);
+				}
+				if (!special || ((block instanceof DefaultBlock) && !block.isRenderingManually()))
+				{
+					if (special && (block instanceof DefaultBlock))
+					{
+						faceMask = ((DefaultBlock) block).getFaceMask();
+						System.out.println("Special block build: " + block + " (fm: " + faceMask + ")");
+					}
 					ChunkData.indexToPosition(blockIndex, vec);
 
 					/* Build the light buffer */

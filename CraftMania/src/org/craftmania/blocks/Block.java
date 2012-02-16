@@ -1,7 +1,5 @@
 package org.craftmania.blocks;
 
-import java.util.Iterator;
-
 import org.craftmania.Side;
 import org.craftmania.datastructures.AABB;
 import org.craftmania.datastructures.AABBObject;
@@ -170,7 +168,8 @@ public abstract class Block implements AABBObject
 	public abstract AABB getAABB();
 	public abstract void smash(InventoryItem item);
 	public abstract void neighborChanged(Side side);
-	
+	public abstract void checkVisibility();
+
 	public void performSpecialAction()
 	{
 		
@@ -196,5 +195,6 @@ public abstract class Block implements AABBObject
 	{
 		return _renderManually;
 	}
+
 
 }

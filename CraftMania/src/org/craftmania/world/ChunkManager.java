@@ -126,7 +126,8 @@ public class ChunkManager
 	public Block getSpecialBlock(int x, int y, int z)
 	{
 		Chunk c = getChunkContaining(x, y, z, false, false, false);
-		return c.getChunkData().getSpecialBlock(ChunkData.positionToIndex(x - c.getAbsoluteX(), y, z - c.getAbsoluteZ()));
+		int index = ChunkData.positionToIndex(x - c.getAbsoluteX(), y, z - c.getAbsoluteZ());
+		return c.getChunkData().getSpecialBlock(index);
 	}
 	
 
