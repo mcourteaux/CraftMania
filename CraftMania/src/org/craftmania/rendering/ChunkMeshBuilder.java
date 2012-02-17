@@ -94,7 +94,7 @@ public class ChunkMeshBuilder
 			IntList blockList = chunk.getVisibleBlocks();
 			int blockIndex = -1;
 			byte blockType = 0;
-			boolean special;
+			boolean special = false, manualRender = false;
 			Vec3i vec = new Vec3i();
 			BlockType type;
 			Block block = null;
@@ -111,17 +111,24 @@ public class ChunkMeshBuilder
 				if (special)
 				{
 					block = chunk.getChunkData().getSpecialBlock(blockIndex);
-				} else
-				{
-					faceMask = chunk.getChunkData().getFaceMask(blockIndex);
-				}
-				if (!special || ((block instanceof DefaultBlock) && !block.isRenderingManually()))
-				{
-					if (special && (block instanceof DefaultBlock))
+					manualRender = block.isRenderingManually();
+					if (block instanceof DefaultBlock)
 					{
 						faceMask = ((DefaultBlock) block).getFaceMask();
 						System.out.println("Special block build: " + block + " (fm: " + faceMask + ")");
+					} else
+					{
+						faceMask = 0;
 					}
+					
+				} else
+				{
+					faceMask = chunk.getChunkData().getFaceMask(blockIndex);
+					block = null;
+					manualRender = false;
+				}
+				if (faceMask != 0 && !manualRender)
+				{
 					ChunkData.indexToPosition(blockIndex, vec);
 
 					/* Build the light buffer */

@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.craftmania.GameObject;
 import org.craftmania.blocks.Block;
+import org.craftmania.blocks.BlockConstructor;
 import org.craftmania.blocks.BlockManager;
 import org.craftmania.blocks.BlockType;
 import org.craftmania.datastructures.AABB;
@@ -219,7 +220,16 @@ public class Player extends GameObject
 								byte currentBlock = bc.getBlockTypeAbsolute(bX, bY, bZ, false, false, false);
 								if (currentBlock == 0)
 								{
-									bc.setDefaultBlockAbsolute(bX, bY, bZ, ((BlockType) _selectedItem), (byte) 0, true, true, true);
+									BlockType type = ((BlockType) _selectedItem);
+									if (type.getCustomClass() == null)
+									{
+										bc.setDefaultBlockAbsolute(bX, bY, bZ, type, (byte) 0, true, true, true);
+									} else
+									{
+										Block block = BlockConstructor.construct(bX, bY, bZ, bc, type.getID(), (byte) 0);
+										bc.setSpecialBlockAbsolute(bX, bY, bZ, block, true, true, true);
+									}
+
 									_inventory.getInventoryPlace(_selectedInventoryItemIndex).getStack().decreaseItemCount();
 									setSelectedInventoryItemIndex(_selectedInventoryItemIndex);
 								}

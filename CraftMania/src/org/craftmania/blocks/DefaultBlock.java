@@ -43,7 +43,7 @@ public class DefaultBlock extends Block
 	{
 		if (!_blockType.isFixed())
 		{
-			byte supportingBlock = _blockChunk.getBlockTypeAbsolute(getX(), getY() - 1, getZ(), false, false, false);
+			byte supportingBlock = _chunk.getBlockTypeAbsolute(getX(), getY() - 1, getZ(), false, false, false);
 			if (supportingBlock == 0)
 			{
 				if (!isFalling())
@@ -54,10 +54,10 @@ public class DefaultBlock extends Block
 						createMovementPlugin();
 						addToManualRenderList();
 						_needVisibilityCheck = true;
-						_blockChunk.needsNewVBO();
+						_chunk.needsNewVBO();
 					}
 					_movement.setFalling(true);
-					_blockChunk.notifyNeighborsOf(getX(), getY(), getZ());
+					_chunk.notifyNeighborsOf(getX(), getY(), getZ());
 				}
 			} else
 			{
@@ -65,10 +65,10 @@ public class DefaultBlock extends Block
 				{
 					/* Stop falling */
 					_movement.setFalling(false);
-					_blockChunk.notifyNeighborsOf(getX(), getY(), getZ());
+					_chunk.notifyNeighborsOf(getX(), getY(), getZ());
 					removeFromManualRenderList();
 					_needVisibilityCheck = true;
-					_blockChunk.needsNewVBO();
+					_chunk.needsNewVBO();
 				}
 			}
 
@@ -148,6 +148,15 @@ public class DefaultBlock extends Block
 
 	public void checkVisibility()
 	{
+//		System.out.println();
+//		System.out.println("BEFORE:");
+//		System.out.println("Chunk = " + _chunk);
+//		System.out.println("FaceMask = " +_faceMask);
+//		System.out.println("Visible = " +_visible);
+//		System.out.println("Rendering = " + _rendering);
+//		System.out.println("Rendering Manually = " + _renderManually);
+//		
+		
 		boolean preVisibility = _faceMask != 0;
 		byte preMask = _faceMask;
 		if (isMoving())
@@ -155,19 +164,20 @@ public class DefaultBlock extends Block
 			_faceMask = ALL_FACES;
 		} else
 		{
-			if (_blockChunk != null)
+			if (_chunk != null)
 			{
 				for (int i = 0; i < 6; ++i)
 				{
 					Side side = Side.getSide(i);
 					Vec3i normal = side.getNormal();
-					Chunk chunk = _blockChunk.getChunkContaining(getX() + normal.x(), getY() + normal.y(), getZ() + normal.z(), false, false, false);
+					Chunk chunk = _chunk.getChunkContaining(getX() + normal.x(), getY() + normal.y(), getZ() + normal.z(), false, false, false);
 					if (chunk == null)
 					{
 						setFaceVisible(side, false);
 					} else
 					{
 						byte block = chunk.getBlockTypeAbsolute(getX() + normal.x(), getY() + normal.y(), getZ() + normal.z(), false, false, false);
+						System.out.println(side.name() + " " + block);
 						if (block != 0)
 						{
 							if (false || !BlockManager.getInstance().getBlockType(block).hasNormalAABB())
@@ -204,11 +214,21 @@ public class DefaultBlock extends Block
 				removeFromVisibilityList();
 			}
 			
-			_blockChunk.needsNewVBO();
+			_chunk.needsNewVBO();
 		} else if (preMask != _faceMask)
 		{
-			_blockChunk.needsNewVBO();
+			_chunk.needsNewVBO();
 		}
+		
+//		System.out.println();
+//		System.out.println("AFTER:");
+//		System.out.println("FaceMask = " +_faceMask);
+//		System.out.println("Visible = " +_visible);
+//		System.out.println("Rendering = " + _rendering);
+//		System.out.println("Rendering Manually = " + _renderManually);
+//		
+//		System.out.println();
+		
 	}
 
 	@Override

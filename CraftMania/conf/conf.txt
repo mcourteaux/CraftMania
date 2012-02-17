@@ -1,11 +1,11 @@
 
 ### Graphics
-fullscreen=true
-width=1280
-height=800
+fullscreen=false
+width=900
+height=500
 fovy=65
 fps=40
-viewing_distance=60
+viewing_distance=90
 vsync=false
 
 ### Texture Pack

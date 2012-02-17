@@ -500,13 +500,11 @@ public class Chunk implements AABBObject
 		Chunk chunk = getChunkContaining(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
 		if (chunk != null)
 		{
+			block.setChunk(this);
+			block.getPosition().set(x, y, z);
 			chunk._chunkData.setSpecialBlock(ChunkData.positionToIndex(x - chunk.getAbsoluteX(), y, z - chunk.getAbsoluteZ()), block);
-			chunk.updateVisibilityFor(x - 1, y, z);
-			chunk.updateVisibilityFor(x + 1, y, z);
-			chunk.updateVisibilityFor(x, y - 1, z);
-			chunk.updateVisibilityFor(x, y + 1, z);
-			chunk.updateVisibilityFor(x, y, z - 1);
-			chunk.updateVisibilityFor(x, y, z + 1);
+			chunk.updateVisibilityFor(x, y, z);
+			chunk.updateVisibilityForNeigborsOf(x, y, z);
 		}
 	}
 

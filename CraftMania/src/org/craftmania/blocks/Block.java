@@ -7,12 +7,13 @@ import org.craftmania.game.Game;
 import org.craftmania.inventory.InventoryItem;
 import org.craftmania.math.Vec3i;
 import org.craftmania.world.Chunk;
+import org.craftmania.world.ChunkData;
 
 public abstract class Block implements AABBObject
 {
 	protected BlockType _blockType;
 	protected Vec3i _postion;
-	protected Chunk _blockChunk;
+	protected Chunk _chunk;
 	protected AABB _aabb;
 	protected float _health;
 	
@@ -29,7 +30,7 @@ public abstract class Block implements AABBObject
 	{
 		_postion = pos;
 		_blockType = type;
-		_blockChunk = blockChunk;
+		_chunk = blockChunk;
 		_health = type.getResistance();
 	}
 	
@@ -55,7 +56,7 @@ public abstract class Block implements AABBObject
 	
 	public Chunk getBlockChunk()
 	{
-		return _blockChunk;
+		return _chunk;
 	}
 	
 	public int getX()
@@ -71,6 +72,11 @@ public abstract class Block implements AABBObject
 	public int getZ()
 	{
 		return _postion.z();
+	}
+	
+	public int getChunkDataIndex()
+	{
+		return ChunkData.positionToIndex(getX() - _chunk.getAbsoluteX(), getY(), getZ() - _chunk.getAbsoluteZ());
 	}
 	
 	public boolean isMoving()
@@ -93,16 +99,16 @@ public abstract class Block implements AABBObject
 	{
 		Game.getInstance().getWorld().getChunkManager().removeBlock(getX(), getY(), getZ());
 		
-		_blockChunk.needsNewVBO();
+		_chunk.needsNewVBO();
 	}
 	
 	public void removeFromVisibilityList()
 	{
 		if (_rendering)
 		{
-			_blockChunk.getVisibleBlocks().bufferRemove(_specialBlockPoolIndex);
+			_chunk.getVisibleBlocks().bufferRemove(getChunkDataIndex());
 			_rendering = false;
-//			removeFromManualRenderList();
+			removeFromManualRenderList();
 		}
 	}
 	
@@ -110,7 +116,7 @@ public abstract class Block implements AABBObject
 	{
 		if (!_rendering)
 		{
-			_blockChunk.getVisibleBlocks().bufferAdd(_specialBlockPoolIndex);
+			_chunk.getVisibleBlocks().bufferAdd(getChunkDataIndex());
 			_rendering = true;
 		}
 	}
@@ -119,7 +125,7 @@ public abstract class Block implements AABBObject
 	{
 		if (!_updating)
 		{
-			_blockChunk.getUpdatingBlocks().bufferAdd(_specialBlockPoolIndex);
+			_chunk.getUpdatingBlocks().bufferAdd(getChunkDataIndex());
 			_updating = true;
 		}
 	}
@@ -128,7 +134,7 @@ public abstract class Block implements AABBObject
 	{
 		if (_updating)
 		{
-			_blockChunk.getUpdatingBlocks().bufferRemove(_specialBlockPoolIndex);
+			_chunk.getUpdatingBlocks().bufferRemove(getChunkDataIndex());
 			_updating = false;
 		}
 	}
@@ -138,7 +144,7 @@ public abstract class Block implements AABBObject
 		System.out.print("Add to list... ");
 //		if (!_renderManually)
 		{
-			_blockChunk.getManualRenderingBlocks().bufferAdd(_specialBlockPoolIndex);
+			_chunk.getManualRenderingBlocks().bufferAdd(getChunkDataIndex());
 			_renderManually = true;
 			System.out.println("Done");
 //		} else
@@ -152,7 +158,7 @@ public abstract class Block implements AABBObject
 		System.out.print("Remove from list... ");
 //		if (_renderManually)
 		{
-			_blockChunk.getManualRenderingBlocks().bufferRemove(_specialBlockPoolIndex);
+			_chunk.getManualRenderingBlocks().bufferRemove(getChunkDataIndex());
 			_renderManually = false;
 			System.out.println("Done");
 //		} else
@@ -186,9 +192,9 @@ public abstract class Block implements AABBObject
 		_rendering = v;
 	}
 
-	public void setBlockChunk(Chunk chunk)
+	public void setChunk(Chunk chunk)
 	{
-		_blockChunk = chunk;	
+		_chunk = chunk;	
 	}
 
 	public boolean isRenderingManually()
