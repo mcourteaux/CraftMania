@@ -18,6 +18,10 @@ public class Camera
 
 	private Vec3f position;
 	private Vec3f lookDirection;
+	private Vec3f up;
+	private Vec3f right;
+	private float bobbing;
+	
 	private float x, y, z;
 	/** Rotations of the camera, in radians */
 	private float rotX, rotY;
@@ -32,10 +36,13 @@ public class Camera
 		viewFrustum = new ViewFrustum();
 		position = new Vec3f();
 		lookDirection = new Vec3f();
+		up = new Vec3f(0, 1, 0);
+		right = new Vec3f();
 	}
 
 	public Camera(Camera cam)
 	{
+		this();
 		x = cam.x;
 		y = cam.y;
 		z = cam.z;
@@ -64,7 +71,7 @@ public class Camera
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 
-		GLU.gluLookAt(x, y, z, x + lookDirection.x(), y + lookDirection.y(), z + lookDirection.z(), 0, 1, 0);
+		GLU.gluLookAt(x, y + Math.abs(bobbing) * 3.5f, z, x + lookDirection.x(), y + lookDirection.y() + Math.abs(bobbing) * 3.5f, z + lookDirection.z(), up.x() + right.x(), up.y() + right.y(), up.z() + right.z());
 
 		viewFrustum.updateFrustum();
 	}
@@ -77,11 +84,16 @@ public class Camera
 		this.position.set(x, y, z);
 	}
 
-	public void setRotation(float rotX, float rotY)
+	public void setRotation(float rotX, float rotY, float bobbing)
 	{
 		this.rotX = rotX;
 		this.rotY = rotY;
+		
 		this.lookDirection.set(MathHelper.cos(rotY), MathHelper.tan(rotX), -MathHelper.sin(rotY));
+		this.right.cross(lookDirection, up);
+		this.right.scale(bobbing);
+		
+		this.bobbing = bobbing;
 	}
 
 	public void setFovy(float fovy)

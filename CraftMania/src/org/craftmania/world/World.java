@@ -62,6 +62,8 @@ public class World
 	private AABB _chunkVisibilityTestingAABB;
 	private ChunkDistanceComparator _chunkDistanceComparator;
 
+	private boolean _checkForNewChunks;
+
 	public World(String name, long seed) throws Exception
 	{
 		_worldName = name;
@@ -77,7 +79,7 @@ public class World
 		_chunkDistanceComparator = new ChunkDistanceComparator();
 		_fogColor = new Vec3f();
 
-		_time = SECONDS_IN_DAY * 0.5f;
+		_time = SECONDS_IN_DAY * 0.3f;
 	}
 
 	public void save() throws Exception
@@ -312,6 +314,13 @@ public class World
 		{
 			_chunksToBeSetDirty.remove(0).regenerateSunlight();
 		}
+		
+		if (_checkForNewChunks)
+		{
+			checkForNewVisibleChunks();
+			selectLocalChunks();
+		}
+		
 		updateLocalChunks();
 
 		_chunkManager.performRememberedBlockChanges();
@@ -368,7 +377,10 @@ public class World
 			System.out.println("New chunk in sight: " + (centerX + xToGenerate) + ", " + (centerZ + zToGenerate));
 			Chunk ch = _chunkManager.getChunk(centerX + xToGenerate, centerZ + zToGenerate, true, false, false);
 			_chunkManager.loadAndGenerateChunk(ch, true);
-			checkForNewVisibleChunks();
+			_checkForNewChunks = true;
+		} else
+		{
+			_checkForNewChunks = false;
 		}
 
 	}

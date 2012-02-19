@@ -346,6 +346,11 @@ public class MathHelper
 		}
 	}
 
+	public static float sqrt(float f)
+	{
+		return (float) Math.sqrt(f);
+	}
+
 
 
 }

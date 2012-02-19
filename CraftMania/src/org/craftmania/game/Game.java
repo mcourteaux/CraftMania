@@ -26,6 +26,7 @@ import static org.lwjgl.opengl.GL11.glBegin;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
+import static org.lwjgl.opengl.GL11.glColor3f;
 import static org.lwjgl.opengl.GL11.glColor4f;
 import static org.lwjgl.opengl.GL11.glDepthFunc;
 import static org.lwjgl.opengl.GL11.glDisable;
@@ -198,7 +199,7 @@ public class Game
 		glMatrixMode(GL_MODELVIEW);
 
 		GL11.glShadeModel(GL11.GL_SMOOTH);
-		
+
 		Vec3f fog = _configuration.getFogColor();
 
 		glClearColor(fog.x(), fog.y(), fog.z(), 1.0f);
@@ -256,6 +257,7 @@ public class Game
 	private void renderOnScreenInfo()
 	{
 		GLFont infoFont = FontStorage.getFont("Monospaced_20");
+		glColor3f(1, 1, 1);
 
 		/* Top Left Info */
 		infoFont.print(4, _configuration.getHeight() - 20, String.format("FPS: %5.1f", getAverageFPS()));
@@ -362,7 +364,7 @@ public class Game
 				_sleepTimeMillis = 0;
 			}
 			_fps = (int) (1000000000.0f / (frameTimeNanos + (_sleepTimeMillis * 1000000L)));
-			
+
 			/* Average FPS System */
 			float fpsSum = _fps;
 			for (int i = 0; i < _fpsDataBuffer.length - 1; ++i)
@@ -373,8 +375,7 @@ public class Game
 			_fpsDataBuffer[_fpsDataBuffer.length - 1] = _fps;
 			fpsSum /= _fpsDataBuffer.length;
 			_averageFPS = fpsSum;
-			
-			
+
 		}
 
 		if (_world != null)
@@ -484,7 +485,7 @@ public class Game
 	{
 		return _sleepTimeMillis;
 	}
-	
+
 	public float getAverageFPS()
 	{
 		return _averageFPS;

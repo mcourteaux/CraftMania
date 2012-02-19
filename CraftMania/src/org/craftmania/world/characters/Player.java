@@ -52,7 +52,9 @@ public class Player extends GameObject
 	private float x, y, z;
 	private Vec3f _position;
 	/** Rotation of the players head, in radians */
-	private float rotX, rotY; // Radialen
+	private float rotX, rotY; // Radians
+	private float bobbing, bobbingProcess;
+	
 	/* Movement variables */
 	private float speedForward = 0.0f;
 	private float speedSide = 0.0f;
@@ -64,6 +66,7 @@ public class Player extends GameObject
 	private boolean onGround = false;
 	private boolean _flying = false;
 	private int _rotationSegment = 0;
+	
 	/* Body */
 	private CharacterBody _body;
 	/* Editing */
@@ -173,7 +176,7 @@ public class Player extends GameObject
 
 		/* Update the camera */
 		_camera.setPosition(x, y + eyeHeight, z);
-		_camera.setRotation(rotX, rotY);
+		_camera.setRotation(rotX, rotY, bobbing);
 
 		_body.update();
 		_body.disableUsingRightHand();
@@ -429,6 +432,12 @@ public class Player extends GameObject
 			speedForward *= -0.2f;
 			speedSide *= -0.2f;
 		}
+		
+		float speed = MathHelper.sqrt(speedForward * speedForward + speedSide * speedSide);
+		speed /= maxSpeed;
+		
+		bobbingProcess += step * 10.0f;
+		bobbingProcess = MathHelper.simplifyRadians(bobbingProcess);
 
 		float dx = Mouse.getDX();
 		float dy = Mouse.getDY();
@@ -453,7 +462,7 @@ public class Player extends GameObject
 
 		rotY = MathHelper.simplifyRadians(rotY);
 		rotX = MathHelper.clamp(rotX, -MathHelper.f_PI / 2.001f, MathHelper.f_PI / 2.001f);
-
+		bobbing = MathHelper.sin(bobbingProcess) * 0.03f * speed;
 	}
 
 	private void physics()
