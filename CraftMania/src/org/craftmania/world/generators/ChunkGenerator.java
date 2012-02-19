@@ -144,7 +144,7 @@ public class ChunkGenerator extends Generator
 					}
 					if (biome == Biome.FOREST)
 					{
-						gen.generateBroadLeavedTree(chunk, x, y, z, random.randomInt(3) == 0);
+						gen.generateBroadLeavedTree(chunk, x, y, z, random.randomInt(5) == 0);
 						type = 0;
 					} else if (biome == Biome.DESERT)
 					{

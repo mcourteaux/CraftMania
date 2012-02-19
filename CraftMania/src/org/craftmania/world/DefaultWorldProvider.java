@@ -23,6 +23,7 @@ public class DefaultWorldProvider extends WorldProvider
 
 	public static int SAMPLE_RATE_HORIZONTAL = 8;
 	public static int SAMPLE_RATE_VERTICAL = 8;
+	public static int SAMPLE_RATE_RAW_HEIGHS = 32;
 
 	public static int SAMPLE_RATE_TEMPERATURE = 32;
 
@@ -30,6 +31,7 @@ public class DefaultWorldProvider extends WorldProvider
 
 	private World _world;
 	private WorldProviderGenerator _generator;
+	private List<DataPoint2D> _rawHeights;
 	private List<DataPoint2D> _heights;
 	private List<DataPoint2D> _humidities;
 	private List<DataPoint2D> _temperatures;
@@ -41,6 +43,7 @@ public class DefaultWorldProvider extends WorldProvider
 	{
 		_world = world;
 		_generator = new WorldProviderGenerator(world);
+		_rawHeights = new ArrayList<DefaultWorldProvider.DataPoint2D>();
 		_heights = new ArrayList<DefaultWorldProvider.DataPoint2D>();
 		_humidities = new ArrayList<DefaultWorldProvider.DataPoint2D>();
 		_trees = new ArrayList<TreeDefinition>();
@@ -334,6 +337,97 @@ public class DefaultWorldProvider extends WorldProvider
 
 		return biLerpDataPoints(x, z, q11, q12, q21, q22);
 	}
+	
+	public int getRawHeightAt(int x, int z)
+	{
+		int lowerX = x;
+		int lowerZ = z;
+
+		lowerX = MathHelper.floorDivision(x, SAMPLE_RATE_RAW_HEIGHS) * SAMPLE_RATE_RAW_HEIGHS;
+		lowerZ = MathHelper.floorDivision(z, SAMPLE_RATE_RAW_HEIGHS) * SAMPLE_RATE_RAW_HEIGHS;
+
+		int upperX = lowerX + SAMPLE_RATE_RAW_HEIGHS;
+		int upperZ = lowerZ + SAMPLE_RATE_RAW_HEIGHS;
+
+		DataPoint2D q11, q12, q21, q22;
+		q11 = q12 = q21 = q22 = null;
+
+		synchronized (_rawHeights)
+		{
+
+			for (DataPoint2D height : _rawHeights)
+			{
+				if (isPoint(height, x, z))
+				{
+					return height.getData();
+				}
+
+				int hX = height._x;
+				int hZ = height._z;
+
+				if (lowerX == hX && lowerZ == hZ)
+				{
+					q11 = height;
+				} else if (lowerX == hX && upperZ == hZ)
+				{
+					q12 = height;
+				} else if (upperX == hX && lowerZ == hZ)
+				{
+					q21 = height;
+				} else if (upperX == hX && upperZ == hZ)
+				{
+					q22 = height;
+				}
+
+				if (q11 != null && q12 != null && q21 != null && q22 != null)
+				{
+					break;
+				}
+			}
+
+			if (q11 == null || q12 == null || q21 == null || q22 == null)
+			{
+				// System.out.println("No level data found for this coordinates ("
+				// +
+				// x + ", " + z + ") !! So, will be generated...");
+				if (q11 == null)
+				{
+					q11 = _generator.generateRawHeightAt(lowerX, lowerZ);
+					if (isPoint(q11, x, z))
+					{
+						return q11._data;
+					}
+				}
+				if (q12 == null)
+				{
+					q12 = _generator.generateRawHeightAt(lowerX, upperZ);
+					if (isPoint(q12, x, z))
+					{
+						return q12._data;
+					}
+				}
+				if (q21 == null)
+				{
+					q21 = _generator.generateRawHeightAt(upperX, lowerZ);
+					if (isPoint(q21, x, z))
+					{
+						return q21._data;
+					}
+				}
+				if (q22 == null)
+				{
+					q22 = _generator.generateRawHeightAt(upperX, upperZ);
+					if (isPoint(q22, x, z))
+					{
+						return q22._data;
+					}
+				}
+			}
+		}
+
+		return biLerpDataPoints(x, z, q11, q12, q21, q22);
+	}
+
 
 	@Override
 	public Biome getBiomeAt(int x, int y, int z)
@@ -490,30 +584,25 @@ public class DefaultWorldProvider extends WorldProvider
 		public DataPoint2D generateHeightAt(int x, int z)
 		{
 			/* Rasterize the coordinates */
-			x = MathHelper.floor((float) x / DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL) * DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL;
-			z = MathHelper.floor((float) z / DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL) * DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL;
+			x = MathHelper.floorDivision(x, DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL) * DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL;
+			z = MathHelper.floorDivision(z, DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL) * DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL;
 
 			DataResults td = gatherDataAround(_heights, x, z, 20);
+			
+			int rawHeight = getRawHeightAt(x, z);
 
 			if (td.count == 0)
 			{
-				DataPoint2D data = new DataPoint2D(x, z, MathHelper.floor(_random.randomFloat(15, 23)));
+				DataPoint2D data = new DataPoint2D(x, z, rawHeight);
 				if (DEBUG_WOLRD_PROVIDER)
 					System.out.println("Height (" + x + ", " + z + ") = " + data.getData());
 				_heights.add(data);
 				return data;
 			} else
 			{
-				float diff = _random.exponentialRandom(250.0f, 7);
+				float diff = _random.exponentialRandom(30.0f, 6);
 
-				float avgHeight = _random.randomFloat(td.avg - Math.min(diff * 2.8f, 7), td.avg + diff * 1.5f);
-				float maxHeight = _random.randomFloat(td.max - diff, td.max + diff * 0.6f);
-				float closestHeight = _random.randomFloat(td.closest - diff, td.closest + diff * 0.6f);
-
-				float closestFactor = (float) (DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL / Math.sqrt(td.closestDistanceSq)) / 3.0f;
-				float factor = 0.5f * (1.0f - closestFactor);
-
-				float height = avgHeight * factor + maxHeight * factor + closestHeight * closestFactor;
+				float height = rawHeight * 0.6f + td.avg * 0.4f + diff;
 
 				height = Math.max(10, height);
 				DataPoint2D data = new DataPoint2D(x, z, MathHelper.round(height));
@@ -524,6 +613,48 @@ public class DefaultWorldProvider extends WorldProvider
 				return data;
 			}
 		}
+		
+		/**
+		 * Generates a new data point, stores it in the heights array. Returns
+		 * the newly generated terrain height
+		 * 
+		 * @param x
+		 * @param z
+		 * @return
+		 */
+		public DataPoint2D generateRawHeightAt(int x, int z)
+		{
+			/* Rasterize the coordinates */
+			x = MathHelper.floorDivision(x, DefaultWorldProvider.SAMPLE_RATE_RAW_HEIGHS) * DefaultWorldProvider.SAMPLE_RATE_RAW_HEIGHS;
+			z = MathHelper.floorDivision(z, DefaultWorldProvider.SAMPLE_RATE_RAW_HEIGHS) * DefaultWorldProvider.SAMPLE_RATE_RAW_HEIGHS;
+
+			DataResults td = gatherDataAround(_rawHeights, x, z, 60);
+
+			if (td.count == 0)
+			{
+				DataPoint2D data = new DataPoint2D(x, z, MathHelper.floor(_random.randomFloat(15, 23)));
+				if (DEBUG_WOLRD_PROVIDER)
+					System.out.println("Height (" + x + ", " + z + ") = " + data.getData());
+				_rawHeights.add(data);
+				return data;
+			} else
+			{
+				float diff = _random.exponentialRandom(120.0f, 4);
+
+				float avgHeight = _random.randomFloat(td.avg - diff, td.avg + diff);
+
+				float height = avgHeight;
+
+				height = MathHelper.clamp(height, 15, 200);
+				DataPoint2D data = new DataPoint2D(x, z, MathHelper.round(height));
+				if (DEBUG_WOLRD_PROVIDER)
+					System.out.println("Height (" + x + ", " + z + ") = " + data.getData());
+
+				_rawHeights.add(data);
+				return data;
+			}
+		}
+
 
 		private DataResults gatherDataAround(List<DataPoint2D> list, int x, int z, float radius)
 		{
@@ -630,6 +761,7 @@ public class DefaultWorldProvider extends WorldProvider
 		writeVec3f(dos, _spawnPoint);
 		writeVec3f(dos, _initialSpawnPoint);
 
+		writeDataPointList(dos, _rawHeights);
 		writeDataPointList(dos, _heights);
 		writeDataPointList(dos, _humidities);
 		writeDataPointList(dos, _temperatures);
@@ -678,6 +810,7 @@ public class DefaultWorldProvider extends WorldProvider
 		readVec3f(dis, _spawnPoint);
 		readVec3f(dis, _initialSpawnPoint);
 
+		readDataPointList(dis, _rawHeights);
 		readDataPointList(dis, _heights);
 		readDataPointList(dis, _humidities);
 		readDataPointList(dis, _temperatures);

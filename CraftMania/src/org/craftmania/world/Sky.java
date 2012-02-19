@@ -12,8 +12,8 @@ public class Sky extends GameObject
 {
 
 	/* Sphere */
-	private Vec3f _innerColor;
-	private Vec3f _outerColor;
+	private static Vec3f COLOR = new Vec3f(0.5f, 0.7f, 1.0f);
+	private Vec3f _color;
 	private float _height;
 	private float _radius;
 	private float _bend;
@@ -33,8 +33,7 @@ public class Sky extends GameObject
 
 	public Sky()
 	{
-		_innerColor = new Vec3f(0.5f, 0.7f, 1.0f);
-		_outerColor = _innerColor;
+		_color = new Vec3f(COLOR);
 		_height = 160.0f;
 		_radius = Game.getInstance().getConfiguration().getViewingDistance() + 20.0f;
 		_bend = 15.0f;
@@ -44,7 +43,7 @@ public class Sky extends GameObject
 		_cloudsTexHeight = _clouds.getImageHeight();
 		_cloudsHeight = 128.0f;
 		_cloudsAlpha = 0.8f;
-		_cloudsScale = 2.0f;
+		_cloudsScale = 1.2f;
 	}
 
 	@Override
@@ -56,6 +55,9 @@ public class Sky extends GameObject
 
 		_cloudsX = MathHelper.simplify(_cloudsX, _cloudsTexWidth * _cloudsScale);
 		_cloudsZ = MathHelper.simplify(_cloudsZ, _cloudsTexHeight * _cloudsScale);
+		
+		_color.set(COLOR);
+		_color.scale(Game.getInstance().getWorld().getSunlight());
 	}
 
 	@Override
@@ -97,14 +99,13 @@ public class Sky extends GameObject
 	{
 		GL11.glPushMatrix();
 		GL11.glTranslatef(x, y, z);
+		GL11.glColor3f(_color.x(), _color.y(), _color.z());
 		if (_sphereCallList == 0)
 		{
 			_sphereCallList = GL11.glGenLists(1);
 			GL11.glNewList(_sphereCallList, GL11.GL_COMPILE_AND_EXECUTE);
 			GL11.glBegin(GL11.GL_TRIANGLE_FAN);
-			GL11.glColor3f(_innerColor.x(), _innerColor.y(), _innerColor.z());
 			GL11.glVertex3f(0, 0, 0);
-			GL11.glColor3f(_outerColor.x(), _outerColor.y(), _outerColor.z());
 			for (int i = 0; i <= _vertices; ++i)
 			{
 				float angle = MathHelper.f_2PI / _vertices * i;

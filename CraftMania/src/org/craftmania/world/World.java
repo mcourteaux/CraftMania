@@ -46,7 +46,7 @@ public class World
 
 	private List<Chunk> _localChunks;
 	private List<Chunk> _oldChunkList;
-	private List<Chunk> _chunksToBeSetDirty;
+	private List<Chunk> _chunksThatNeedsNewVBO;
 
 	private FastArrayList<Chunk> _visibleChunks;
 	private Inventory _activatedInventory;
@@ -73,7 +73,7 @@ public class World
 		_chunkManager = new ChunkManager(this);
 		_localChunks = new ArrayList<Chunk>();
 		_oldChunkList = new ArrayList<Chunk>();
-		_chunksToBeSetDirty = new ArrayList<Chunk>();
+		_chunksThatNeedsNewVBO = new ArrayList<Chunk>();
 		_visibleChunks = new FastArrayList<Chunk>(30);
 		_chunkVisibilityTestingAABB = new AABB(new Vec3f(), new Vec3f());
 		_chunkDistanceComparator = new ChunkDistanceComparator();
@@ -239,7 +239,7 @@ public class World
 
 			for (Chunk c : _localChunks)
 			{
-				c.needsNewVBO();
+				_chunksThatNeedsNewVBO.add(c);
 			}
 		}
 
@@ -310,9 +310,9 @@ public class World
 			_activatedInventory.update();
 		}
 
-		if (!_chunksToBeSetDirty.isEmpty())
+		if (!_chunksThatNeedsNewVBO.isEmpty())
 		{
-			_chunksToBeSetDirty.remove(0).regenerateSunlight();
+			_chunksThatNeedsNewVBO.remove(0).needsNewVBO();
 		}
 		
 		if (_checkForNewChunks)
