@@ -55,8 +55,8 @@ public class ChunkLoader
 		boolean generated = dis.readBoolean();
 		System.out.println("Load Chunk (" + chunk.getX() + ", " + chunk.getZ() + "): generated = " + generated);
 
-		int size = Chunk.BLOCK_COUNT;
-
+		int size = dis.readInt();
+		
 		BlockType type = null;
 		Vec3i blockPos = new Vec3i();
 		for (int i = 0; i < size; ++i)
@@ -99,8 +99,19 @@ public class ChunkLoader
 		System.out.println("Save Chunk (" + blockChunk.getX() + ", " + blockChunk.getZ() + "): generated = " + blockChunk.isGenerated());
 
 		ChunkData data = blockChunk.getChunkData();
-
-		for (int i = 0; i < Chunk.BLOCK_COUNT; ++i)
+		int blockCount = 0;
+		for (int i = 0; i< Chunk.BLOCK_COUNT; ++i)
+		{
+			byte b = data.getBlockType(i);
+			if (b != 0)
+			{
+				blockCount = i;
+			}
+		}
+		blockCount++;
+		dos.writeInt(blockCount);
+		
+		for (int i = 0; i < blockCount; ++i)
 		{
 			byte b = data.getBlockType(i);
 			if (b == 0)

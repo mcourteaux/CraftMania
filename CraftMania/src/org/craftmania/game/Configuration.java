@@ -36,7 +36,7 @@ public class Configuration
 
 	public Configuration()
 	{
-		_fogColor = new Vec3f(0.8f, 0.9f, 1.0f);
+		_fogColor = new Vec3f(0.75f, 0.8f, 1.0f);
 	}
 
 	public int getWidth()

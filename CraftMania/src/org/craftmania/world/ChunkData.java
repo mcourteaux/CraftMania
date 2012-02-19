@@ -285,7 +285,7 @@ public class ChunkData
 
 	public static int positionToIndex(int x, int y, int z)
 	{
-		return x * 128 * 16 + y * 16 + z;
+		return x * Chunk.CHUNK_SIZE_VERTICAL * Chunk.CHUNK_SIZE_HORIZONTAL + y * Chunk.CHUNK_SIZE_HORIZONTAL + z;
 	}
 
 	public static void indexToPosition(int index, Vec3i output)

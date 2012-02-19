@@ -37,7 +37,7 @@ import org.lwjgl.opengl.GL11;
 public class World
 {
 
-	private static final float SECONDS_IN_DAY = 60f * 9f; // 15 minutes / day
+	private static final float SECONDS_IN_DAY = 60f * 10f; // 15 minutes / day
 
 	private WorldProvider _worldProvider;
 	private ChunkManager _chunkManager;
@@ -115,7 +115,7 @@ public class World
 
 		/* Set the fog color based on time */
 		_fogColor.set(Game.getInstance().getConfiguration().getFogColor());
-		_fogColor.scale(_sunlight / 15.001f);
+		_fogColor.scale(_sunlight - 0.1f);
 		GL11.glFog(GL11.GL_FOG_COLOR, GLUtils.wrapDirect(_fogColor.x(), _fogColor.y(), _fogColor.z(), 1.0f));
 		GL11.glClearColor(_fogColor.x(), _fogColor.y(), _fogColor.z(), 1.0f);
 
@@ -226,18 +226,18 @@ public class World
 
 		float todNew = MathHelper.simplify(_time, SECONDS_IN_DAY) / SECONDS_IN_DAY;
 
-		int oldSunlight = MathHelper.floor(_sunlight);
+		int oldSunlight = MathHelper.floor(_sunlight * 29.99f);
 
 		_sunlight = -MathHelper.cos(todNew * MathHelper.f_2PI) * 0.5f + 0.5f;
 		_sunlight = Math.max(0.2f, _sunlight);
-		_sunlight *= 14.99f;
 
-		if (oldSunlight != MathHelper.floor(_sunlight))
+		if (oldSunlight != MathHelper.floor(_sunlight * 29.99f))
 		{
 			/* Update chunk lights */
+
 			for (Chunk c : _localChunks)
 			{
-				_chunksToBeSetDirty.add(c);
+				c.needsNewVBO();
 			}
 		}
 
@@ -298,26 +298,28 @@ public class World
 			if (!(_localChunks.size() < 4 && _oldChunkList.size() < 4))
 			{
 				_player.update();
+			} else
+			{
+				checkForNewVisibleChunks();
+				selectLocalChunks();
 			}
 		} else
 		{
 			_activatedInventory.update();
 		}
-		
+
 		if (!_chunksToBeSetDirty.isEmpty())
 		{
 			_chunksToBeSetDirty.remove(0).regenerateSunlight();
 		}
-		selectLocalChunks();
 		updateLocalChunks();
-		checkForNewVisibleChunks();
-		
+
 		_chunkManager.performRememberedBlockChanges();
 
 		_tick++;
 	}
 
-	private void checkForNewVisibleChunks()
+	public void checkForNewVisibleChunks()
 	{
 		float viewingDistance = Game.getInstance().getConfiguration().getViewingDistance();
 		viewingDistance /= Chunk.CHUNK_SIZE_HORIZONTAL;
@@ -366,6 +368,7 @@ public class World
 			System.out.println("New chunk in sight: " + (centerX + xToGenerate) + ", " + (centerZ + zToGenerate));
 			Chunk ch = _chunkManager.getChunk(centerX + xToGenerate, centerZ + zToGenerate, true, false, false);
 			_chunkManager.loadAndGenerateChunk(ch, true);
+			checkForNewVisibleChunks();
 		}
 
 	}
@@ -499,9 +502,9 @@ public class World
 		return _worldName;
 	}
 
-	public byte getSunlight()
+	public float getSunlight()
 	{
-		return (byte) MathHelper.floor(_sunlight);
+		return _sunlight;
 	}
 
 	public float getTime()
@@ -525,9 +528,9 @@ public class World
 			/* Update chunk lights */
 			for (Chunk c : _localChunks)
 			{
-				_chunksToBeSetDirty.add(c);
+				c.needsNewVBO();
 			}
 		}
-		
+
 	}
 }

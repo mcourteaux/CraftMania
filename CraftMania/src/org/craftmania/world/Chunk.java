@@ -24,7 +24,7 @@ import org.craftmania.world.generators.ChunkGenerator;
 public class Chunk implements AABBObject
 {
 	public static final int CHUNK_SIZE_HORIZONTAL = 16;
-	public static final int CHUNK_SIZE_VERTICAL = 128;
+	public static final int CHUNK_SIZE_VERTICAL = 256;
 	public static final Vec3i BLOCKCHUNK_SIZE = new Vec3i(CHUNK_SIZE_HORIZONTAL, CHUNK_SIZE_VERTICAL, CHUNK_SIZE_HORIZONTAL);
 	public static final Vec3i HALF_BLOCKCHUNK_SIZE = new Vec3i(BLOCKCHUNK_SIZE).scale(0.5f);
 	public static final int BLOCK_COUNT = CHUNK_SIZE_HORIZONTAL * CHUNK_SIZE_HORIZONTAL * CHUNK_SIZE_VERTICAL;
@@ -149,9 +149,8 @@ public class Chunk implements AABBObject
 		}
 		_loading = false;
 		/* Generate sunlight */
-		 generateSunlight();
+		generateSunlight();
 	}
-
 
 	public int getBlockCount()
 	{
@@ -323,7 +322,7 @@ public class Chunk implements AABBObject
 
 	private boolean isInvalidHeight(int y)
 	{
-		return y >= 128 || y < 0;
+		return y >= CHUNK_SIZE_VERTICAL || y < 0;
 	}
 
 	public void rebuildVisibilityBuffer()
@@ -449,6 +448,9 @@ public class Chunk implements AABBObject
 		Chunk chunk = getChunkContaining(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
 		if (chunk != null)
 		{
+			int absX = chunk.getAbsoluteX();
+			int absZ = chunk.getAbsoluteZ();
+
 			int index = ChunkData.positionToIndex(x - chunk.getAbsoluteX(), y, z - chunk.getAbsoluteZ());
 
 			byte blockType = chunk._chunkData.getBlockType(index);
@@ -461,13 +463,22 @@ public class Chunk implements AABBObject
 
 			if (type == null)
 			{
-				chunk._chunkData.clearBlock(index);
-				chunk.needsNewVBO();
 				return;
 			}
-			
+
 			/* Unspread the sunlight */
-			unspreadSunlight(x, z);
+			if (!type.isTransculent())
+			{
+				chunk.unspreadSunlight(absX + x, absZ + z, y - 1);
+
+				// int lightIndex;
+				// for (int i = y; i > 0; --i)
+				// {
+				// lightIndex = ChunkData.positionToIndex(x - absX, y, z -
+				// absZ);
+				// chunk._chunkData.setSunlight(lightIndex, (byte) 0);
+				// }
+			}
 
 			/* Set it in the chunk data */
 			chunk._chunkData.setDefaultBlock(index, type.getID(), (byte) 0, metadata);
@@ -484,7 +495,7 @@ public class Chunk implements AABBObject
 				unspreadLight(x, y, z, blocklight, LightType.BLOCK);
 				unspreadLight(x, y, z, sunlight, LightType.SUN);
 				/* Respread sunlight */
-				spreadSunlight(x, z);
+				// spreadSunlight(x, z);
 			}
 
 		}
@@ -673,7 +684,7 @@ public class Chunk implements AABBObject
 					count += MathHelper.cardinality(faceMask);
 				}
 			}
-			
+
 		}
 		return count;
 	}
@@ -731,7 +742,7 @@ public class Chunk implements AABBObject
 	{
 		_newVboNeeded = false;
 	}
-	
+
 	public void markChunkForNewVBO(int x, int z)
 	{
 		Chunk c = getChunk(x, z, false, false, false);
@@ -740,6 +751,51 @@ public class Chunk implements AABBObject
 			c.needsNewVBO();
 		}
 	}
+
+//	public void setSunlight(byte sunlight)
+//	{
+//		if (oldSunlight < sunlight)
+//		{
+//			raiseSunlight((byte) (sunlight - oldSunlight));
+//		} else if (oldSunlight > sunlight)
+//		{
+//			lowerSunlight((byte) (oldSunlight - sunlight));
+//		}
+//	}
+//
+//	public void lowerSunlight(byte amount)
+//	{
+//		for (int i = 0; i < BLOCK_COUNT; ++i)
+//		{
+//			_chunkData.setSunlight(i, (byte) Math.max(0, _chunkData.getSunlight(i) - amount));
+//		}
+//		needsNewVBO();
+//	}
+//
+//	public void raiseSunlight(byte amount)
+//	{
+//		IntList spreadpoints = new IntList();
+//		for (int i = 0; i < BLOCK_COUNT; ++i)
+//		{
+//			byte sunlight = _chunkData.getSunlight(i);
+//			if (sunlight != 0)
+//			{
+//				_chunkData.setSunlight(i, (byte) Math.min(15, sunlight + amount));
+//				if (sunlight == 1)
+//				{
+//					spreadpoints.add(i);
+//				}
+//			}
+//		}
+//		Vec3i v = new Vec3i();
+//		int absX = getAbsoluteX(), absZ = getAbsoluteZ();
+//		for (int i = 0; i < spreadpoints.size(); ++i)
+//		{
+//			ChunkData.indexToPosition(spreadpoints.get(i), v);
+//			spreadLight(absX + v.x(), v.y(), absZ + v.z(), (byte) (1 + amount), LightType.SUN);
+//		}
+//		needsNewVBO();
+//	}
 
 	public byte getLightAbsolute(int x, int y, int z, LightType type)
 	{
@@ -787,7 +843,7 @@ public class Chunk implements AABBObject
 		int index = ChunkData.positionToIndex(relX, y, relZ);
 		chunk._chunkData.setLight(index, light, type);
 		chunk.needsNewVBO();
-		
+
 		if (relX == 0)
 		{
 			if (relZ == 0)
@@ -880,22 +936,29 @@ public class Chunk implements AABBObject
 
 			if (spreading)
 			{
-				chunk.spreadLight(x, y, z, (byte) _world.getSunlight(), LightType.SUN);
+				chunk.spreadLight(x, y, z, (byte) 15, LightType.SUN);
 			} else
 			{
-				chunk.setLightAbsolute(x, y, z, (byte) _world.getSunlight(), LightType.SUN);
+				chunk.setLightAbsolute(x, y, z, (byte) (byte) 15, LightType.SUN);
 			}
 		}
 	}
 
-	public void unspreadSunlight(int x, int z)
+	public void unspreadSunlight(int x, int z, int height)
 	{
 		Chunk chunk = getChunkContaining(x, 0, z, false, false, false);
+		if (chunk == null)
+		{
+			return;
+		}
 		if (chunk._loading)
 			return;
+		
+		int absX = chunk.getAbsoluteX();
+		int absZ = chunk.getAbsoluteZ();
 
 		boolean covered = false;
-		for (int y = CHUNK_SIZE_VERTICAL - 1; y > 0; --y)
+		for (int y = height; y > 0; --y)
 		{
 			byte type = chunk.getBlockTypeAbsolute(x, y, z, false, false, false);
 			if (type < 0)
@@ -912,7 +975,7 @@ public class Chunk implements AABBObject
 			}
 			if (covered)
 			{
-				chunk.unspreadLight(x, y, z, (byte) 15, LightType.SUN);
+				chunk.unspreadLight(x, y, z, chunk._chunkData.getSunlight(ChunkData.positionToIndex(x - absX, y, z - absZ)), LightType.SUN);
 			}
 		}
 	}
@@ -923,6 +986,12 @@ public class Chunk implements AABBObject
 			return;
 
 		Chunk chunk = getChunkContaining(x, y, z, false, false, false);
+
+		if (chunk == null)
+		{
+			return;
+		}
+
 		if (chunk._loading)
 			return;
 
@@ -1045,7 +1114,7 @@ public class Chunk implements AABBObject
 		}
 		_sunlightDirty = false;
 	}
-	
+
 	public void regenerateSunlight()
 	{
 		for (int i = 0; i < BLOCK_COUNT; ++i)
@@ -1054,7 +1123,6 @@ public class Chunk implements AABBObject
 		}
 		generateSunlight();
 	}
-	
 
 	public void setSunlightDirty(boolean b)
 	{
@@ -1098,7 +1166,7 @@ public class Chunk implements AABBObject
 			c._sunlightDirty = true;
 
 	}
-	
+
 	public boolean isGenerated()
 	{
 		return _generated;
@@ -1155,5 +1223,9 @@ public class Chunk implements AABBObject
 		}
 	}
 
+	public World getWorld()
+	{
+		return _world;
+	}
 
 }

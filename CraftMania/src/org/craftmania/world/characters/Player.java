@@ -63,6 +63,7 @@ public class Player extends GameObject
 	private float ySpeed = 0.0f;
 	private boolean onGround = false;
 	private boolean _flying = false;
+	private int _rotationSegment = 0;
 	/* Body */
 	private CharacterBody _body;
 	/* Editing */
@@ -432,8 +433,23 @@ public class Player extends GameObject
 		float dx = Mouse.getDX();
 		float dy = Mouse.getDY();
 
-		rotY -= dx / 300.0f;
-		rotX += dy / 300.0f;
+		dx /= 300.0f;
+		dy /= 300.0f;
+
+		float rotSeg = _rotationSegment;
+		_rotationSegment = MathHelper.round(rotY / MathHelper.f_PI * 10.0f);
+
+		rotY -= dx;
+		rotX += dy;
+
+		/* If it changes from chunk, recheck visible chunks */
+		if (MathHelper.floorDivision(MathHelper.floor(x + xStep), Chunk.CHUNK_SIZE_HORIZONTAL) != MathHelper.floorDivision(MathHelper.floor(x), Chunk.CHUNK_SIZE_HORIZONTAL)
+				|| MathHelper.floorDivision(MathHelper.floor(z + zStep), Chunk.CHUNK_SIZE_HORIZONTAL) != MathHelper.floorDivision(MathHelper.floor(z), Chunk.CHUNK_SIZE_HORIZONTAL)
+				|| _rotationSegment != rotSeg)
+		{
+			Game.getInstance().getWorld().selectLocalChunks();
+			Game.getInstance().getWorld().checkForNewVisibleChunks();
+		}
 
 		rotY = MathHelper.simplifyRadians(rotY);
 		rotX = MathHelper.clamp(rotX, -MathHelper.f_PI / 2.001f, MathHelper.f_PI / 2.001f);

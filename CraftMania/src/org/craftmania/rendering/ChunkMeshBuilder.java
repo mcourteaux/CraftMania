@@ -14,6 +14,7 @@ import org.craftmania.math.Vec3f;
 import org.craftmania.math.Vec3i;
 import org.craftmania.utilities.IntList;
 import org.craftmania.world.Chunk;
+import org.craftmania.world.Chunk.LightType;
 import org.craftmania.world.ChunkData;
 import org.lwjgl.opengl.ARBVertexBufferObject;
 import org.lwjgl.opengl.GL11;
@@ -120,7 +121,7 @@ public class ChunkMeshBuilder
 					{
 						faceMask = 0;
 					}
-					
+
 				} else
 				{
 					faceMask = chunk.getChunkData().getFaceMask(blockIndex);
@@ -130,6 +131,8 @@ public class ChunkMeshBuilder
 				if (faceMask != 0 && !manualRender)
 				{
 					ChunkData.indexToPosition(blockIndex, vec);
+
+					byte blockLight, sunlight;
 
 					/* Build the light buffer */
 					for (int x = -1; x <= 1; ++x)
@@ -142,7 +145,12 @@ public class ChunkMeshBuilder
 								int yy = y + vec.y();
 								int zz = z + vec.z();
 
-								lightBuffer[x + 1][y + 1][z + 1] = chunk.getTotalLightRelative(xx, yy, zz);
+								blockLight = chunk.getLightRelative(xx, yy, zz, LightType.BLOCK);
+								sunlight = chunk.getLightRelative(xx, yy, zz, LightType.SUN);
+
+								sunlight *= chunk.getWorld().getSunlight() * 2.0f;
+
+								lightBuffer[x + 1][y + 1][z + 1] = (byte) Math.max(blockLight * 2, sunlight);
 							}
 						}
 					}
@@ -300,10 +308,10 @@ public class ChunkMeshBuilder
 		if (SMOOTH_LIGHTING)
 		{
 			value = light + light1 + light2 + light3;
-			value /= 60.0001f;
+			value /= 120.0001f;
 		} else
 		{
-			value = light / 15.001f;
+			value = light / 30.001f;
 		}
 		vertexBuffer.put(vec.x() * value);
 		vertexBuffer.put(vec.y() * value);
