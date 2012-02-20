@@ -3,11 +3,11 @@ CraftMania
 
 ![CraftMania](http://2dbrothers.comuf.com/wordpress/wp-content/uploads/2012/02/Schermafbeelding-2012-02-20-om-02.17.17.png "CraftMania")
 
-CraftMania is my open-source game. It is supposed to look like Minecraft by Mojang. I am trying to make the game as close as possible to Minecraft. Before I made my source public, I asked on [StackExchange](http://gamedev.stackexchange.com/questions/22247/am-i-allowed-to-make-my-minecraft-clone-open-source) if it is actually legal to do so. The answer was yes, as long as I don’t use the name Minecraft and do not use any assets created by Mojang. So right now, all the source code is available at my [GitHub repository](https://github.com/mcourteaux/CraftMania)!
+CraftMania is my open-source game. It is supposed to look like Minecraft by Mojang. I am trying to make the game as close as possible to Minecraft. Before I made my source public, I asked on [StackExchange](http://gamedev.stackexchange.com/questions/22247/am-i-allowed-to-make-my-minecraft-clone-open-source) if it is actually legal to do so. The answer was yes, as long as I don't use the name Minecraft and do not use any assets created by Mojang. So right now, all the source code is available at my [GitHub repository](https://github.com/mcourteaux/CraftMania)!
 
-I started the game in Java from scratch. I’m using OpenGL through LWJGL.
+I started the game in Java from scratch. I'm using OpenGL through [LWJGL](http://lwjgl.org/).
 
-Currently, I’m using a texture pack from MineCraft called [Good Morning Craft](http://www.minecraftforum.net/topic/262628-16x11-good-morning-craft-v33-170112/) by Louis Durrant.
+Currently, I'm using a texture pack from MineCraft called [Good Morning Craft](http://www.minecraftforum.net/topic/262628-16x11-good-morning-craft-v33-170112/) by Louis Durrant.
 
 Setup
 -----
@@ -22,15 +22,21 @@ You can simply double click the CraftMania.jar file when you installed Oracle's 
 Controls
 --------
 
-[Z,Q,S,D]		Walking. This is for Azerty keyboards. I'll make an option for Querty soon!
-[Space] 		Jump.
-[Left click]	Place the block in your hand.
-[Right click]	Destroy the block on which you are aiming.
-[F]				Toggle God-mode.
-[E]				Open your inventory.
-[O]				Toggle overlay rendering.
-[A]				Place a lightpoint (you should use torches, in fact :D)
-[X]				Remove the lightpoint.
+ * [Z,Q,S,D]		Walking. This is for Azerty keyboards. I'll make an option for Querty soon!
+ * [Space] 			Jump.
+ * [Left click]		Place the block in your hand.
+ * [Right click]	Destroy the block on which you are aiming.
+ * [F]				Toggle God-mode.
+ * [E]				Open your inventory.
+ * [O]				Toggle overlay rendering.
+ * [A]				Place a lightpoint (you should use torches, in fact :D)
+ * [X]				Remove the lightpoint.
+
+
+Credits
+=======
+
+ * Martijn Courteaux
 
 Texture Pack
 ------------
