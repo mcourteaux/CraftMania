@@ -22,7 +22,7 @@ public class KeyboardSettings
 	
 	public static enum KeyboardPreset
 	{
-		AZERTY, QUERTY
+		AZERTY, QWERTY
 	}
 	
 	
@@ -48,10 +48,10 @@ public class KeyboardSettings
 		case AZERTY:
 			intializeAzerty();
 			break;
-		case QUERTY:
-			intializeQuerty();
+		case QWERTY:
+			intializeQwerty();
 		default:
-			intializeQuerty();
+			intializeQwerty();
 			break;
 		}
 	}
@@ -74,7 +74,7 @@ public class KeyboardSettings
 		TOGGLE_OVERLAY = Keyboard.KEY_O;
 	}
 	
-	public static void intializeQuerty()
+	public static void intializeQwerty()
 	{
 		/* Walking */
 		MOVE_FORWARD = Keyboard.KEY_W;

@@ -29,7 +29,9 @@ public class ChunkThreading
 	public ChunkThreading(ChunkManager chman)
 	{
 		_chunkManager = chman;
-		_generatePool = new ThreadPool(1);
+		int generatePoolSize = Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
+		System.out.println("Generate Pool Size: " + generatePoolSize);
+		_generatePool = new ThreadPool(generatePoolSize);
 		_savePool = new ThreadPool(2);
 		_deletePool = new ThreadPool(1);
 	}

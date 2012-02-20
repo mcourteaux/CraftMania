@@ -113,10 +113,6 @@ public class Chunk implements AABBObject
 
 	public void needsNewVBO()
 	{
-		if (Keyboard.isKeyDown(Keyboard.KEY_T))
-		{
-			Thread.dumpStack();
-		}
 		_newVboNeeded = true;
 	}
 
