@@ -36,7 +36,7 @@ public class ChunkManager
 	private BlockManager _blockManager;
 	private Map<Integer, AbstractChunk<Chunk>> _superChunks;
 	private List<BlockMovement> _blocksToMove;
-	private ChunkLoader _blockChunkLoader;
+	private ChunkLoader _chunkLoader;
 	private ChunkThreading _blockChunkThreading;
 
 	public ChunkManager(World world)
@@ -44,7 +44,7 @@ public class ChunkManager
 		_world = world;
 		_superChunks = new HashMap<Integer, AbstractChunk<Chunk>>();
 		_blocksToMove = new ArrayList<ChunkManager.BlockMovement>();
-		_blockChunkLoader = new ChunkLoader();
+		_chunkLoader = new ChunkLoader();
 		_blockChunkThreading = new ChunkThreading(this);
 		_blockManager = BlockManager.getInstance();
 	}
@@ -84,28 +84,28 @@ public class ChunkManager
 		{
 			AbstractChunk<Chunk> superChunk = getSuperChunk(superX, superZ);
 
-			Chunk blockChunk = superChunk.get(xInChunk, zInChunk);
-			if (blockChunk == null && createIfNecessary)
+			Chunk chunk = superChunk.get(xInChunk, zInChunk);
+			if (chunk == null && createIfNecessary)
 			{
-				blockChunk = new Chunk(x, z);
-				assignNeighbors(blockChunk);
-				superChunk.set(xInChunk, zInChunk, blockChunk);
+				chunk = new Chunk(x, z);
+				assignNeighbors(chunk);
+				superChunk.set(xInChunk, zInChunk, chunk);
 			}
-			if (blockChunk != null && !blockChunk.isLoaded() && loadIfNecessary && !blockChunk.isLoading() && !blockChunk.isDestroying())
+			if (chunk != null && !chunk.isLoaded() && loadIfNecessary && !chunk.isLoading() && !chunk.isDestroying())
 			{
 				try
 				{
-					_blockChunkLoader.loadChunk(blockChunk);
+					_chunkLoader.loadChunk(chunk);
 				} catch (IOException e)
 				{
 					e.printStackTrace();
 				}
 			}
-			if (blockChunk != null && generateIfNecessary && !blockChunk.isLoading() && !blockChunk.isGenerated() && !blockChunk.isDestroying())
+			if (chunk != null && generateIfNecessary && !chunk.isLoading() && !chunk.isGenerated() && !chunk.isDestroying())
 			{
-				blockChunk.generate();
+				chunk.generate();
 			}
-			return blockChunk;
+			return chunk;
 		}
 	}
 
@@ -284,7 +284,7 @@ public class ChunkManager
 		{
 			try
 			{
-				_blockChunkLoader.saveChunk(chunk);
+				_chunkLoader.saveChunk(chunk);
 			} catch (Exception e)
 			{
 				// TODO Auto-generated catch block
@@ -307,7 +307,7 @@ public class ChunkManager
 
 	public ChunkLoader getBlockChunkLoader()
 	{
-		return _blockChunkLoader;
+		return _chunkLoader;
 	}
 
 	public boolean isBlockChunkThreadingBusy()
@@ -324,7 +324,7 @@ public class ChunkManager
 		{
 			try
 			{
-				_blockChunkLoader.loadChunk(chunk);
+				_chunkLoader.loadChunk(chunk);
 			} catch (IOException e)
 			{
 				// TODO Auto-generated catch block

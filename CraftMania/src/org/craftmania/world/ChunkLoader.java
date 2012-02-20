@@ -90,7 +90,7 @@ public class ChunkLoader
 					chunk.setDefaultBlockRelative(bx, by, bz, type, metadata, false, false, false);
 				} else
 				{
-					Block block = BlockConstructor.construct(bx, by, bz, chunk, b, metadata);
+					Block block = BlockConstructor.construct(chunk.getAbsoluteX() + bx, by, chunk.getAbsoluteZ() + bz, chunk, b, metadata);
 					chunk.setSpecialBlockRelative(bx, by, bz, block, false, false, false);
 				}
 			}

@@ -216,9 +216,9 @@ public class ChunkData
 
 	public void setPosition(int index, int position)
 	{
-		if (isSpecial(index))
+		if (!isSpecial(index))
 		{
-			System.out.println("Updating position of special block");
+			System.out.println("Updating position of a non-special block");
 		}
 		index *= BLOCK_DATA_SIZE;
 		++index;
@@ -251,7 +251,6 @@ public class ChunkData
 	public Block getSpecialBlock(int index)
 	{
 		int position = getPosition(index);
-		System.out.println(index + " -> " + position);
 		return _blockPool.getBlock(position);
 	}
 
@@ -260,8 +259,6 @@ public class ChunkData
 		int position = _blockPool.allocateBlock(block);
 		block.setSpecialBlockPoolIndex(position);
 		setSpecialBlock(index, block.getBlockType().getID(), position);
-		System.out.println(index + " " + block.getBlockType().getID() + "->" + getBlockType(index) + " -> SetPosition: " + position + " GetPosition: " + getPosition(index) + " ("
-				+ Integer.toHexString(getBlockData(index)) + ")");
 	}
 
 	public class SpecialBlockPool

@@ -156,7 +156,7 @@ public abstract class Block implements AABBObject
 	
 	public synchronized void addToManualRenderList()
 	{
-		System.out.print("Add to list... ");
+		System.out.print("Add to list (" + getChunkDataIndex() + ") ... ");
 //		if (!_renderManually)
 		{
 			_chunk.getManualRenderingBlocks().bufferAdd(getChunkDataIndex());

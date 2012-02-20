@@ -188,6 +188,7 @@ public class Chunk implements AABBObject
 				spreadLight(v.x() + absX, v.y(), v.z() + absZ, type.getLuminosity(), LightType.BLOCK);
 			}
 		}
+		_lightPointsDirty = false;
 	}
 
 	public int getBlockCount()
@@ -570,7 +571,7 @@ public class Chunk implements AABBObject
 		Chunk chunk = getChunkContaining(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
 		if (chunk != null)
 		{
-			block.setChunk(this);
+			block.setChunk(chunk);
 			block.getPosition().set(x, y, z);
 			chunk._chunkData.setSpecialBlock(ChunkData.positionToIndex(x - chunk.getAbsoluteX(), y, z - chunk.getAbsoluteZ()), block);
 			chunk.updateVisibilityFor(x, y, z);
@@ -753,7 +754,6 @@ public class Chunk implements AABBObject
 	{
 		if (_manualRenderingBlocks.size() > 0)
 		{
-			System.out.println("Manual blocks: " + _manualRenderingBlocks.size());
 			Vec3i v = new Vec3i();
 			for (int i = 0; i < _manualRenderingBlocks.size(); ++i)
 			{

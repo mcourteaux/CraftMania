@@ -88,12 +88,11 @@ public class TreeGenerator extends Generator
 		String leafType = "leafs" + _random.randomInt(2);
 
 		int trunkHeight = _random.randomInt(3, 5);
-		
+
 		DataNode<Vec3i> tree = new DataNode<Vec3i>(new Vec3i(rootX, rootY, rootZ));
 		tree.addChild(new DataNode<Vec3i>(new Vec3i(rootX, rootY + trunkHeight, rootZ)));
 
 		int depth = _random.randomInt(4, 5);
-		
 
 		/* Generate a random tree of branches */
 		generateBraches(tree.getData(), tree.getChild(0), depth);
@@ -108,12 +107,23 @@ public class TreeGenerator extends Generator
 		/* Enlarge the trunk */
 		if (true)
 		{
-			for (int y = rootY; y < tree.getChild(0).getData().y() + 4; ++y)
+			if (_random.randomInt(4) == 0)
 			{
-				targetChunk.setDefaultBlockAbsolute(rootX - 1, y, rootZ, wood, (byte) 0, false, false, false);
-				targetChunk.setDefaultBlockAbsolute(rootX + 1, y, rootZ, wood, (byte) 0, false, false, false);
-				targetChunk.setDefaultBlockAbsolute(rootX, y, rootZ - 1, wood, (byte) 0, false, false, false);
-				targetChunk.setDefaultBlockAbsolute(rootX, y, rootZ + 1, wood, (byte) 0, false, false, false);
+				for (int y = rootY; y < tree.getChild(0).getData().y() + 4; ++y)
+				{
+					targetChunk.setDefaultBlockAbsolute(rootX - 1, y, rootZ, wood, (byte) 0, false, false, false);
+					targetChunk.setDefaultBlockAbsolute(rootX + 1, y, rootZ, wood, (byte) 0, false, false, false);
+					targetChunk.setDefaultBlockAbsolute(rootX, y, rootZ - 1, wood, (byte) 0, false, false, false);
+					targetChunk.setDefaultBlockAbsolute(rootX, y, rootZ + 1, wood, (byte) 0, false, false, false);
+				}
+			} else
+			{
+				for (int y = rootY; y < tree.getChild(0).getData().y() + 4; ++y)
+				{
+					targetChunk.setDefaultBlockAbsolute(rootX + 1, y, rootZ, wood, (byte) 0, false, false, false);
+					targetChunk.setDefaultBlockAbsolute(rootX, y, rootZ + 1, wood, (byte) 0, false, false, false);
+					targetChunk.setDefaultBlockAbsolute(rootX + 1, y, rootZ + 1, wood, (byte) 0, false, false, false);
+				}
 			}
 		}
 
@@ -213,7 +223,7 @@ public class TreeGenerator extends Generator
 		{
 			if (useRandomDirections)
 			{
-				childAngle = _random.randomFloat(-MathHelper.f_PI, MathHelper.f_PI);
+				childAngle += _random.randomFloat(MathHelper.f_PI / 3.0f, MathHelper.f_PI);
 			}
 			Vec3i vec = new Vec3i();
 			vec.setY(child.getData().y() + _random.randomInt(depth - 2, depth));
