@@ -15,116 +15,54 @@
  ******************************************************************************/
 package org.craftmania.blocks.customblocks;
 
+import java.nio.FloatBuffer;
+
 import org.craftmania.Side;
-import org.craftmania.blocks.Block;
 import org.craftmania.blocks.BlockManager;
-import org.craftmania.blocks.DefaultBlock;
-import org.craftmania.datastructures.AABB;
-import org.craftmania.game.TextureStorage;
-import org.craftmania.inventory.InventoryItem;
-import org.craftmania.math.Vec3f;
+import org.craftmania.blocks.CrossedBlock;
+import org.craftmania.blocks.CrossedBlockBrush;
 import org.craftmania.math.Vec3i;
 import org.craftmania.world.Chunk;
-import org.lwjgl.opengl.GL11;
-import org.newdawn.slick.opengl.Texture;
 
-public class TallGrass extends Block
+public class TallGrass extends CrossedBlock
 {
-
-	private static int CALL_LIST_BASE;
-	private static int LENGHT_COUNT = 6;
+	
+	private static final int LENGHT_COUNT;
+	private static final CrossedBlockBrush[] BLOCK_BRUSHES;
+	
+	static
+	{
+		LENGHT_COUNT = 6;
+		BLOCK_BRUSHES = new CrossedBlockBrush[LENGHT_COUNT];
+		for (int i = 0; i < LENGHT_COUNT; ++i)
+		{
+			BLOCK_BRUSHES[i] = new CrossedBlockBrush();
+			BLOCK_BRUSHES[i].setTexturePosition(10 + i, 11);
+			BLOCK_BRUSHES[i].create();
+		}
+	}
+	
+	
 	private int _length;
 
 	public TallGrass(Chunk chunk, Vec3i pos, int length)
 	{
 		super(BlockManager.getInstance().getBlockType("tallgrass"), chunk, pos);
-		_length = length;
-		addToManualRenderList();
-	}
-
-	@Override
-	public void update()
-	{
-
+		
+		_length = length;	
 	}
 
 	@Override
 	public void render(byte[][][] lightBuffer)
 	{
-		Texture terrain = TextureStorage.getTexture("terrain");
-		terrain.bind();
-
-		float light = lightBuffer[1][1][1] / 29.99f;
-
-		/* Texture 11,10 -> 11,15 */
-		GL11.glDisable(GL11.GL_CULL_FACE);
-		GL11.glEnable(GL11.GL_BLEND);
-		// GL11.glDepthFunc(GL11.GL_ALWAYS);
-		GL11.glPushMatrix();
-		GL11.glTranslatef(getX() + 0.5f, getY() + 0.5f, getZ() + 0.5f);
-		GL11.glColor3f(light, light, light);
-		
-		if (CALL_LIST_BASE == 0)
-		{
-			CALL_LIST_BASE = GL11.glGenLists(LENGHT_COUNT);
-
-			for (int i = 0; i < LENGHT_COUNT; ++i)
-			{
-				GL11.glNewList(CALL_LIST_BASE + i, i == _length ? GL11.GL_COMPILE_AND_EXECUTE : GL11.GL_COMPILE);
-				GL11.glBegin(GL11.GL_QUADS);
-
-				GL11.glTexCoord2f((9f + i) * 16 / terrain.getImageWidth(), 11f * 16 / terrain.getImageHeight());
-				GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
-				GL11.glTexCoord2f((10f + i) * 16 / terrain.getImageWidth(), 11f * 16 / terrain.getImageHeight());
-				GL11.glVertex3f(0.5f, 0.5f, 0.5f);
-				GL11.glTexCoord2f((10f + i) * 16 / terrain.getImageWidth(), 12f * 16 / terrain.getImageHeight());
-				GL11.glVertex3f(0.5f, -0.5f, 0.5f);
-				GL11.glTexCoord2f((9f + i) * 16 / terrain.getImageWidth(), 12f * 16 / terrain.getImageHeight());
-				GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
-
-				GL11.glTexCoord2f((9f + i) * 16 / terrain.getImageWidth(), 11f * 16 / terrain.getImageHeight());
-				GL11.glVertex3f(0.5f, 0.5f, -0.5f);
-				GL11.glTexCoord2f((10f + i) * 16 / terrain.getImageWidth(), 11f * 16 / terrain.getImageHeight());
-				GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
-				GL11.glTexCoord2f((10f + i) * 16 / terrain.getImageWidth(), 12f * 16 / terrain.getImageHeight());
-				GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
-				GL11.glTexCoord2f((9f + i) * 16 / terrain.getImageWidth(), 12f * 16 / terrain.getImageHeight());
-				GL11.glVertex3f(0.5f, -0.5f, -0.5f);
-
-				GL11.glEnd();
-				GL11.glEndList();
-			}
-		} else
-		{
-			GL11.glCallList(CALL_LIST_BASE + _length);
-		}
-		GL11.glPopMatrix();
-		// GL11.glDepthFunc(GL11.GL_LEQUAL);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_BLEND);
-
+		BLOCK_BRUSHES[_length].setPosition(getX() + 0.5f, getY() + 0.5f, getZ() + 0.5f);
+		BLOCK_BRUSHES[_length].render(lightBuffer);
 	}
 
 	@Override
 	public boolean isVisible()
 	{
 		return true;
-	}
-
-	@Override
-	public synchronized AABB getAABB()
-	{
-		if (_aabb == null)
-		{
-			_aabb = new AABB(new Vec3f(getPosition()).add(DefaultBlock.HALF_BLOCK_SIZE), DefaultBlock.HALF_BLOCK_SIZE);
-		}
-		return _aabb;
-	}
-
-	@Override
-	public void smash(InventoryItem item)
-	{
-		destory();
 	}
 
 	@Override
@@ -139,10 +77,17 @@ public class TallGrass extends Block
 		}
 	}
 
+	
 	@Override
-	public void checkVisibility()
+	public void storeInVBO(FloatBuffer vbo, byte[][][] lightBuffer)
 	{
-
+		BLOCK_BRUSHES[_length].storeInVBO(vbo, getX() + 0.5f, getY() + 0.5f, getZ() + 0.5f, lightBuffer);
+	}
+	
+	@Override
+	public byte getMetaData()
+	{
+		return (byte) _length;
 	}
 
 }

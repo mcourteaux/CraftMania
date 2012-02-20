@@ -20,7 +20,6 @@ import org.craftmania.rendering.ChunkMeshBuilder.MeshType;
 import org.craftmania.world.Chunk;
 import org.lwjgl.opengl.ARBVertexBufferObject;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
 
 public class ChunkMeshRenderer
 {
@@ -55,7 +54,6 @@ public class ChunkMeshRenderer
 			{
 				GL11.glDisable(GL11.GL_CULL_FACE);
 				GL11.glEnable(GL11.GL_BLEND);
-				GL11.glEnable(GL11.GL_CULL_FACE);
 			}
 
 			ChunkMesh mesh = chunk.getMesh();
@@ -85,7 +83,11 @@ public class ChunkMeshRenderer
 			GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
 			GL11.glDisableClientState(GL11.GL_COLOR_ARRAY);
 			GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-
+			
+			if (meshType == MeshType.TRANSCULENT)
+			{
+				GL11.glEnable(GL11.GL_CULL_FACE);
+			}
 		}
 	}
 }

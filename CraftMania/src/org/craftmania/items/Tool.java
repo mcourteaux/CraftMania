@@ -16,14 +16,8 @@
 package org.craftmania.items;
 
 
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glColor3f;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glTexCoord2f;
-import static org.lwjgl.opengl.GL11.glVertex3f;
+import static org.lwjgl.opengl.GL11.*;
 
-import org.craftmania.blocks.Block;
 import org.craftmania.blocks.BlockManager;
 import org.craftmania.blocks.BlockType;
 import org.craftmania.blocks.BlockType.BlockClass;
@@ -87,7 +81,7 @@ public abstract class Tool extends TexturedItem
     
 
     @Override
-    public void renderHoldableObject()
+    public void renderHoldableObject(byte[][][] lightBuffer)
     {
         _texture.bind();
 

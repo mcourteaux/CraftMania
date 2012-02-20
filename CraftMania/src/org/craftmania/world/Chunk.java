@@ -130,7 +130,7 @@ public class Chunk implements AABBObject
 		_mesh = mesh;
 	}
 
-	public void createVBO()
+	public void createMesh()
 	{
 		_newVboNeeded = false;
 		performListChanges();
@@ -433,7 +433,7 @@ public class Chunk implements AABBObject
 						if (block != 0)
 						{
 							BlockType blockType = _blockManager.getBlockType(block);
-							if (blockType.hasNormalAABB() && btype.isTransculent() == blockType.isTransculent())
+							if (blockType.hasNormalAABB() && btype.isTranslucent() == blockType.isTranslucent())
 							{
 								faceMask = MathHelper.setBit(faceMask, i, false);
 							} else
@@ -521,7 +521,7 @@ public class Chunk implements AABBObject
 			}
 
 			/* Unspread the sunlight */
-			if (!type.isTransculent())
+			if (!type.isTranslucent())
 			{
 				chunk.unspreadSunlight(absX + x, absZ + z, y - 1);
 
@@ -542,7 +542,7 @@ public class Chunk implements AABBObject
 			chunk.updateVisibilityForNeigborsOf(x, y, z);
 
 			/* Clear the light at this position if solid */
-			if (!type.isTransculent())
+			if (!type.isTranslucent())
 			{
 				chunk._chunkData.clearLight(index);
 				/* Unspread light */
@@ -739,15 +739,21 @@ public class Chunk implements AABBObject
 
 	public void render(MeshType meshType)
 	{
+
 		if (_lightPointsDirty)
 		{
 			spreadLightFromLightPoints();
 		}
 		if (_newVboNeeded)
 		{
-			createVBO();
+			if (isReadyForCreatingMesh())
+				createMesh();
 		}
-		ChunkMeshRenderer.renderChunkMesh(this, meshType);
+		if (_mesh != null)
+		{
+			ChunkMeshRenderer.renderChunkMesh(this, meshType);
+		}
+
 	}
 
 	public void renderManualBlocks()
@@ -790,11 +796,12 @@ public class Chunk implements AABBObject
 		}
 	}
 
-	public int getNumberOfVisibleFacesForVBO(MeshType meshType)
+	public int getVertexCount(MeshType meshType)
 	{
 		int count = 0;
 		int blockIndex = 0;
 		int blockData = 0;
+		byte blockType = 0;
 		boolean special;
 		BlockType type = null;
 		Block block = null;
@@ -802,27 +809,24 @@ public class Chunk implements AABBObject
 		{
 			blockIndex = _visibleBlocks.get(i);
 			blockData = _chunkData.getBlockData(blockIndex);
-			type = _blockManager.getBlockType((byte) (blockData >>> 16));
+			blockType = (byte) ((blockData & 0xFF0000) >>> 16);
+			type = _blockManager.getBlockType(blockType);
+
 			special = ChunkData.dataIsSpecial(blockData);
 
-			if (type == null)
-				continue;
-
-			if ((meshType == MeshType.SOLID && !type.isTransculent() && type.hasNormalAABB()) || (meshType == MeshType.TRANSCULENT && (type.isTransculent() || !type.hasNormalAABB())))
+			if ((meshType == MeshType.SOLID && !type.isTranslucent() && type.hasNormalAABB()) || (meshType == MeshType.TRANSCULENT && (type.isTranslucent() || !type.hasNormalAABB())))
 			{
 				if (!special)
 				{
 					byte faceMask = ChunkData.dataGetFaceMask(blockData);
-					count += MathHelper.cardinality(faceMask);
+					count += 4 * MathHelper.cardinality(faceMask);
 				} else
 				{
 					System.out.println("Block Data = " + Integer.toHexString(blockData));
 					block = _chunkData.getSpecialBlock(blockIndex);
-					if (block instanceof DefaultBlock && !block.isRenderingManually())
+					if (block.isVisible() && !block.isRenderingManually())
 					{
-						System.out.println(block);
-						byte faceMask = ((DefaultBlock) block).getFaceMask();
-						count += MathHelper.cardinality(faceMask);
+						count += block.getVertexCount();
 					}
 				}
 			}
@@ -1055,7 +1059,7 @@ public class Chunk implements AABBObject
 			if (type != 0)
 			{
 				BlockType btype = BlockManager.getInstance().getBlockType(type);
-				if (!btype.isTransculent())
+				if (!btype.isTranslucent())
 				{
 					return;
 				}
@@ -1110,7 +1114,7 @@ public class Chunk implements AABBObject
 			if (type != 0)
 			{
 				BlockType btype = BlockManager.getInstance().getBlockType(type);
-				if (!btype.isTransculent())
+				if (!btype.isTranslucent())
 				{
 					continue;
 				}
@@ -1164,7 +1168,7 @@ public class Chunk implements AABBObject
 			if (type != 0)
 			{
 				BlockType btype = BlockManager.getInstance().getBlockType(type);
-				if (!btype.isTransculent())
+				if (!btype.isTranslucent())
 				{
 					continue;
 				}
@@ -1226,7 +1230,7 @@ public class Chunk implements AABBObject
 			if (type != 0)
 			{
 				BlockType btype = BlockManager.getInstance().getBlockType(type);
-				if (!btype.isTransculent())
+				if (!btype.isTranslucent())
 				{
 					continue;
 				}
@@ -1388,6 +1392,51 @@ public class Chunk implements AABBObject
 	public World getWorld()
 	{
 		return _world;
+	}
+
+	public byte[][][] getLightBuffer()
+	{
+		return _lightBuffer;
+	}
+
+	public boolean isReadyForCreatingMesh()
+	{
+		Chunk c;
+
+		c = getChunk(getX() - 1, getZ() - 1, false, false, false);
+		if (c != null && c._loading)
+			return false;
+
+		c = getChunk(getX(), getZ() - 1, false, false, false);
+		if (c != null && c._loading)
+			return false;
+
+		c = getChunk(getX() + 1, getZ() - 1, false, false, false);
+		if (c != null && c._loading)
+			return false;
+
+		c = getChunk(getX() - 1, getZ(), false, false, false);
+		if (c != null && c._loading)
+			return false;
+
+		c = getChunk(getX() + 1, getZ(), false, false, false);
+		if (c != null && c._loading)
+			return false;
+
+		c = getChunk(getX() - 1, getZ() + 1, false, false, false);
+		if (c != null && c._loading)
+			return false;
+
+		c = getChunk(getX(), getZ() + 1, false, false, false);
+		if (c != null && c._loading)
+			return false;
+
+		c = getChunk(getX() + 1, getZ() + 1, false, false, false);
+		if (c != null && c._loading)
+			return false;
+
+		return true;
+
 	}
 
 }

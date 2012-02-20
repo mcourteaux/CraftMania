@@ -13,31 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package org.craftmania.blocks.customblocks;
+package org.craftmania.blocks;
 
-import org.craftmania.Side;
-import org.craftmania.blocks.BlockManager;
-import org.craftmania.blocks.CrossedBlock;
-import org.craftmania.math.Vec3i;
-import org.craftmania.world.Chunk;
+import java.nio.FloatBuffer;
 
-public class YellowFlower extends CrossedBlock
+import org.craftmania.math.Vec3f;
+
+public abstract class BlockBrush
 {
-	public YellowFlower(Chunk chunk, Vec3i pos)
+
+	public abstract void setPosition(float x, float y, float z);
+
+	public void setPosition(Vec3f v)
 	{
-		super(BlockManager.getInstance().getBlockType("yellowflower"), chunk, pos);
+		setPosition(v.x(), v.y(), v.z());
 	}
 
-	@Override
-	public void neighborChanged(Side side)
-	{
-		if (side == Side.BOTTOM)
-		{
-			if (_chunk.getBlockTypeAbsolute(getX(), getY() - 1, getZ(), false, false, false) <= 0)
-			{
-				destory();
-			}
-		}
-	}
+	public abstract void render(byte[][][] lightBuffer);
+	public abstract void storeInVBO(FloatBuffer vbo, float x, float y, float z, byte[][][] lightBuffer);
+	public abstract int getVertexCount();
 
+	public abstract void create();
+
+	public abstract void release();
 }

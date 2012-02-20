@@ -34,18 +34,19 @@ public final class BlockType extends InventoryItem
 
 	private String type;
 	private byte id;
-	private DefaultBlockBrush brush;
+	private BlockBrush brush;
 	private Texture inventoryTexture;
 	private Vec3f dimensions;
 	private boolean solid;
 	private boolean fixed;
-	private boolean transculent;
+	private boolean translucent;
 	private int resistance;
 	private boolean normalAABB;
 	private int mineResult;
 	private int mineResultCount;
 	private String customClass;
 	private boolean hasSpecialAction;
+	private boolean crossed;
 	private byte luminosity;
 
 	public enum BlockClass
@@ -66,11 +67,13 @@ public final class BlockType extends InventoryItem
 		dimensions = new Vec3f(0.5f, 0.5f, 0.5f);
 		solid = true;
 		fixed = true;
-		transculent = false;
+		translucent = false;
 		normalAABB = true;
 		mineResult = -1;
 		mineResultCount = 1;
 		customClass = null;
+		crossed = false;
+		luminosity = 0;
 	}
 
 	@Override
@@ -140,12 +143,12 @@ public final class BlockType extends InventoryItem
 	}
 
 	@Override
-	public void renderHoldableObject()
+	public void renderHoldableObject(byte[][][] lightBuffer)
 	{
 		float scale = 0.1f;
 		glScalef(scale, scale, scale);
 		glRotatef(-40, 0, 0, 1);
-		brush.renderAt(0, 0, 0);
+		brush.render(lightBuffer);
 	}
 
 	@Override
@@ -165,7 +168,7 @@ public final class BlockType extends InventoryItem
 		return normalAABB;
 	}
 
-	public DefaultBlockBrush getBrush()
+	public BlockBrush getBrush()
 	{
 		return brush;
 	}
@@ -195,9 +198,9 @@ public final class BlockType extends InventoryItem
 		return solid;
 	}
 
-	public boolean isTransculent()
+	public boolean isTranslucent()
 	{
-		return transculent;
+		return translucent;
 	}
 
 	public String getType()
@@ -233,6 +236,21 @@ public final class BlockType extends InventoryItem
 	public byte getLuminosity()
 	{
 		return luminosity;
+	}
+
+	public DefaultBlockBrush getDefaultBlockBrush()
+	{
+		return (DefaultBlockBrush) brush;
+	}
+	
+	public CrossedBlockBrush getCrossedBlockBrush()
+	{
+		return (CrossedBlockBrush) brush;
+	}
+
+	public boolean isCrossed()
+	{
+		return crossed;
 	}
 
 }

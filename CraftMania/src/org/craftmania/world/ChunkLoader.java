@@ -71,7 +71,7 @@ public class ChunkLoader
 		System.out.println("Load Chunk (" + chunk.getX() + ", " + chunk.getZ() + "): generated = " + generated);
 
 		int size = dis.readInt();
-		
+
 		BlockType type = null;
 		Vec3i blockPos = new Vec3i();
 		for (int i = 0; i < size; ++i)
@@ -116,7 +116,7 @@ public class ChunkLoader
 
 		ChunkData data = blockChunk.getChunkData();
 		int blockCount = 0;
-		for (int i = 0; i< Chunk.BLOCK_COUNT; ++i)
+		for (int i = 0; i < Chunk.BLOCK_COUNT; ++i)
 		{
 			byte b = data.getBlockType(i);
 			if (b != 0)
@@ -126,11 +126,16 @@ public class ChunkLoader
 		}
 		blockCount++;
 		dos.writeInt(blockCount);
-		
+
 		for (int i = 0; i < blockCount; ++i)
 		{
 			byte b = data.getBlockType(i);
-			if (b == 0)
+			if (data.isSpecial(i))
+			{
+				Block bl = data.getSpecialBlock(i);
+				dos.writeByte(b);
+				dos.writeByte(bl.getMetaData());
+			} else if (b == 0)
 			{
 				dos.writeShort(0);
 			} else

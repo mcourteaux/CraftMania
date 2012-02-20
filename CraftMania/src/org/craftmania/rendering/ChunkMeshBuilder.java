@@ -35,6 +35,8 @@ import org.lwjgl.opengl.GL11;
 
 public class ChunkMeshBuilder
 {
+	public static final Vec3f COLOR_WHITE = new Vec3f(1, 1, 1);
+
 
 	public static int STRIDE = 8;
 	public static int POSITION_SIZE = 3;
@@ -67,7 +69,8 @@ public class ChunkMeshBuilder
 			mesh.destroy(meshType);
 
 			/* Compute vertex count */
-			int vertexCount = chunk.getNumberOfVisibleFacesForVBO(meshType) * 4;
+			int vertexCount = chunk.getVertexCount(meshType);
+			System.out.println("Vertex Count = " + vertexCount);
 			/*
 			 * If there are no faces visible yet (because of generating busy),
 			 * don't create a buffer
@@ -77,7 +80,7 @@ public class ChunkMeshBuilder
 				return;
 			}
 			mesh.setVertexCount(meshType, vertexCount);
-			vertexCount += 100;
+
 
 			/* Create a buffer */
 			int vbo = ARBVertexBufferObject.glGenBuffersARB();
@@ -112,16 +115,20 @@ public class ChunkMeshBuilder
 
 			/* Store all vertices in the buffer */
 			USED_SIZE = 0;
+			
+			/* Local temporary variables, used to speed up */
 			IntList blockList = chunk.getVisibleBlocks();
 			int blockIndex = -1;
 			byte blockType = 0;
-			boolean special = false, manualRender = false;
+			boolean special = false;
 			Vec3i vec = new Vec3i();
 			BlockType type;
 			Block block = null;
 			byte[][][] lightBuffer = new byte[3][3][3];
 			byte faceMask = 0;
-			for (int i = 0; USED_SIZE < size - 100 && i < blockList.size(); ++i)
+			
+			/* Iterate over the blocks */
+			for (int i = 0; i < blockList.size(); ++i)
 			{
 				blockIndex = blockList.get(i);
 				blockType = chunk.getChunkData().getBlockType(blockIndex);
@@ -130,46 +137,39 @@ public class ChunkMeshBuilder
 				special = chunk.getChunkData().isSpecial(blockIndex);
 				type = _blockManager.getBlockType(blockType);
 
-				if ((meshType == MeshType.SOLID && !type.isTransculent() && type.hasNormalAABB()) || (meshType == MeshType.TRANSCULENT && (type.isTransculent() || !type.hasNormalAABB())))
+				if ((meshType == MeshType.SOLID && !type.isTranslucent() && type.hasNormalAABB()) || (meshType == MeshType.TRANSCULENT && (type.isTranslucent() || !type.hasNormalAABB())))
 				{
+					
+					ChunkData.indexToPosition(blockIndex, vec);
 
+					/* Build the light buffer */
+
+					vec.setX(vec.x() + chunk.getAbsoluteX());
+					vec.setZ(vec.z() + chunk.getAbsoluteZ());
+
+					chunk.fillLightBuffer(lightBuffer, vec.x(), vec.y(), vec.z());
+					
 					if (special)
 					{
 						block = chunk.getChunkData().getSpecialBlock(blockIndex);
-						manualRender = block.isRenderingManually();
-						if (block instanceof DefaultBlock)
+						if (block.isVisible() && !block.isRenderingManually())
 						{
-							faceMask = ((DefaultBlock) block).getFaceMask();
-							System.out.println("Special block build: " + block + " (fm: " + faceMask + ")");
-						} else
-						{
-							faceMask = 0;
+							block.storeInVBO(vertexBuffer, lightBuffer);
 						}
-
 					} else
 					{
 						faceMask = chunk.getChunkData().getFaceMask(blockIndex);
-						block = null;
-						manualRender = false;
-					}
-					if (faceMask != 0 && !manualRender)
-					{
-						ChunkData.indexToPosition(blockIndex, vec);
-
-						/* Build the light buffer */
-
-						vec.setX(vec.x() + chunk.getAbsoluteX());
-						vec.setZ(vec.z() + chunk.getAbsoluteZ());
-
-						chunk.fillLightBuffer(lightBuffer, vec.x(), vec.y(), vec.z());
-						storeVertexData(vertexBuffer, vec.x(), vec.y(), vec.z(), faceMask, _blockManager.getBlockType(blockType), lightBuffer);
+						type.getDefaultBlockBrush().setFaceMask(faceMask);
+						type.getBrush().storeInVBO(vertexBuffer, vec.x() + 0.5f, vec.y() + 0.5f, vec.z() + 0.5f, lightBuffer);
 					}
 				}
 			}
-			mesh.setVertexCount(meshType, USED_SIZE);
-			if (USED_SIZE != mesh.getVertexCount(meshType))
+			
+			/* Perform a check */
+			if (USED_SIZE != STRIDE * FLOAT_SIZE * mesh.getVertexCount(meshType))
 			{
 				System.out.println("[WARNING!]: Used size = " + USED_SIZE);
+				mesh.setVertexCount(meshType, USED_SIZE / STRIDE / FLOAT_SIZE);
 			}
 
 			byteBuffer.flip();
@@ -185,7 +185,7 @@ public class ChunkMeshBuilder
 		{
 			return;
 		}
-		DefaultBlockBrush dbb = blockType.getBrush();
+		DefaultBlockBrush dbb = blockType.getDefaultBlockBrush();
 
 		float tileSize = 0.0624f;
 		Vec3f p = new Vec3f(x, y, z);
@@ -202,104 +202,104 @@ public class ChunkMeshBuilder
 				if (side == Side.TOP)
 				{
 					put3f(vertexBuffer, p.x() - 0.5f, p.y() + 0.5f - inset, p.z() + 0.5f);
-					putColorWithLight(vertexBuffer, color, lightBuffer[1][2][1], lightBuffer[0][2][1], lightBuffer[0][2][2], lightBuffer[1][2][2]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[1][2][1], lightBuffer[0][2][1], lightBuffer[0][2][2], lightBuffer[1][2][2]);
 					put2f(vertexBuffer, uv.x(), uv.y());
 
 					put3f(vertexBuffer, p.x() + 0.5f, p.y() + 0.5f - inset, p.z() + 0.5f);
-					putColorWithLight(vertexBuffer, color, lightBuffer[1][2][1], lightBuffer[2][2][1], lightBuffer[1][2][2], lightBuffer[2][2][2]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[1][2][1], lightBuffer[2][2][1], lightBuffer[1][2][2], lightBuffer[2][2][2]);
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y());
 
 					put3f(vertexBuffer, p.x() + 0.5f, p.y() + 0.5f - inset, p.z() - 0.5f);
-					putColorWithLight(vertexBuffer, color, lightBuffer[1][2][1], lightBuffer[1][2][0], lightBuffer[2][2][0], lightBuffer[2][2][1]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[1][2][1], lightBuffer[1][2][0], lightBuffer[2][2][0], lightBuffer[2][2][1]);
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y() + tileSize);
 
 					put3f(vertexBuffer, p.x() - 0.5f, p.y() + 0.5f - inset, p.z() - 0.5f);
-					putColorWithLight(vertexBuffer, color, lightBuffer[1][2][1], lightBuffer[0][2][1], lightBuffer[1][2][0], lightBuffer[0][2][0]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[1][2][1], lightBuffer[0][2][1], lightBuffer[1][2][0], lightBuffer[0][2][0]);
 					put2f(vertexBuffer, uv.x(), uv.y() + tileSize);
 				} else if (side == Side.LEFT)
 				{
 					put3f(vertexBuffer, p.x() - 0.5f + inset, p.y() - 0.5f, p.z() - 0.5f);
-					putColorWithLight(vertexBuffer, color, lightBuffer[0][1][1], lightBuffer[0][0][1], lightBuffer[0][1][0], lightBuffer[0][0][0]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[0][1][1], lightBuffer[0][0][1], lightBuffer[0][1][0], lightBuffer[0][0][0]);
 					put2f(vertexBuffer, uv.x(), uv.y() + tileSize);
 
 					put3f(vertexBuffer, p.x() - 0.5f + inset, p.y() - 0.5f, p.z() + 0.5f);
-					putColorWithLight(vertexBuffer, color, lightBuffer[0][1][1], lightBuffer[0][0][1], lightBuffer[0][1][2], lightBuffer[0][0][2]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[0][1][1], lightBuffer[0][0][1], lightBuffer[0][1][2], lightBuffer[0][0][2]);
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y() + tileSize);
 
 					put3f(vertexBuffer, p.x() - 0.5f + inset, p.y() + 0.5f, p.z() + 0.5f);
-					putColorWithLight(vertexBuffer, color, lightBuffer[0][1][1], lightBuffer[0][1][2], lightBuffer[0][2][1], lightBuffer[0][2][2]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[0][1][1], lightBuffer[0][1][2], lightBuffer[0][2][1], lightBuffer[0][2][2]);
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y());
 
 					put3f(vertexBuffer, p.x() - 0.5f + inset, p.y() + 0.5f, p.z() - 0.5f);
-					putColorWithLight(vertexBuffer, color, lightBuffer[0][1][1], lightBuffer[0][1][0], lightBuffer[0][2][0], lightBuffer[0][2][1]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[0][1][1], lightBuffer[0][1][0], lightBuffer[0][2][0], lightBuffer[0][2][1]);
 					put2f(vertexBuffer, uv.x(), uv.y());
 				} else if (side == Side.FRONT)
 				{
 					put3f(vertexBuffer, p.x() - 0.5f, p.y() - 0.5f, p.z() + 0.5f - inset);
-					putColorWithLight(vertexBuffer, color, lightBuffer[1][1][2], lightBuffer[0][0][2], lightBuffer[0][1][2], lightBuffer[1][0][2]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[1][1][2], lightBuffer[0][0][2], lightBuffer[0][1][2], lightBuffer[1][0][2]);
 					put2f(vertexBuffer, uv.x(), uv.y() + tileSize);
 
 					put3f(vertexBuffer, p.x() + 0.5f, p.y() - 0.5f, p.z() + 0.5f - inset);
-					putColorWithLight(vertexBuffer, color, lightBuffer[1][1][2], lightBuffer[1][0][2], lightBuffer[2][1][2], lightBuffer[2][0][2]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[1][1][2], lightBuffer[1][0][2], lightBuffer[2][1][2], lightBuffer[2][0][2]);
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y() + tileSize);
 
 					put3f(vertexBuffer, p.x() + 0.5f, p.y() + 0.5f, p.z() + 0.5f - inset);
-					putColorWithLight(vertexBuffer, color, lightBuffer[1][1][2], lightBuffer[1][2][2], lightBuffer[2][2][2], lightBuffer[2][1][2]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[1][1][2], lightBuffer[1][2][2], lightBuffer[2][2][2], lightBuffer[2][1][2]);
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y());
 
 					put3f(vertexBuffer, p.x() - 0.5f, p.y() + 0.5f, p.z() + 0.5f - inset);
-					putColorWithLight(vertexBuffer, color, lightBuffer[1][1][2], lightBuffer[1][2][2], lightBuffer[0][1][2], lightBuffer[0][2][2]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[1][1][2], lightBuffer[1][2][2], lightBuffer[0][1][2], lightBuffer[0][2][2]);
 					put2f(vertexBuffer, uv.x(), uv.y());
 				} else if (side == Side.RIGHT)
 				{
 					put3f(vertexBuffer, p.x() + 0.5f - inset, p.y() + 0.5f, p.z() - 0.5f);
-					putColorWithLight(vertexBuffer, color, lightBuffer[2][1][1], lightBuffer[2][2][1], lightBuffer[2][1][0], lightBuffer[2][2][0]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[2][1][1], lightBuffer[2][2][1], lightBuffer[2][1][0], lightBuffer[2][2][0]);
 					put2f(vertexBuffer, uv.x(), uv.y());
 
 					put3f(vertexBuffer, p.x() + 0.5f - inset, p.y() + 0.5f, p.z() + 0.5f);
-					putColorWithLight(vertexBuffer, color, lightBuffer[2][1][1], lightBuffer[2][2][2], lightBuffer[2][2][1], lightBuffer[2][1][2]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[2][1][1], lightBuffer[2][2][2], lightBuffer[2][2][1], lightBuffer[2][1][2]);
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y());
 
 					put3f(vertexBuffer, p.x() + 0.5f - inset, p.y() - 0.5f, p.z() + 0.5f);
-					putColorWithLight(vertexBuffer, color, lightBuffer[2][1][1], lightBuffer[2][0][2], lightBuffer[2][0][1], lightBuffer[2][1][2]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[2][1][1], lightBuffer[2][0][2], lightBuffer[2][0][1], lightBuffer[2][1][2]);
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y() + tileSize);
 
 					put3f(vertexBuffer, p.x() + 0.5f - inset, p.y() - 0.5f, p.z() - 0.5f);
-					putColorWithLight(vertexBuffer, color, lightBuffer[2][1][1], lightBuffer[2][0][0], lightBuffer[2][0][1], lightBuffer[2][1][0]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[2][1][1], lightBuffer[2][0][0], lightBuffer[2][0][1], lightBuffer[2][1][0]);
 					put2f(vertexBuffer, uv.x(), uv.y() + tileSize);
 				} else if (side == Side.BACK)
 				{
 					put3f(vertexBuffer, p.x() - 0.5f, p.y() + 0.5f, p.z() - 0.5f + inset);
-					putColorWithLight(vertexBuffer, color, lightBuffer[1][1][0], lightBuffer[1][2][0], lightBuffer[0][2][0], lightBuffer[0][1][0]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[1][1][0], lightBuffer[1][2][0], lightBuffer[0][2][0], lightBuffer[0][1][0]);
 					put2f(vertexBuffer, uv.x(), uv.y());
 
 					put3f(vertexBuffer, p.x() + 0.5f, p.y() + 0.5f, p.z() - 0.5f + inset);
-					putColorWithLight(vertexBuffer, color, lightBuffer[1][1][0], lightBuffer[1][2][0], lightBuffer[2][2][0], lightBuffer[2][1][0]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[1][1][0], lightBuffer[1][2][0], lightBuffer[2][2][0], lightBuffer[2][1][0]);
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y());
 
 					put3f(vertexBuffer, p.x() + 0.5f, p.y() - 0.5f, p.z() - 0.5f + inset);
-					putColorWithLight(vertexBuffer, color, lightBuffer[1][1][0], lightBuffer[1][0][0], lightBuffer[2][0][0], lightBuffer[2][1][0]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[1][1][0], lightBuffer[1][0][0], lightBuffer[2][0][0], lightBuffer[2][1][0]);
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y() + tileSize);
 
 					put3f(vertexBuffer, p.x() - 0.5f, p.y() - 0.5f, p.z() - 0.5f + inset);
-					putColorWithLight(vertexBuffer, color, lightBuffer[1][1][0], lightBuffer[1][0][0], lightBuffer[0][0][0], lightBuffer[0][1][0]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[1][1][0], lightBuffer[1][0][0], lightBuffer[0][0][0], lightBuffer[0][1][0]);
 					put2f(vertexBuffer, uv.x(), uv.y() + tileSize);
 				} else if (side == Side.BOTTOM)
 				{
 					put3f(vertexBuffer, p.x() - 0.5f, p.y() - 0.5f + inset, p.z() - 0.5f);
-					putColorWithLight(vertexBuffer, color, lightBuffer[1][0][1], lightBuffer[1][0][0], lightBuffer[0][0][0], lightBuffer[0][0][1]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[1][0][1], lightBuffer[1][0][0], lightBuffer[0][0][0], lightBuffer[0][0][1]);
 					put2f(vertexBuffer, uv.x(), uv.y());
 
 					put3f(vertexBuffer, p.x() + 0.5f, p.y() - 0.5f + inset, p.z() - 0.5f);
-					putColorWithLight(vertexBuffer, color, lightBuffer[1][0][1], lightBuffer[1][0][0], lightBuffer[2][0][0], lightBuffer[2][0][1]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[1][0][1], lightBuffer[1][0][0], lightBuffer[2][0][0], lightBuffer[2][0][1]);
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y());
 
 					put3f(vertexBuffer, p.x() + 0.5f, p.y() - 0.5f + inset, p.z() + 0.5f);
-					putColorWithLight(vertexBuffer, color, lightBuffer[1][0][1], lightBuffer[1][0][2], lightBuffer[2][0][2], lightBuffer[2][0][1]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[1][0][1], lightBuffer[1][0][2], lightBuffer[2][0][2], lightBuffer[2][0][1]);
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y() + tileSize);
 
 					put3f(vertexBuffer, p.x() - 0.5f, p.y() - 0.5f + inset, p.z() + 0.5f);
-					putColorWithLight(vertexBuffer, color, lightBuffer[1][0][1], lightBuffer[1][0][2], lightBuffer[0][0][2], lightBuffer[0][0][1]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer[1][0][1], lightBuffer[1][0][2], lightBuffer[0][0][2], lightBuffer[0][0][1]);
 					put2f(vertexBuffer, uv.x(), uv.y() + tileSize);
 				}
 			}
@@ -307,7 +307,7 @@ public class ChunkMeshBuilder
 
 	}
 
-	public static void putColorWithLight(FloatBuffer vertexBuffer, Vec3f vec, byte light, byte light1, byte light2, byte light3)
+	public static void putColorWithLight4(FloatBuffer vertexBuffer, Vec3f vec, byte light, byte light1, byte light2, byte light3)
 	{
 		float value;
 
@@ -324,11 +324,29 @@ public class ChunkMeshBuilder
 		vertexBuffer.put(vec.z() * value);
 		USED_SIZE += 3 * FLOAT_SIZE;
 	}
+	
+	public static void putColorWithLight3(FloatBuffer vertexBuffer, Vec3f vec, byte light, byte light1, byte light2)
+	{
+		float value;
+
+		if (SMOOTH_LIGHTING)
+		{
+			value = light + light1 + light2;
+			value /= 90.0001f;
+		} else
+		{
+			value = light / 30.001f;
+		}
+		vertexBuffer.put(vec.x() * value);
+		vertexBuffer.put(vec.y() * value);
+		vertexBuffer.put(vec.z() * value);
+		USED_SIZE += 3 * FLOAT_SIZE;
+	}
 
 	public static void putColorWithLight(FloatBuffer vertexBuffer, Vec3f vec, byte light)
 	{
 		float value;
-		value = light / 15.001f;
+		value = light / 30.001f;
 		vertexBuffer.put(vec.x() * value);
 		vertexBuffer.put(vec.y() * value);
 		vertexBuffer.put(vec.z() * value);

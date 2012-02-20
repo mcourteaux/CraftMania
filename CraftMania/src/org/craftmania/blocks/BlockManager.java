@@ -68,8 +68,24 @@ public class BlockManager
 
 			if (bt != null)
 			{
-				bt.getBrush().generateDisplayListForEachFace();
-				bt.getBrush().generateDisplayList();
+				/* Brush might be null like in case of Tall Grass, where there are six block brushes. Initialized by the class itself */
+				if (bt.getBrush() != null)
+				{
+					bt.getBrush().create();
+				}
+				
+				/* Make sure all static initializer bodies are called */
+				if (bt.getCustomClass() != null)
+				{
+					try
+					{
+						Class.forName(bt.getCustomClass());						
+					} catch (Exception e)
+					{
+						System.err.println("Custom Block class is not found!");
+						e.printStackTrace();
+					}
+				}
 				_typeStrings.put(bt.getType(), Byte.valueOf((byte) i));
 
 				BufferedImage img = inventoryImageCreator.createInventoryImage(bt);

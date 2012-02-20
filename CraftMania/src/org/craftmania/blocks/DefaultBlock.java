@@ -15,10 +15,13 @@
  ******************************************************************************/
 package org.craftmania.blocks;
 
+import java.nio.FloatBuffer;
+
 import org.craftmania.Side;
 import org.craftmania.datastructures.AABB;
 import org.craftmania.game.Game;
 import org.craftmania.inventory.InventoryItem;
+import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3f;
 import org.craftmania.math.Vec3i;
 import org.craftmania.world.Chunk;
@@ -42,7 +45,7 @@ public class DefaultBlock extends Block
 		_aabb = null;
 		_needVisibilityCheck = true;
 	}
-	
+
 	private void createMovementPlugin()
 	{
 		_movement = new BlockMovementPlugin(this);
@@ -147,7 +150,7 @@ public class DefaultBlock extends Block
 		if (isVisible())
 		{
 			_blockType.getBrush().setPosition(_aabb.getPosition());
-			_blockType.getBrush().renderFaces(_faceMask);
+			_blockType.getDefaultBlockBrush().renderFaces(_faceMask, lightBuffer);
 		}
 	}
 
@@ -163,15 +166,7 @@ public class DefaultBlock extends Block
 
 	public void checkVisibility()
 	{
-//		System.out.println();
-//		System.out.println("BEFORE:");
-//		System.out.println("Chunk = " + _chunk);
-//		System.out.println("FaceMask = " +_faceMask);
-//		System.out.println("Visible = " +_visible);
-//		System.out.println("Rendering = " + _rendering);
-//		System.out.println("Rendering Manually = " + _renderManually);
-//		
-		
+
 		boolean preVisibility = _faceMask != 0;
 		byte preMask = _faceMask;
 		if (isMoving())
@@ -228,22 +223,12 @@ public class DefaultBlock extends Block
 			{
 				removeFromVisibilityList();
 			}
-			
+
 			_chunk.needsNewVBO();
 		} else if (preMask != _faceMask)
 		{
 			_chunk.needsNewVBO();
 		}
-		
-//		System.out.println();
-//		System.out.println("AFTER:");
-//		System.out.println("FaceMask = " +_faceMask);
-//		System.out.println("Visible = " +_visible);
-//		System.out.println("Rendering = " + _rendering);
-//		System.out.println("Rendering Manually = " + _renderManually);
-//		
-//		System.out.println();
-		
 	}
 
 	@Override
@@ -274,7 +259,7 @@ public class DefaultBlock extends Block
 			addToUpdateList();
 		}
 	}
-	
+
 	@Override
 	public boolean isMoving()
 	{
@@ -291,9 +276,21 @@ public class DefaultBlock extends Block
 	}
 
 	@Override
+	public int getVertexCount()
+	{
+		return 4 * MathHelper.cardinality(_faceMask);
+	}
+
+	@Override
 	public String toString()
 	{
 		return _blockType.getName() + " " + _postion.toString();
+	}
+	
+	@Override
+	public void storeInVBO(FloatBuffer vbo, byte[][][] lightBuffer)
+	{
+		_blockType.getDefaultBlockBrush().storeInVBO(vbo, getX() + 0.5f, getY() + 0.5f, getZ() + 0.5f, lightBuffer);
 	}
 
 }

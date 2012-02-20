@@ -218,10 +218,10 @@ public class ChunkGenerator extends Generator
 				{
 					if (random.randomBoolean())
 					{
-						chunk.setSpecialBlockAbsolute(x, y + 1, z, BlockConstructor.construct(x, y + 1, z, chunk, _blockManager.blockID("redflower"), (byte) random.randomInt(6)), false, false, false);
+						chunk.setSpecialBlockAbsolute(x, y + 1, z, BlockConstructor.construct(x, y + 1, z, chunk, _blockManager.blockID("redflower"), (byte) 0), false, false, false);
 					} else
 					{
-						chunk.setSpecialBlockAbsolute(x, y + 1, z, BlockConstructor.construct(x, y + 1, z, chunk, _blockManager.blockID("yellowflower"), (byte) random.randomInt(6)), false, false, false);
+						chunk.setSpecialBlockAbsolute(x, y + 1, z, BlockConstructor.construct(x, y + 1, z, chunk, _blockManager.blockID("yellowflower"), (byte) 0), false, false, false);
 					}
 				}
 			}

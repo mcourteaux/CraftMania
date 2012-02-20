@@ -181,7 +181,6 @@ public class ChunkData
 		_data[index + 0] = type;
 		_data[index + 1] = (byte) (SPECIAL_BIT | ((position >>> 8) & 0x7F));
 		_data[index + 2] = (byte) (position & 0xFF);
-		System.out.println(Integer.toHexString(getBlockData(index / BLOCK_DATA_SIZE)));
 	}
 
 	public void setBlockType(int index, byte type)

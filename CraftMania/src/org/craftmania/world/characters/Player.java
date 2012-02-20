@@ -176,7 +176,10 @@ public class Player extends GameObject
 			glDisable(GL_CULL_FACE);
 
 			_body.transformToRightHand();
-			_selectedItem.renderHoldableObject();
+			
+			Chunk c = Game.getInstance().getWorld().getChunkManager().getChunkContaining((int) _position.x(), (int) _position.y(), (int) _position.z(), false, false, false);
+			c.fillLightBuffer(c.getLightBuffer(), (int) _position.x(), (int) _position.y(), (int) _position.z());
+			_selectedItem.renderHoldableObject(c.getLightBuffer());
 			glEnable(GL_CULL_FACE);
 			glPopMatrix();
 		}

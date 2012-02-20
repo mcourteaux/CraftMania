@@ -21,6 +21,8 @@ import java.awt.image.BufferedImage;
 
 import org.craftmania.Side;
 import org.craftmania.blocks.BlockType;
+import org.craftmania.blocks.CrossedBlockBrush;
+import org.craftmania.blocks.DefaultBlockBrush;
 import org.craftmania.game.TextureStorage;
 import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec2f;
@@ -35,10 +37,16 @@ public class InventoryImageCreator
 {
 
 	private int _size;
+	private Texture _terrainTexture;
+	private BufferedImage _terrainImage;
+	private final BufferedImage NOT_AVAILABLE;
 
 	public InventoryImageCreator(int size)
 	{
 		_size = size;
+		_terrainTexture = TextureStorage.getTexture("terrain");
+		_terrainImage = textureToBufferedImage(_terrainTexture);
+		NOT_AVAILABLE = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
 	}
 
 	/**
@@ -48,30 +56,61 @@ public class InventoryImageCreator
 	{
 		this(32);
 	}
+	
+	public BufferedImage createInventoryImage(BlockType type)
+	{
+		if (type.getBrush() == null)
+		{
+			return NOT_AVAILABLE;
+		}
+		if (type.isCrossed())
+		{
+			return createInventoryImage(type.getCrossedBlockBrush());
+		} else
+		{
+			return createInventoryImage(type.getDefaultBlockBrush());
+		}
+	}
 
 	/**
-	 * Creates an inventory image of the blocktype
+	 * Creates an inventory image of a crossed block brush
 	 * 
-	 * @param bt
+	 * @param dbb The CrossedBlockBrush for which an inventory image will be created
 	 * @return
 	 */
-	public BufferedImage createInventoryImage(BlockType bt)
+	public BufferedImage createInventoryImage(CrossedBlockBrush cbb)
+	{
+		BufferedImage bi = new BufferedImage(_size, _size, BufferedImage.TYPE_INT_ARGB);
+
+		Vec2f texpos = cbb.getTexturePosition();
+		BufferedImage tile = getTile16(_terrainImage, MathHelper.round(texpos.x() / 16f * _terrainImage.getWidth()), MathHelper.round(texpos.y() /16f * _terrainImage.getHeight()));
+		
+		Graphics2D g = bi.createGraphics();
+		g.drawImage(tile, 0, 0, bi.getWidth(), bi.getHeight(), null);
+		g.dispose();
+
+		return bi;
+	}
+
+	/**
+	 * Creates an inventory image of a default block brush
+	 * 
+	 * @param dbb The DefaultBlockBrush for which an inventory image will be created
+	 * @return
+	 */
+	public BufferedImage createInventoryImage(DefaultBlockBrush dbb)
 	{
 
 		// Changed from TYPE_4BYTES_ABGR to TYPE_INT_ARGB
 		BufferedImage bi = new BufferedImage(_size, _size, BufferedImage.TYPE_INT_ARGB);
 
-		Vec2f leftPos = bt.getBrush().getTexturePositionInGridFor(Side.LEFT);
-		Vec2f topPos = bt.getBrush().getTexturePositionInGridFor(Side.TOP);
-		Vec2f frontPos = bt.getBrush().getTexturePositionInGridFor(Side.FRONT);
+		Vec2f leftPos = dbb.getTexturePositionInGridFor(Side.LEFT);
+		Vec2f topPos = dbb.getTexturePositionInGridFor(Side.TOP);
+		Vec2f frontPos = dbb.getTexturePositionInGridFor(Side.FRONT);
 
-		Vec3f leftColor = bt.getBrush().getColorFor(Side.LEFT);
-		Vec3f topColor = bt.getBrush().getColorFor(Side.TOP);
-		Vec3f frontColor = bt.getBrush().getColorFor(Side.FRONT);
-
-		Texture texture = TextureStorage.getTexture("terrain");
-
-		BufferedImage srcImage = textureToBufferedImage(texture);
+		Vec3f leftColor = dbb.getColorFor(Side.LEFT);
+		Vec3f topColor = dbb.getColorFor(Side.TOP);
+		Vec3f frontColor = dbb.getColorFor(Side.FRONT);
 
 		Graphics2D g = bi.createGraphics();
 		g.scale(_size / 16.0f, _size / 16.0f);
@@ -81,7 +120,7 @@ public class InventoryImageCreator
 			transform.translate(0, 3.72f);
 			transform.scale(0.5, 0.5);
 			transform.shear(0.0, 0.36);
-			BufferedImage leftSide = getSubTexture(srcImage, (int) leftPos.x(), (int) leftPos.y());
+			BufferedImage leftSide = getTile16(_terrainImage, (int) leftPos.x(), (int) leftPos.y());
 			leftSide = applyColorFilter(leftSide, leftColor.x(), leftColor.y(), leftColor.z());
 			g.drawImage(leftSide, transform, null);
 		}
@@ -91,7 +130,7 @@ public class InventoryImageCreator
 			transform.translate(8, 6.62f);
 			transform.scale(0.5, 0.5);
 			transform.shear(0.0, -0.36);
-			BufferedImage frontSide = getSubTexture(srcImage, (int) frontPos.x(), (int) frontPos.y());
+			BufferedImage frontSide = getTile16(_terrainImage, (int) frontPos.x(), (int) frontPos.y());
 			frontSide = applyColorFilter(frontSide, frontColor.x(), frontColor.y(), frontColor.z());
 			g.drawImage(frontSide, transform, null);
 		}
@@ -102,7 +141,7 @@ public class InventoryImageCreator
 			transform.translate(22.6d / 2.0f, 3);
 			transform.rotate(Math.PI / 4.0d);
 
-			BufferedImage topSide = getSubTexture(srcImage, (int) topPos.x(), (int) topPos.y());
+			BufferedImage topSide = getTile16(_terrainImage, (int) topPos.x(), (int) topPos.y());
 			topSide = applyColorFilter(topSide, topColor.x(), topColor.y(), topColor.z());
 			g.drawImage(topSide, transform, null);
 		}
@@ -162,9 +201,9 @@ public class InventoryImageCreator
 		return bi;
 	}
 
-	private static BufferedImage getSubTexture(BufferedImage srcImage, int x, int y)
+	private static BufferedImage getTile16(BufferedImage _terrainImage, int x, int y)
 	{
-		return srcImage.getSubimage(x * 16, y * 16, 16, 16);
+		return _terrainImage.getSubimage(x * 16, y * 16, 16, 16);
 	}
 
 	private static BufferedImage applyColorFilter(BufferedImage img, float r, float g, float b)

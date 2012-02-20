@@ -15,6 +15,8 @@
  ******************************************************************************/
 package org.craftmania.blocks;
 
+import java.nio.FloatBuffer;
+
 import org.craftmania.Side;
 import org.craftmania.datastructures.AABB;
 import org.craftmania.datastructures.AABBObject;
@@ -174,11 +176,13 @@ public abstract class Block implements AABBObject
 
 	public abstract void update();
 	public abstract void render(byte[][][] lightBuffer);
+	public abstract void storeInVBO(FloatBuffer vbo, byte[][][] lightBuffer);
 	public abstract boolean isVisible();
 	public abstract AABB getAABB();
 	public abstract void smash(InventoryItem item);
 	public abstract void neighborChanged(Side side);
 	public abstract void checkVisibility();
+	public abstract int getVertexCount();
 
 	public void performSpecialAction()
 	{
@@ -204,6 +208,11 @@ public abstract class Block implements AABBObject
 	public boolean isRenderingManually()
 	{
 		return _renderManually;
+	}
+
+	public byte getMetaData()
+	{
+		return 0;
 	}
 
 

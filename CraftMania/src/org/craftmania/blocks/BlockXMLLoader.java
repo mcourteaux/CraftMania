@@ -23,6 +23,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.craftmania.Side;
 import org.craftmania.items.ItemManager;
 import org.craftmania.math.Vec2f;
+import org.craftmania.math.Vec2i;
 import org.craftmania.math.Vec3f;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -66,19 +67,21 @@ public class BlockXMLLoader
 		int id = Integer.parseInt(element.getAttribute("id"));
 		String name = element.getAttribute("name");
 
+		boolean crossed = false;
+		
 		// System.out.println("Loading BlockType: " + name);
 
 		/* BlockBrush */
-		DefaultBlockBrush bb = new DefaultBlockBrush();
-		Element brushElement = (Element) element.getElementsByTagName("brush").item(0);
-		if (brushElement != null)
+		Element defaultBrushElement = (Element) element.getElementsByTagName("brush").item(0);
+		if (defaultBrushElement != null)
 		{
-			if (brushElement.hasAttribute("alphaBlending"))
+			DefaultBlockBrush bb = new DefaultBlockBrush();
+			if (defaultBrushElement.hasAttribute("alphaBlending"))
 			{
-				bb.setAlphaBlending(Boolean.parseBoolean(brushElement.getAttribute("alphaBlending")));
+				bb.setAlphaBlending(Boolean.parseBoolean(defaultBrushElement.getAttribute("alphaBlending")));
 				System.out.println("Enable alphaBlending for " + name);
 			}
-			NodeList brushSidesList = brushElement.getChildNodes();
+			NodeList brushSidesList = defaultBrushElement.getChildNodes();
 			for (int i = 0; i < brushSidesList.getLength(); ++i)
 			{
 				if (brushSidesList.item(i).getNodeType() == Node.ELEMENT_NODE)
@@ -170,13 +173,23 @@ public class BlockXMLLoader
 				}
 			}
 			/* Load the brush into the brushstorage */
-			BlockBrushStorage.loadBrush(name, bb);
-
+			BlockBrushStorage.registerBrush(name, bb);
 		}
-		
+		Element crossedBrushElement = (Element) element.getElementsByTagName("crossedbrush").item(0);
+		if (crossedBrushElement != null)
+		{
+			CrossedBlockBrush cbb = new CrossedBlockBrush();
+			Vec2i pos = parseVec2i(crossedBrushElement.getTextContent());
+			cbb.setTexturePosition(pos.x(), pos.y());
+			crossed = true;
+			BlockBrushStorage.registerBrush(name, cbb);
+		}
+
 		/* Custom settings */
 		BlockType blockType = new BlockType(id, name);
 		BlockManager bm = BlockManager.getInstance();
+		
+		bm.setBlockTypeSetting(blockType, "crossed", crossed);
 
 		NodeList settingsList = element.getChildNodes();
 		for (int i = 0; i < settingsList.getLength(); ++i)
@@ -271,5 +284,26 @@ public class BlockXMLLoader
 		}
 
 		return new Vec2f(x, y);
+	}
+	
+	private static Vec2i parseVec2i(String str)
+	{
+		int x = 0;
+		int y = 0;
+		int indexOfComa = str.indexOf(",");
+		if (indexOfComa == -1)
+		{
+			throw new IllegalArgumentException("For string input: " + str);
+		}
+		try
+		{
+			x = Integer.parseInt(str.substring(0, indexOfComa));
+			y = Integer.parseInt(str.substring(indexOfComa + 1));
+		} catch (Exception e)
+		{
+			throw new IllegalArgumentException("Cannot parse Vec2i", e);
+		}
+
+		return new Vec2i(x, y);
 	}
 }

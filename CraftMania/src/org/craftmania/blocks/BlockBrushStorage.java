@@ -25,7 +25,7 @@ import java.util.Map.Entry;
  */
 public class BlockBrushStorage
 {
-    private static Map<String, DefaultBlockBrush> brushes = new HashMap<String, DefaultBlockBrush>();
+    private static Map<String, BlockBrush> brushes = new HashMap<String, BlockBrush>();
 
     private BlockBrushStorage()
     {
@@ -33,18 +33,18 @@ public class BlockBrushStorage
     
     public static void releaseBrushes()
     {
-        for (Entry<String, DefaultBlockBrush> entry : brushes.entrySet())
+        for (Entry<String, BlockBrush> entry : brushes.entrySet())
         {
-            entry.getValue().releaseDisplayList();
+            entry.getValue().release();
         }
     }
     
-    public static void loadBrush(String id, DefaultBlockBrush bb)
+    public static void registerBrush(String id, BlockBrush bb)
     {
         brushes.put(id, bb);
     }
     
-    public static DefaultBlockBrush get(String id)
+    public static BlockBrush get(String id)
     {
         return brushes.get(id);
     }

@@ -61,7 +61,7 @@ public abstract class InventoryItem extends GameObject
         return _name;
     }
 
-    public void renderHoldableObject()
+    public void renderHoldableObject(byte[][][] lightBuffer)
     {
         glPushMatrix();
         float scale = 0.1f / 16.0f;
