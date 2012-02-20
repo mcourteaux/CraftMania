@@ -484,4 +484,9 @@ public final class DefaultBlockBrush
 		z = position.z();
 		
 	}
+
+	public float getInset(Side side)
+	{
+		return insets[side.ordinal()];
+	}
 }

@@ -82,9 +82,10 @@ public class ChunkLoader
 		}
 
 		dis.close();
-
 		chunk.setGenerated(generated);
 		chunk.setLoading(false);
+		chunk.performListChanges();
+		chunk.markNeighborsLightPointsDirty();
 		chunk.setLoaded(true);
 	}
 

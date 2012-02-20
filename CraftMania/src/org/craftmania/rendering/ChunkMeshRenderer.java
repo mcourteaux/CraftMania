@@ -1,6 +1,7 @@
 package org.craftmania.rendering;
 
 import org.craftmania.game.TextureStorage;
+import org.craftmania.rendering.ChunkMeshBuilder.MeshType;
 import org.craftmania.world.Chunk;
 import org.lwjgl.opengl.ARBVertexBufferObject;
 import org.lwjgl.opengl.GL11;
@@ -17,9 +18,9 @@ public class ChunkMeshRenderer
 	public static int TEX_COORD_OFFSET = COLOR_OFFSET + COLOR_SIZE;
 	public static int FLOAT_SIZE = 4;
 
-	public static void renderChunkMesh(Chunk chunk)
+	public static void renderChunkMesh(Chunk chunk, MeshType meshType)
 	{
-		if (chunk.getMesh().getVBO() <= 0)
+		if (chunk.getMesh().getVBO(meshType) <= 0)
 		{
 			return;
 		}
@@ -31,10 +32,21 @@ public class ChunkMeshRenderer
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			TextureStorage.getTexture("terrain").bind();
 
+			if (meshType == MeshType.SOLID)
+			{
+				GL11.glDisable(GL11.GL_BLEND);
+
+			} else if (meshType == MeshType.TRANSCULENT)
+			{
+				GL11.glDisable(GL11.GL_CULL_FACE);
+				GL11.glEnable(GL11.GL_BLEND);
+				GL11.glEnable(GL11.GL_CULL_FACE);
+			}
+
 			ChunkMesh mesh = chunk.getMesh();
 
 			/* Bind the buffer */
-			ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, mesh.getVBO());
+			ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, mesh.getVBO(meshType));
 
 			/* Enable the different kinds of data in the buffer */
 			GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
@@ -49,7 +61,7 @@ public class ChunkMeshRenderer
 			GL11.glColorPointer(COLOR_SIZE, GL11.GL_FLOAT, STRIDE * FLOAT_SIZE, COLOR_OFFSET * FLOAT_SIZE);
 
 			/* Draw the buffer */
-			GL11.glDrawArrays(GL11.GL_QUADS, 0, mesh.getVertexCount());
+			GL11.glDrawArrays(GL11.GL_QUADS, 0, mesh.getVertexCount(meshType));
 
 			/* Unbind the buffer */
 			ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, 0);

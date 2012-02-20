@@ -56,105 +56,109 @@ public class BlockXMLLoader
 		/* BlockBrush */
 		DefaultBlockBrush bb = new DefaultBlockBrush();
 		Element brushElement = (Element) element.getElementsByTagName("brush").item(0);
-		if (brushElement.hasAttribute("alphaBlending"))
+		if (brushElement != null)
 		{
-			bb.setAlphaBlending(Boolean.parseBoolean(brushElement.getAttribute("alphaBlending")));
-			System.out.println("Enable alphaBlending for " + name);
-		}
-		NodeList brushSidesList = brushElement.getChildNodes();
-		for (int i = 0; i < brushSidesList.getLength(); ++i)
-		{
-			if (brushSidesList.item(i).getNodeType() == Node.ELEMENT_NODE)
+			if (brushElement.hasAttribute("alphaBlending"))
 			{
-				Element sideElement = (Element) brushSidesList.item(i);
-				String sideName = sideElement.getTagName();
-				Vec2f pos = parseVec2f(sideElement.getTextContent());
-				Vec3f color = null;
-				float inset = 0;
-				if (sideElement.hasAttribute("color"))
+				bb.setAlphaBlending(Boolean.parseBoolean(brushElement.getAttribute("alphaBlending")));
+				System.out.println("Enable alphaBlending for " + name);
+			}
+			NodeList brushSidesList = brushElement.getChildNodes();
+			for (int i = 0; i < brushSidesList.getLength(); ++i)
+			{
+				if (brushSidesList.item(i).getNodeType() == Node.ELEMENT_NODE)
 				{
-					String colorStr = sideElement.getAttribute("color");
-					int colorInt = Integer.parseInt(colorStr.substring(1), 16);
-					int r = (colorInt >> 16) & 0xFF;
-					int g = (colorInt >> 8) & 0xFF;
-					int b = colorInt & 0xFF;
+					Element sideElement = (Element) brushSidesList.item(i);
+					String sideName = sideElement.getTagName();
+					Vec2f pos = parseVec2f(sideElement.getTextContent());
+					Vec3f color = null;
+					float inset = 0;
+					if (sideElement.hasAttribute("color"))
+					{
+						String colorStr = sideElement.getAttribute("color");
+						int colorInt = Integer.parseInt(colorStr.substring(1), 16);
+						int r = (colorInt >> 16) & 0xFF;
+						int g = (colorInt >> 8) & 0xFF;
+						int b = colorInt & 0xFF;
 
-					color = new Vec3f(r / 255f, g / 255f, b / 255f);
-				}
-				if (sideElement.hasAttribute("inset"))
-				{
-					inset = Float.parseFloat(sideElement.getAttribute("inset"));
-				}
-				if (sideName.equals("allsides"))
-				{
-					if (color != null)
-					{
-						bb.setGlobalColor(color);
+						color = new Vec3f(r / 255f, g / 255f, b / 255f);
 					}
-					bb.setInset(inset);
-					bb.setTexture(pos);
-				} else if (sideName.equals("mantle"))
-				{
-					if (color != null)
+					if (sideElement.hasAttribute("inset"))
 					{
-						bb.setMantleColor(color);
+						inset = Float.parseFloat(sideElement.getAttribute("inset"));
 					}
-					bb.setInsetForMantle(inset);
-					bb.setTextureForMantle(pos);
-				} else if (sideName.equals("top"))
-				{
-					if (color != null)
+					if (sideName.equals("allsides"))
 					{
-						bb.setSideColor(Side.TOP, color);
-					}
-					bb.setSideInset(Side.TOP, inset);
-					bb.setTextureForSize(pos, Side.TOP);
-				} else if (sideName.equals("bottom"))
-				{
-					if (color != null)
+						if (color != null)
+						{
+							bb.setGlobalColor(color);
+						}
+						bb.setInset(inset);
+						bb.setTexture(pos);
+					} else if (sideName.equals("mantle"))
 					{
-						bb.setSideColor(Side.BOTTOM, color);
-					}
-					bb.setSideInset(Side.BOTTOM, inset);
-					bb.setTextureForSize(pos, Side.BOTTOM);
-				} else if (sideName.equals("front"))
-				{
-					if (color != null)
+						if (color != null)
+						{
+							bb.setMantleColor(color);
+						}
+						bb.setInsetForMantle(inset);
+						bb.setTextureForMantle(pos);
+					} else if (sideName.equals("top"))
 					{
-						bb.setSideColor(Side.FRONT, color);
-					}
-					bb.setSideInset(Side.FRONT, inset);
-					bb.setTextureForSize(pos, Side.FRONT);
-				} else if (sideName.equals("back"))
-				{
-					if (color != null)
+						if (color != null)
+						{
+							bb.setSideColor(Side.TOP, color);
+						}
+						bb.setSideInset(Side.TOP, inset);
+						bb.setTextureForSize(pos, Side.TOP);
+					} else if (sideName.equals("bottom"))
 					{
-						bb.setSideColor(Side.BACK, color);
-					}
-					bb.setSideInset(Side.BACK, inset);
-					bb.setTextureForSize(pos, Side.BACK);
-				} else if (sideName.equals("left"))
-				{
-					if (color != null)
+						if (color != null)
+						{
+							bb.setSideColor(Side.BOTTOM, color);
+						}
+						bb.setSideInset(Side.BOTTOM, inset);
+						bb.setTextureForSize(pos, Side.BOTTOM);
+					} else if (sideName.equals("front"))
 					{
-						bb.setSideColor(Side.LEFT, color);
-					}
-					bb.setSideInset(Side.LEFT, inset);
-					bb.setTextureForSize(pos, Side.LEFT);
-				} else if (sideName.equals("right"))
-				{
-					if (color != null)
+						if (color != null)
+						{
+							bb.setSideColor(Side.FRONT, color);
+						}
+						bb.setSideInset(Side.FRONT, inset);
+						bb.setTextureForSize(pos, Side.FRONT);
+					} else if (sideName.equals("back"))
 					{
-						bb.setSideColor(Side.RIGHT, color);
+						if (color != null)
+						{
+							bb.setSideColor(Side.BACK, color);
+						}
+						bb.setSideInset(Side.BACK, inset);
+						bb.setTextureForSize(pos, Side.BACK);
+					} else if (sideName.equals("left"))
+					{
+						if (color != null)
+						{
+							bb.setSideColor(Side.LEFT, color);
+						}
+						bb.setSideInset(Side.LEFT, inset);
+						bb.setTextureForSize(pos, Side.LEFT);
+					} else if (sideName.equals("right"))
+					{
+						if (color != null)
+						{
+							bb.setSideColor(Side.RIGHT, color);
+						}
+						bb.setSideInset(Side.RIGHT, inset);
+						bb.setTextureForSize(pos, Side.RIGHT);
 					}
-					bb.setSideInset(Side.RIGHT, inset);
-					bb.setTextureForSize(pos, Side.RIGHT);
 				}
 			}
-		}
-		/* Load the brush into the brushstorage */
-		BlockBrushStorage.loadBrush(name, bb);
+			/* Load the brush into the brushstorage */
+			BlockBrushStorage.loadBrush(name, bb);
 
+		}
+		
 		/* Custom settings */
 		BlockType blockType = new BlockType(id, name);
 		BlockManager bm = BlockManager.getInstance();
@@ -195,7 +199,7 @@ public class BlockXMLLoader
 				{
 					continue;
 				}
-				
+
 				Object value = null;
 
 				if (settingsType == boolean.class)
@@ -210,6 +214,9 @@ public class BlockXMLLoader
 				} else if (settingsType == String.class)
 				{
 					value = valueStr;
+				} else if (settingsType == byte.class)
+				{
+					value = Byte.parseByte(valueStr);
 				}
 
 				bm.setBlockTypeSetting(blockType, settingName, value);

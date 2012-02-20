@@ -31,6 +31,7 @@ public final class BlockType extends InventoryItem
 	private int mineResultCount;
 	private String customClass;
 	private boolean hasSpecialAction;
+	private byte luminosity;
 
 	public enum BlockClass
 	{
@@ -212,6 +213,11 @@ public final class BlockType extends InventoryItem
 	public boolean hasSpecialAction()
 	{
 		return hasSpecialAction;
+	}
+
+	public byte getLuminosity()
+	{
+		return luminosity;
 	}
 
 }

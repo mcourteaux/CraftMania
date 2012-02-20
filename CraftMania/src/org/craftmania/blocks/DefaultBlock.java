@@ -125,7 +125,7 @@ public class DefaultBlock extends Block
 	}
 
 	@Override
-	public void render()
+	public void render(byte[][][] lightBuffer)
 	{
 		_renderManually = true;
 		_rendering = true;

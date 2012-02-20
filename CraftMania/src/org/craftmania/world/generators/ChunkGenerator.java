@@ -2,6 +2,7 @@ package org.craftmania.world.generators;
 
 import java.util.Random;
 
+import org.craftmania.blocks.BlockConstructor;
 import org.craftmania.blocks.BlockManager;
 import org.craftmania.math.MathHelper;
 import org.craftmania.utilities.SmartRandom;
@@ -123,7 +124,7 @@ public class ChunkGenerator extends Generator
 					float zDiff = z - treeDef.z;
 
 					float distSq = xDiff * xDiff + zDiff * zDiff;
-					if (distSq < 17)
+					if (distSq < 60)
 					{
 						continue trees;
 					}
@@ -144,7 +145,7 @@ public class ChunkGenerator extends Generator
 					}
 					if (biome == Biome.FOREST)
 					{
-						gen.generateBroadLeavedTree(chunk, x, y, z, random.randomInt(5) == 0);
+						gen.generateNiceBroadLeavedTree(chunk, x, y, z); //, random.randomInt(5) == 0);
 						type = 0;
 					} else if (biome == Biome.DESERT)
 					{
@@ -163,6 +164,40 @@ public class ChunkGenerator extends Generator
 					{
 						_worldProvider.getTrees().add(new TreeDefinition(x, y, z, type));
 					}
+				}
+			}
+		}
+		
+		/* Generate flora */
+		{
+			int grassCount = random.randomInt(5, 10);
+			
+			for (int i = 0; i < grassCount; ++i)
+			{
+				int x = chunk.getAbsoluteX() + random.randomInt(0, Chunk.CHUNK_SIZE_HORIZONTAL);
+				int z = chunk.getAbsoluteZ() + random.randomInt(0, Chunk.CHUNK_SIZE_HORIZONTAL);
+				int y = _worldProvider.getHeightAt(x, z);
+
+				Biome biome = _worldProvider.getBiomeAt(x, y, z);
+				if (biome == Biome.FIELDS || biome == Biome.FOREST)
+				{
+					chunk.setSpecialBlockAbsolute(x, y + 1, z, BlockConstructor.construct(x, y + 1, z, chunk, _blockManager.blockID("tallgrass"), (byte) random.randomInt(6)), false, false, false);
+				}
+			}
+		}
+		{
+			int flowerCount = random.randomInt(5, 10);
+			
+			for (int i = 0; i < flowerCount; ++i)
+			{
+				int x = chunk.getAbsoluteX() + random.randomInt(0, Chunk.CHUNK_SIZE_HORIZONTAL);
+				int z = chunk.getAbsoluteZ() + random.randomInt(0, Chunk.CHUNK_SIZE_HORIZONTAL);
+				int y = _worldProvider.getHeightAt(x, z);
+
+				Biome biome = _worldProvider.getBiomeAt(x, y, z);
+				if (biome == Biome.FIELDS || biome == Biome.FOREST)
+				{
+					chunk.setSpecialBlockAbsolute(x, y + 1, z, BlockConstructor.construct(x, y + 1, z, chunk, _blockManager.blockID("redflower"), (byte) random.randomInt(6)), false, false, false);
 				}
 			}
 		}

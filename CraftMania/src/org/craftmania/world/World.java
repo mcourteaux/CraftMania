@@ -26,6 +26,7 @@ import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3f;
 import org.craftmania.rendering.GLFont;
 import org.craftmania.rendering.GLUtils;
+import org.craftmania.rendering.ChunkMeshBuilder.MeshType;
 import org.craftmania.utilities.FastArrayList;
 import org.craftmania.utilities.IntList;
 import org.craftmania.utilities.MultiTimer;
@@ -117,7 +118,7 @@ public class World
 
 		/* Set the fog color based on time */
 		_fogColor.set(Game.getInstance().getConfiguration().getFogColor());
-		_fogColor.scale(_sunlight - 0.1f);
+		_fogColor.scale(_sunlight - 0.05f);
 		GL11.glFog(GL11.GL_FOG_COLOR, GLUtils.wrapDirect(_fogColor.x(), _fogColor.y(), _fogColor.z(), 1.0f));
 		GL11.glClearColor(_fogColor.x(), _fogColor.y(), _fogColor.z(), 1.0f);
 
@@ -135,7 +136,16 @@ public class World
 		for (Chunk ch : _visibleChunks)
 		{
 			timer.start(i);
-			ch.render();
+			ch.render(MeshType.SOLID);
+			timer.stop(i);
+			i++;
+		}
+		i = 0;
+		for (Chunk ch : _visibleChunks)
+		{
+			timer.start(i);
+			ch.render(MeshType.TRANSCULENT);
+			ch.renderManualBlocks();
 			timer.stop(i);
 			i++;
 		}
@@ -171,7 +181,7 @@ public class World
 		infoFont.print(4, 30, _player.coordinatesToString());
 		infoFont.print(4, 45, "Visible Chunks:      " + _visibleChunks.size());
 		infoFont.print(4, 60, "Updading Blocks:     " + _updatingBlocks);
-		infoFont.print(4, 75, "Total Chunks in RAM: " + _chunkManager.getTotalBlockChunkCount());
+		infoFont.print(4, 75, "Total Chunks in RAM: " + _chunkManager.getTotalChunkCount());
 		infoFont.print(4, 90, "Local Chunks:        " + _localChunks.size());
 		infoFont.print(4, 105, "Total Local Blocks:  " + _localBlockCount);
 		infoFont.print(4, 120, "Time:  " + _time);

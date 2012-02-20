@@ -65,9 +65,9 @@ public class ChunkManager
 		int xInChunk = x - superX * AbstractChunk.CHUNK_SIZE_X;
 		int zInChunk = z - superZ * AbstractChunk.CHUNK_SIZE_X;
 
-		AbstractChunk<Chunk> superChunk = getSuperChunk(superX, superZ);
-		// synchronized (superChunk)
+		synchronized (_superChunks)
 		{
+			AbstractChunk<Chunk> superChunk = getSuperChunk(superX, superZ);
 
 			Chunk blockChunk = superChunk.get(xInChunk, zInChunk);
 			if (blockChunk == null && createIfNecessary)
@@ -129,7 +129,6 @@ public class ChunkManager
 		int index = ChunkData.positionToIndex(x - c.getAbsoluteX(), y, z - c.getAbsoluteZ());
 		return c.getChunkData().getSpecialBlock(index);
 	}
-	
 
 	public void removeBlock(int x, int y, int z)
 	{
@@ -153,8 +152,6 @@ public class ChunkManager
 
 		chunks.clear();
 
-
-		
 		for (int x = -distance; x <= distance; ++x)
 		{
 			for (int z = -distance; z <= distance; ++z)
@@ -176,9 +173,8 @@ public class ChunkManager
 
 	public Chunk getChunkContaining(int x, int y, int z, boolean createIfNecessary, boolean loadIfNeccessary, boolean generateIfNecessary)
 	{
-		return getChunk(MathHelper.floorDivision(x, Chunk.CHUNK_SIZE_HORIZONTAL),
-							 MathHelper.floorDivision(z, Chunk.CHUNK_SIZE_HORIZONTAL),
-							 createIfNecessary,	loadIfNeccessary, generateIfNecessary);
+		return getChunk(MathHelper.floorDivision(x, Chunk.CHUNK_SIZE_HORIZONTAL), MathHelper.floorDivision(z, Chunk.CHUNK_SIZE_HORIZONTAL), createIfNecessary, loadIfNeccessary,
+				generateIfNecessary);
 	}
 
 	/**
@@ -251,12 +247,15 @@ public class ChunkManager
 		}
 	}
 
-	public int getTotalBlockChunkCount()
+	public int getTotalChunkCount()
 	{
 		int count = 0;
-		for (AbstractChunk<Chunk> ch : getAllSuperChunks())
+		synchronized (_superChunks)
 		{
-			count += ch.objectCount();
+			for (AbstractChunk<Chunk> ch : getAllSuperChunks())
+			{
+				count += ch.objectCount();
+			}
 		}
 		return count;
 	}
@@ -319,6 +318,5 @@ public class ChunkManager
 			chunk.generate();
 		}
 	}
-
 
 }

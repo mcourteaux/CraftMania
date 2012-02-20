@@ -91,7 +91,7 @@ public class Camera
 		
 		this.lookDirection.set(MathHelper.cos(rotY), MathHelper.tan(rotX), -MathHelper.sin(rotY));
 		this.right.cross(lookDirection, up);
-		this.right.scale(bobbing);
+		this.right.scale(bobbing * 0.6f);
 		
 		this.bobbing = bobbing;
 	}

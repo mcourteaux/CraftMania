@@ -26,11 +26,11 @@ public abstract class Block implements AABBObject
 	protected boolean _renderManually;
 	protected int _specialBlockPoolIndex;
 
-	public Block(BlockType type, Chunk blockChunk, Vec3i pos)
+	public Block(BlockType type, Chunk chunk, Vec3i pos)
 	{
 		_postion = pos;
 		_blockType = type;
-		_chunk = blockChunk;
+		_chunk = chunk;
 		_health = type.getResistance();
 	}
 	
@@ -168,7 +168,7 @@ public abstract class Block implements AABBObject
 	}
 
 	public abstract void update();
-	public abstract void render();
+	public abstract void render(byte[][][] lightBuffer);
 	public abstract void forceVisiblilityCheck();
 	public abstract boolean isVisible();
 	public abstract AABB getAABB();

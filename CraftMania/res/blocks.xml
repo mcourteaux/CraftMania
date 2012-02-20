@@ -66,18 +66,20 @@
     
     <block id="7" name="leafs0">
         <brush>
-            <allsides color="#809930">5,3</allsides>
+            <allsides color="#809930">4,3</allsides>
         </brush>
         <resistance>1</resistance>
         <mineResult>null</mineResult>
+        <transculent>true</transculent>
     </block>
     
     <block id="8" name="leafs1">
         <brush>
-            <allsides color="#B4B450">5,3</allsides>
+            <allsides color="#B4B450">4,3</allsides>
         </brush>
         <resistance>1</resistance>
         <mineResult>null</mineResult>
+        <transculent>true</transculent>
     </block>
     
     <block id="9" name="crafting_table">
@@ -147,6 +149,8 @@
         </brush>
         <solid>false</solid>
         <normalAABB>false</normalAABB>
+        <transculent>true</transculent>
+        <luminosity>15</luminosity>
     </block>
     
     <block id="16" name="bedrock">
@@ -178,5 +182,17 @@
     	</brush>
     	<resistance>9</resistance>
     	<blockClass>STONE</blockClass>
+    </block>
+    <block id="20" name="tallgrass">
+    	<customClass>org.craftmania.blocks.customblocks.TallGrass</customClass>
+    	<solid>false</solid>
+    	<transculent>true</transculent>
+    	<mineResult>null</mineResult>
+    </block>
+    <block id="21" name="redflower">
+    	<customClass>org.craftmania.blocks.customblocks.RedFlower</customClass>
+    	<solid>false</solid>
+    	<transculent>true</transculent>
+    	<mineResult>null</mineResult>
     </block>
 </root>
