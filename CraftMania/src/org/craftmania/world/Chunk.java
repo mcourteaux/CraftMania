@@ -36,6 +36,7 @@ import org.craftmania.rendering.ChunkMeshRenderer;
 import org.craftmania.utilities.FastArrayList;
 import org.craftmania.utilities.IntList;
 import org.craftmania.world.generators.ChunkGenerator;
+import org.lwjgl.input.Keyboard;
 
 public class Chunk implements AABBObject
 {
@@ -54,7 +55,6 @@ public class Chunk implements AABBObject
 	private boolean _generated;
 	private boolean _destroying;
 	private boolean _loading;
-	private long _creationTime;
 	private boolean _lightPointsDirty;
 	private World _world;
 
@@ -73,7 +73,7 @@ public class Chunk implements AABBObject
 
 	public static enum LightType
 	{
-		SUN, BLOCK
+		SUN, BLOCK, RAW
 	}
 
 	public Chunk(int x, int z)
@@ -96,11 +96,6 @@ public class Chunk implements AABBObject
 		_loaded = false;
 		_loading = false;
 		_world = Game.getInstance().getWorld();
-
-		// System.out.println("BlockChunk constructed at: " + x + " " + z +
-		// "  \t (AABB = " + _aabb.toString() + ")");
-		_creationTime = System.currentTimeMillis();
-
 	}
 
 	public static AABB createAABBForBlockChunkAt(int x, int z, AABB output)
@@ -118,6 +113,10 @@ public class Chunk implements AABBObject
 
 	public void needsNewVBO()
 	{
+		if (Keyboard.isKeyDown(Keyboard.KEY_T))
+		{
+			Thread.dumpStack();
+		}
 		_newVboNeeded = true;
 	}
 
@@ -145,7 +144,7 @@ public class Chunk implements AABBObject
 		ChunkMeshBuilder.generateChunkMeshes(this);
 		if (_mesh.getVBO(MeshType.SOLID) <= 0)
 		{
-			_newVboNeeded = true;
+			_newVboNeeded = false;
 		} else
 		{
 			_newVboNeeded = false;
@@ -180,7 +179,8 @@ public class Chunk implements AABBObject
 			int index = _visibleBlocks.get(i);
 
 			BlockType type = _blockManager.getBlockType(_chunkData.getBlockType(index));
-			if (type == null) continue;
+			if (type == null)
+				continue;
 			if (type.getLuminosity() > 0)
 			{
 				ChunkData.indexToPosition(index, v);
@@ -771,15 +771,16 @@ public class Chunk implements AABBObject
 
 	public void fillLightBuffer(byte[][][] lightBuffer, int x, int y, int z)
 	{
-		byte blockLight, sunlight;
+		byte rawlight, blockLight, sunlight;
 		for (int xx = -1; xx <= 1; ++xx)
 		{
 			for (int yy = -1; yy <= 1; ++yy)
 			{
 				for (int zz = -1; zz <= 1; ++zz)
 				{
-					blockLight = getLightAbsolute(xx + x, yy + y, zz + z, LightType.BLOCK);
-					sunlight = getLightAbsolute(xx + x, yy + y, zz + z, LightType.SUN);
+					rawlight = getLightAbsolute(xx + x, yy + y, zz + z, LightType.RAW);
+					blockLight = (byte) (rawlight & 0xF);
+					sunlight = (byte) (rawlight >>> 4);
 
 					sunlight *= getWorld().getSunlight() * 2.0f;
 
@@ -807,8 +808,7 @@ public class Chunk implements AABBObject
 			if (type == null)
 				continue;
 
-			if ((meshType == MeshType.SOLID && !type.isTransculent() && type.hasNormalAABB())
-					|| (meshType == MeshType.TRANSCULENT && (type.isTransculent() || !type.hasNormalAABB())))
+			if ((meshType == MeshType.SOLID && !type.isTransculent() && type.hasNormalAABB()) || (meshType == MeshType.TRANSCULENT && (type.isTransculent() || !type.hasNormalAABB())))
 			{
 				if (!special)
 				{

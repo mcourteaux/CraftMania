@@ -35,6 +35,7 @@ import org.craftmania.datastructures.ViewFrustum;
 import org.craftmania.game.Configuration;
 import org.craftmania.game.FontStorage;
 import org.craftmania.game.Game;
+import org.craftmania.game.KeyboardSettings;
 import org.craftmania.game.TextureStorage;
 import org.craftmania.inventory.Inventory;
 import org.craftmania.math.MathHelper;
@@ -264,7 +265,10 @@ public class World
 
 			for (Chunk c : _localChunks)
 			{
-				_chunksThatNeedsNewVBO.add(c);
+				if (!_chunksThatNeedsNewVBO.contains(c))
+				{
+					_chunksThatNeedsNewVBO.add(c);
+				}
 			}
 		}
 
@@ -272,7 +276,7 @@ public class World
 
 		while (Keyboard.next())
 		{
-			if (Keyboard.getEventKey() == Keyboard.KEY_E && Keyboard.getEventKeyState())
+			if (Keyboard.getEventKey() == KeyboardSettings.INVENTORY && Keyboard.getEventKeyState())
 			{
 				if (_activatedInventory != null)
 				{
@@ -298,26 +302,12 @@ public class World
 					}
 				}
 				System.out.println();
-			} else if (Keyboard.getEventKey() == Keyboard.KEY_O && Keyboard.getEventKeyState())
+			} else if (Keyboard.getEventKey() == KeyboardSettings.TOGGLE_OVERLAY && Keyboard.getEventKeyState())
 			{
 				Game.RENDER_OVERLAY = !Game.RENDER_OVERLAY;
-			} else if (Keyboard.getEventKey() == Keyboard.KEY_A && Keyboard.getEventKeyState())
+			} else if (Keyboard.getEventKey() == KeyboardSettings.TOGGLE_LIGHT_POINT && Keyboard.getEventKeyState())
 			{
-				_player.spreadLight();
-			} else if (Keyboard.getEventKey() == Keyboard.KEY_X && Keyboard.getEventKeyState())
-			{
-				_player.unspreadLight();
-			} else if (Keyboard.getEventKey() == Keyboard.KEY_W && Keyboard.getEventKeyState())
-			{
-				Vec3f pos = _player.getPosition();
-				Chunk chunk = getChunkManager().getChunkContaining(MathHelper.floor(pos.x()), MathHelper.floor(pos.y()), MathHelper.floor(pos.z()), false, false, false);
-				for (int x = 0; x < Chunk.CHUNK_SIZE_HORIZONTAL; ++x)
-				{
-					for (int z = 0; z < Chunk.CHUNK_SIZE_HORIZONTAL; ++z)
-					{
-						chunk.spreadSunlight(chunk.getAbsoluteX() + x, chunk.getAbsoluteZ() + z);
-					}
-				}
+				_player.toggleLight();
 			}
 		}
 		if (_activatedInventory == null)
@@ -339,13 +329,13 @@ public class World
 		{
 			_chunksThatNeedsNewVBO.remove(0).needsNewVBO();
 		}
-		
+
 		if (_checkForNewChunks)
 		{
 			checkForNewVisibleChunks();
 			selectLocalChunks();
 		}
-		
+
 		updateLocalChunks();
 
 		_chunkManager.performRememberedBlockChanges();

@@ -66,6 +66,7 @@ public class ChunkMesh
 			}
 //			System.out.println("Delete VBO: " + _vbo);
 			_vbos[meshType.ordinal()] = 0;
+			_vertexCount[meshType.ordinal()] = 0;
 		}
 	}
 

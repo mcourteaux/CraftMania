@@ -77,7 +77,10 @@ public class ChunkData
 
 	public byte getLight(int index, LightType type)
 	{
-		if (type == LightType.SUN)
+		if (type == LightType.RAW)
+		{
+			return _light[index];
+		} else if (type == LightType.SUN)
 		{
 			return getSunlight(index);
 		}
@@ -86,7 +89,10 @@ public class ChunkData
 
 	public void setLight(int index, byte light, LightType type)
 	{
-		if (type == LightType.SUN)
+		if (type == LightType.RAW)
+		{
+			_light[index] = light;
+		} else if (type == LightType.SUN)
 		{
 			setSunlight(index, light);
 		} else

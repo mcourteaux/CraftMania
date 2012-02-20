@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import org.craftmania.game.KeyboardSettings.KeyboardPreset;
 import org.craftmania.math.Vec3f;
 
 /**
@@ -48,6 +49,7 @@ public class Configuration
 	private boolean _updateVisibleOnly;
 	private String _texturePack;
 	private Vec3f _fogColor;
+	private KeyboardSettings.KeyboardPreset _keyboard;
 
 	public Configuration()
 	{
@@ -175,6 +177,10 @@ public class Configuration
 			} else if (p.equals("fovy"))
 			{
 				_fovy = Integer.parseInt(v);
+			} else if (p.equals("keyboard"))
+			{
+				_keyboard = KeyboardPreset.valueOf(v.toUpperCase());
+				KeyboardSettings.initialize(_keyboard);
 			}
 
 		}

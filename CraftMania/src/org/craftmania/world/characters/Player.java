@@ -37,6 +37,7 @@ import org.craftmania.blocks.BlockManager;
 import org.craftmania.blocks.BlockType;
 import org.craftmania.datastructures.AABB;
 import org.craftmania.game.Game;
+import org.craftmania.game.KeyboardSettings;
 import org.craftmania.inventory.DefaultPlayerInventory;
 import org.craftmania.inventory.Inventory.InventoryPlace;
 import org.craftmania.inventory.InventoryItem;
@@ -69,7 +70,7 @@ public class Player extends GameObject
 	/** Rotation of the players head, in radians */
 	private float rotX, rotY; // Radians
 	private float bobbing, bobbingProcess;
-	
+
 	/* Movement variables */
 	private float speedForward = 0.0f;
 	private float speedSide = 0.0f;
@@ -81,7 +82,7 @@ public class Player extends GameObject
 	private boolean onGround = false;
 	private boolean _flying = false;
 	private int _rotationSegment = 0;
-	
+
 	/* Body */
 	private CharacterBody _body;
 	/* Editing */
@@ -295,8 +296,7 @@ public class Player extends GameObject
 						{
 							for (int i = 0; i < mineResultCount; ++i)
 							{
-								boolean added = _inventory.addToInventory(ItemManager.getInstance().getInventoryItem(
-										(short) (mineResult == -1 ? getAimedBlockType().getInventoryTypeID() : mineResult)));
+								boolean added = _inventory.addToInventory(ItemManager.getInstance().getInventoryItem((short) (mineResult == -1 ? getAimedBlockType().getInventoryTypeID() : mineResult)));
 
 								if (added)
 								{
@@ -338,10 +338,10 @@ public class Player extends GameObject
 		float zStep = 0.0f;
 		// Forward movement
 		{
-			if (Keyboard.isKeyDown(Keyboard.KEY_Z))
+			if (Keyboard.isKeyDown(KeyboardSettings.MOVE_FORWARD))
 			{
 				speedForward = Math.min(maxSpeed * (_flying ? 3.0f : 1.0f), speedForward + acceleration * step);
-			} else if (Keyboard.isKeyDown(Keyboard.KEY_S))
+			} else if (Keyboard.isKeyDown(KeyboardSettings.MOVE_BACK))
 			{
 				speedForward = Math.max(-maxSpeed * (_flying ? 3.0f : 1.0f), speedForward - acceleration * step);
 			} else
@@ -375,10 +375,10 @@ public class Player extends GameObject
 		}
 		// Side movement
 		{
-			if (Keyboard.isKeyDown(Keyboard.KEY_Q))
+			if (Keyboard.isKeyDown(KeyboardSettings.MOVE_LEFT))
 			{
 				speedSide = Math.max(-maxSpeed * (_flying ? 3.0f : 1.0f), speedSide - acceleration * step);
-			} else if (Keyboard.isKeyDown(Keyboard.KEY_D))
+			} else if (Keyboard.isKeyDown(KeyboardSettings.MOVE_RIGHT))
 			{
 				speedSide = Math.min(maxSpeed * (_flying ? 3.0f : 1.0f), speedSide + acceleration * step);
 			} else
@@ -447,10 +447,10 @@ public class Player extends GameObject
 			speedForward *= -0.2f;
 			speedSide *= -0.2f;
 		}
-		
+
 		float speed = MathHelper.sqrt(speedForward * speedForward + speedSide * speedSide);
 		speed /= maxSpeed;
-		
+
 		bobbingProcess += step * 10.0f;
 		bobbingProcess = MathHelper.simplifyRadians(bobbingProcess);
 
@@ -468,8 +468,7 @@ public class Player extends GameObject
 
 		/* If it changes from chunk, recheck visible chunks */
 		if (MathHelper.floorDivision(MathHelper.floor(x + xStep), Chunk.CHUNK_SIZE_HORIZONTAL) != MathHelper.floorDivision(MathHelper.floor(x), Chunk.CHUNK_SIZE_HORIZONTAL)
-				|| MathHelper.floorDivision(MathHelper.floor(z + zStep), Chunk.CHUNK_SIZE_HORIZONTAL) != MathHelper.floorDivision(MathHelper.floor(z), Chunk.CHUNK_SIZE_HORIZONTAL)
-				|| _rotationSegment != rotSeg)
+				|| MathHelper.floorDivision(MathHelper.floor(z + zStep), Chunk.CHUNK_SIZE_HORIZONTAL) != MathHelper.floorDivision(MathHelper.floor(z), Chunk.CHUNK_SIZE_HORIZONTAL) || _rotationSegment != rotSeg)
 		{
 			Game.getInstance().getWorld().selectLocalChunks();
 			Game.getInstance().getWorld().checkForNewVisibleChunks();
@@ -488,7 +487,7 @@ public class Player extends GameObject
 		byte subSupport = chunkManager.getBlock(MathHelper.floor(x), MathHelper.floor(y) - 2, MathHelper.floor(z), false, false, false);
 		float supportHeight = Float.NEGATIVE_INFINITY;
 
-		if (Keyboard.isKeyDown(Keyboard.KEY_SPACE))
+		if (Keyboard.isKeyDown(KeyboardSettings.JUMP))
 		{
 			if (onGround)
 			{
@@ -498,7 +497,7 @@ public class Player extends GameObject
 			{
 				ySpeed += 14f * step;
 			}
-		} else if (_flying && Keyboard.isKeyDown(Keyboard.KEY_LSHIFT))
+		} else if (_flying && Keyboard.isKeyDown(KeyboardSettings.CROUCH))
 		{
 			ySpeed -= 14f * step;
 		}
@@ -611,8 +610,7 @@ public class Player extends GameObject
 						_intersectionTestingAABB.getDimensions().set(_blockManager.getBlockType(bl).getDimensions());
 						_intersectionTestingAABB.recalcVertices();
 						/* Perform the raycast */
-						List<RayBlockIntersection.Intersection> intersections = RayBlockIntersection
-								.executeIntersection(x, y, z, _intersectionTestingAABB, rayOrigin, rayDirection);
+						List<RayBlockIntersection.Intersection> intersections = RayBlockIntersection.executeIntersection(x, y, z, _intersectionTestingAABB, rayOrigin, rayDirection);
 						if (!intersections.isEmpty())
 						{
 							if (closestIntersection == null || intersections.get(0).getDistance() < closestIntersection.getDistance())
@@ -717,12 +715,8 @@ public class Player extends GameObject
 		if (_aimedBlockType != 0)
 		{
 			System.out.println("Spread Light! (" + _aimedAdjacentBlockPosition.x() + ", " + _aimedAdjacentBlockPosition.y() + ", " + _aimedAdjacentBlockPosition.z() + ")");
-			Chunk chunk = Game.getInstance().getWorld().getChunkManager()
-					.getChunkContaining(_aimedAdjacentBlockPosition.x(), _aimedAdjacentBlockPosition.y(), _aimedAdjacentBlockPosition.z(), false, false, false);
+			Chunk chunk = Game.getInstance().getWorld().getChunkManager().getChunkContaining(_aimedAdjacentBlockPosition.x(), _aimedAdjacentBlockPosition.y(), _aimedAdjacentBlockPosition.z(), false, false, false);
 			chunk.spreadLight(_aimedAdjacentBlockPosition.x(), _aimedAdjacentBlockPosition.y(), _aimedAdjacentBlockPosition.z(), (byte) 15, LightType.BLOCK);
-			// chunk.spreadSunlight(MathHelper.floor(getPosition().x()),
-			// MathHelper.floor(getPosition().z()));
-
 		}
 	}
 
@@ -731,12 +725,24 @@ public class Player extends GameObject
 		if (_aimedBlockType != 0)
 		{
 			System.out.println("Spread Light! (" + _aimedAdjacentBlockPosition.x() + ", " + _aimedAdjacentBlockPosition.y() + ", " + _aimedAdjacentBlockPosition.z() + ")");
-			Chunk chunk = Game.getInstance().getWorld().getChunkManager()
-					.getChunkContaining(_aimedAdjacentBlockPosition.x(), _aimedAdjacentBlockPosition.y(), _aimedAdjacentBlockPosition.z(), false, false, false);
+			Chunk chunk = Game.getInstance().getWorld().getChunkManager().getChunkContaining(_aimedAdjacentBlockPosition.x(), _aimedAdjacentBlockPosition.y(), _aimedAdjacentBlockPosition.z(), false, false, false);
 			chunk.unspreadLight(_aimedAdjacentBlockPosition.x(), _aimedAdjacentBlockPosition.y(), _aimedAdjacentBlockPosition.z(), (byte) 15, LightType.BLOCK);
-			// chunk.spreadSunlight(MathHelper.floor(getPosition().x()),
-			// MathHelper.floor(getPosition().z()));
+		}
+	}
 
+	public void toggleLight()
+	{
+		if (_aimedBlockType != 0)
+		{
+			Chunk chunk = Game.getInstance().getWorld().getChunkManager().getChunkContaining(_aimedAdjacentBlockPosition.x(), _aimedAdjacentBlockPosition.y(), _aimedAdjacentBlockPosition.z(), false, false, false);
+			byte light = chunk.getLightAbsolute(_aimedAdjacentBlockPosition.x(), _aimedAdjacentBlockPosition.y(), _aimedAdjacentBlockPosition.z(), LightType.BLOCK);
+			if (light == 15)
+			{
+				unspreadLight();
+			} else
+			{
+				spreadLight();
+			}
 		}
 	}
 }

@@ -72,7 +72,7 @@ public class Sky extends GameObject
 		_cloudsZ = MathHelper.simplify(_cloudsZ, _cloudsTexHeight * _cloudsScale);
 		
 		_color.set(COLOR);
-		_color.scale(Game.getInstance().getWorld().getSunlight());
+		_color.scale(Game.getInstance().getWorld().getSunlight() - 0.15f);
 	}
 
 	@Override

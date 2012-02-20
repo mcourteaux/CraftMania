@@ -15,6 +15,8 @@ Setup
 -----
 
 You will need Oracle's [Java Virtual Machine (JVM)](http://www.java.com/de/download/). You should be sure that your Graphics Card (GPU) driver is up to date.
+It is recommended to take a look at "conf/conf.txt" and set the values you think are the best for your machine.
+
 
 Run the Game
 ------------
@@ -24,15 +26,14 @@ You can simply double click the CraftMania.jar file when you installed Oracle's 
 Controls
 --------
 
- * [Z,Q,S,D]		Walking. This is for Azerty keyboards. I'll make an option for Querty soon!
- * [Space] 			Jump.
- * [Left click]		Place the block in your hand.
- * [Right click]	Destroy the block on which you are aiming.
- * [F]				Toggle God-mode.
- * [E]				Open your inventory.
- * [O]				Toggle overlay rendering.
- * [A]				Place a lightpoint (you should use torches, in fact :D)
- * [X]				Remove the lightpoint.
+ * [Z,Q,S,D] or [Q,W,A,S]	Walking. Choose your Keyboard layout in "conf/conf.txt"
+ * [Space] 					Jump.
+ * [Left click]				Place the block in your hand.
+ * [Right click]			Destroy the block on which you are aiming.
+ * [F]						Toggle God-mode.
+ * [E]						Open your inventory.
+ * [O]						Toggle overlay rendering.
+ * [L]						Place or remove a lightpoint (you should use torches, in fact :D)
 
 
 Credits
