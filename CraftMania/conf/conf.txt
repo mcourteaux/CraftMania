@@ -5,13 +5,11 @@ width=900
 height=500
 fovy=65
 fps=30
-viewing_distance=200
+viewing_distance=50
 vsync=false
 
 ### Texture Pack
 texture_pack=GoodMorningCraftv3.2
-#texture_pack=CUBISM1.00
-#texture_pack=QuantumCraft [3.1]
 
-# Keyboard
+### Keyboard
 keyboard=azerty

@@ -780,7 +780,7 @@ public class Chunk implements AABBObject
 				{
 					rawlight = getLightAbsolute(xx + x, yy + y, zz + z, LightType.RAW);
 					blockLight = (byte) (rawlight & 0xF);
-					sunlight = (byte) (rawlight >>> 4);
+					sunlight = (byte) ((rawlight & 0xF0) >>> 4);
 
 					sunlight *= getWorld().getSunlight() * 2.0f;
 
