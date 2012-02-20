@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright 2012 Martijn Courteaux <martijn.courteaux@skynet.be>
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ ******************************************************************************/
 package org.craftmania.world.generators;
 
 import java.util.Random;
@@ -145,7 +160,10 @@ public class ChunkGenerator extends Generator
 					}
 					if (biome == Biome.FOREST)
 					{
-						gen.generateNiceBroadLeavedTree(chunk, x, y, z); //, random.randomInt(5) == 0);
+						gen.generateNiceBroadLeavedTree(chunk, x, y, z); // ,
+																			// random.randomInt(5)
+																			// ==
+																			// 0);
 						type = 0;
 					} else if (biome == Biome.DESERT)
 					{
@@ -167,11 +185,11 @@ public class ChunkGenerator extends Generator
 				}
 			}
 		}
-		
+
 		/* Generate flora */
 		{
 			int grassCount = random.randomInt(5, 10);
-			
+
 			for (int i = 0; i < grassCount; ++i)
 			{
 				int x = chunk.getAbsoluteX() + random.randomInt(0, Chunk.CHUNK_SIZE_HORIZONTAL);
@@ -187,7 +205,7 @@ public class ChunkGenerator extends Generator
 		}
 		{
 			int flowerCount = random.randomInt(5, 10);
-			
+
 			for (int i = 0; i < flowerCount; ++i)
 			{
 				int x = chunk.getAbsoluteX() + random.randomInt(0, Chunk.CHUNK_SIZE_HORIZONTAL);
@@ -197,7 +215,13 @@ public class ChunkGenerator extends Generator
 				Biome biome = _worldProvider.getBiomeAt(x, y, z);
 				if (biome == Biome.FIELDS || biome == Biome.FOREST)
 				{
-					chunk.setSpecialBlockAbsolute(x, y + 1, z, BlockConstructor.construct(x, y + 1, z, chunk, _blockManager.blockID("redflower"), (byte) random.randomInt(6)), false, false, false);
+					if (random.randomBoolean())
+					{
+						chunk.setSpecialBlockAbsolute(x, y + 1, z, BlockConstructor.construct(x, y + 1, z, chunk, _blockManager.blockID("redflower"), (byte) random.randomInt(6)), false, false, false);
+					} else
+					{
+						chunk.setSpecialBlockAbsolute(x, y + 1, z, BlockConstructor.construct(x, y + 1, z, chunk, _blockManager.blockID("yellowflower"), (byte) random.randomInt(6)), false, false, false);
+					}
 				}
 			}
 		}
@@ -223,13 +247,11 @@ public class ChunkGenerator extends Generator
 						int offsetX = (x / SAMPLE_RATE_HORIZONTAL_DENSITY) * SAMPLE_RATE_HORIZONTAL_DENSITY;
 						int offsetY = (y / SAMPLE_RATE_VERTICAL_DENSITY) * SAMPLE_RATE_VERTICAL_DENSITY;
 						int offsetZ = (z / SAMPLE_RATE_HORIZONTAL_DENSITY) * SAMPLE_RATE_HORIZONTAL_DENSITY;
-						densityMap[x][y][z] = (float) MathHelper.triLerp(x, y, z, densityMap[offsetX][offsetY][offsetZ],
-								densityMap[offsetX][SAMPLE_RATE_VERTICAL_DENSITY + offsetY][offsetZ], densityMap[offsetX][offsetY][offsetZ + SAMPLE_RATE_HORIZONTAL_DENSITY],
-								densityMap[offsetX][offsetY + SAMPLE_RATE_VERTICAL_DENSITY][offsetZ + SAMPLE_RATE_HORIZONTAL_DENSITY], densityMap[SAMPLE_RATE_HORIZONTAL_DENSITY
-										+ offsetX][offsetY][offsetZ], densityMap[SAMPLE_RATE_HORIZONTAL_DENSITY + offsetX][offsetY + SAMPLE_RATE_VERTICAL_DENSITY][offsetZ],
-								densityMap[SAMPLE_RATE_HORIZONTAL_DENSITY + offsetX][offsetY][offsetZ + SAMPLE_RATE_HORIZONTAL_DENSITY], densityMap[SAMPLE_RATE_HORIZONTAL_DENSITY
-										+ offsetX][offsetY + SAMPLE_RATE_VERTICAL_DENSITY][offsetZ + SAMPLE_RATE_HORIZONTAL_DENSITY], offsetX, SAMPLE_RATE_HORIZONTAL_DENSITY
-										+ offsetX, offsetY, SAMPLE_RATE_VERTICAL_DENSITY + offsetY, offsetZ, offsetZ + SAMPLE_RATE_HORIZONTAL_DENSITY);
+						densityMap[x][y][z] = (float) MathHelper.triLerp(x, y, z, densityMap[offsetX][offsetY][offsetZ], densityMap[offsetX][SAMPLE_RATE_VERTICAL_DENSITY + offsetY][offsetZ], densityMap[offsetX][offsetY][offsetZ + SAMPLE_RATE_HORIZONTAL_DENSITY],
+								densityMap[offsetX][offsetY + SAMPLE_RATE_VERTICAL_DENSITY][offsetZ + SAMPLE_RATE_HORIZONTAL_DENSITY], densityMap[SAMPLE_RATE_HORIZONTAL_DENSITY + offsetX][offsetY][offsetZ], densityMap[SAMPLE_RATE_HORIZONTAL_DENSITY + offsetX][offsetY
+										+ SAMPLE_RATE_VERTICAL_DENSITY][offsetZ], densityMap[SAMPLE_RATE_HORIZONTAL_DENSITY + offsetX][offsetY][offsetZ + SAMPLE_RATE_HORIZONTAL_DENSITY],
+								densityMap[SAMPLE_RATE_HORIZONTAL_DENSITY + offsetX][offsetY + SAMPLE_RATE_VERTICAL_DENSITY][offsetZ + SAMPLE_RATE_HORIZONTAL_DENSITY], offsetX, SAMPLE_RATE_HORIZONTAL_DENSITY + offsetX, offsetY, SAMPLE_RATE_VERTICAL_DENSITY + offsetY, offsetZ,
+								offsetZ + SAMPLE_RATE_HORIZONTAL_DENSITY);
 					}
 				}
 			}

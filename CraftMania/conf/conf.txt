@@ -5,7 +5,7 @@ width=900
 height=500
 fovy=65
 fps=30
-viewing_distance=90
+viewing_distance=50
 vsync=false
 
 ### Texture Pack

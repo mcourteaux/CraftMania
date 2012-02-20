@@ -28,24 +28,20 @@ import org.craftmania.world.Chunk;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
 
-public class TallGrass extends Block
+public class YellowFlower extends Block
 {
 
-	private static int CALL_LIST_BASE;
-	private static int LENGHT_COUNT = 6;
-	private int _length;
+	private static int CALL_LIST;
 
-	public TallGrass(Chunk chunk, Vec3i pos, int length)
+	public YellowFlower(Chunk chunk, Vec3i pos)
 	{
-		super(BlockManager.getInstance().getBlockType("tallgrass"), chunk, pos);
-		_length = length;
+		super(BlockManager.getInstance().getBlockType("yellowflower"), chunk, pos);
 		addToManualRenderList();
 	}
 
 	@Override
 	public void update()
 	{
-
 	}
 
 	@Override
@@ -63,53 +59,44 @@ public class TallGrass extends Block
 		GL11.glPushMatrix();
 		GL11.glTranslatef(getX() + 0.5f, getY() + 0.5f, getZ() + 0.5f);
 		GL11.glColor3f(light, light, light);
-		
-		if (CALL_LIST_BASE == 0)
+
+		if (CALL_LIST == 0)
 		{
-			CALL_LIST_BASE = GL11.glGenLists(LENGHT_COUNT);
+			CALL_LIST = GL11.glGenLists(1);
 
-			for (int i = 0; i < LENGHT_COUNT; ++i)
-			{
-				GL11.glNewList(CALL_LIST_BASE + i, i == _length ? GL11.GL_COMPILE_AND_EXECUTE : GL11.GL_COMPILE);
-				GL11.glBegin(GL11.GL_QUADS);
+			GL11.glNewList(CALL_LIST, GL11.GL_COMPILE_AND_EXECUTE);
+			GL11.glBegin(GL11.GL_QUADS);
 
-				GL11.glTexCoord2f((9f + i) * 16 / terrain.getImageWidth(), 11f * 16 / terrain.getImageHeight());
-				GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
-				GL11.glTexCoord2f((10f + i) * 16 / terrain.getImageWidth(), 11f * 16 / terrain.getImageHeight());
-				GL11.glVertex3f(0.5f, 0.5f, 0.5f);
-				GL11.glTexCoord2f((10f + i) * 16 / terrain.getImageWidth(), 12f * 16 / terrain.getImageHeight());
-				GL11.glVertex3f(0.5f, -0.5f, 0.5f);
-				GL11.glTexCoord2f((9f + i) * 16 / terrain.getImageWidth(), 12f * 16 / terrain.getImageHeight());
-				GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
+			GL11.glTexCoord2f(13f * 16 / terrain.getImageWidth(), 0f * 16 / terrain.getImageHeight());
+			GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
+			GL11.glTexCoord2f(14f * 16 / terrain.getImageWidth(), 0f * 16 / terrain.getImageHeight());
+			GL11.glVertex3f(0.5f, 0.5f, 0.5f);
+			GL11.glTexCoord2f(14f * 16 / terrain.getImageWidth(), 1f * 16 / terrain.getImageHeight());
+			GL11.glVertex3f(0.5f, -0.5f, 0.5f);
+			GL11.glTexCoord2f(13f * 16 / terrain.getImageWidth(), 1f * 16 / terrain.getImageHeight());
+			GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
 
-				GL11.glTexCoord2f((9f + i) * 16 / terrain.getImageWidth(), 11f * 16 / terrain.getImageHeight());
-				GL11.glVertex3f(0.5f, 0.5f, -0.5f);
-				GL11.glTexCoord2f((10f + i) * 16 / terrain.getImageWidth(), 11f * 16 / terrain.getImageHeight());
-				GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
-				GL11.glTexCoord2f((10f + i) * 16 / terrain.getImageWidth(), 12f * 16 / terrain.getImageHeight());
-				GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
-				GL11.glTexCoord2f((9f + i) * 16 / terrain.getImageWidth(), 12f * 16 / terrain.getImageHeight());
-				GL11.glVertex3f(0.5f, -0.5f, -0.5f);
+			GL11.glTexCoord2f(13f * 16 / terrain.getImageWidth(), 0f * 16 / terrain.getImageHeight());
+			GL11.glVertex3f(0.5f, 0.5f, -0.5f);
+			GL11.glTexCoord2f(14f * 16 / terrain.getImageWidth(), 0f * 16 / terrain.getImageHeight());
+			GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
+			GL11.glTexCoord2f(14f * 16 / terrain.getImageWidth(), 1f * 16 / terrain.getImageHeight());
+			GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
+			GL11.glTexCoord2f(13f * 16 / terrain.getImageWidth(), 1f * 16 / terrain.getImageHeight());
+			GL11.glVertex3f(0.5f, -0.5f, -0.5f);
+			GL11.glEnd();
+			GL11.glEndList();
 
-				GL11.glEnd();
-				GL11.glEndList();
-			}
 		} else
 		{
-			GL11.glCallList(CALL_LIST_BASE + _length);
+			GL11.glCallList(CALL_LIST);
 		}
 		GL11.glPopMatrix();
 		// GL11.glDepthFunc(GL11.GL_LEQUAL);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_BLEND);
-
 	}
 
-	@Override
-	public void forceVisiblilityCheck()
-	{
-
-	}
 
 	@Override
 	public boolean isVisible()
@@ -144,11 +131,15 @@ public class TallGrass extends Block
 			}
 		}
 	}
+	
+	@Override
+	public void forceVisiblilityCheck()
+	{
+	}
 
 	@Override
 	public void checkVisibility()
 	{
-
 	}
 
 }
