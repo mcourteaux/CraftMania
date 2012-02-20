@@ -133,11 +133,6 @@ public class YellowFlower extends Block
 	}
 	
 	@Override
-	public void forceVisiblilityCheck()
-	{
-	}
-
-	@Override
 	public void checkVisibility()
 	{
 	}

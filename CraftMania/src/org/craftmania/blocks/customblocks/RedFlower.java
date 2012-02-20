@@ -131,11 +131,6 @@ public class RedFlower extends Block
 			}
 		}
 	}
-	
-	@Override
-	public void forceVisiblilityCheck()
-	{
-	}
 
 	@Override
 	public void checkVisibility()

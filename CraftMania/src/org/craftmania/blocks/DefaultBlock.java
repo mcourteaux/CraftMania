@@ -274,17 +274,7 @@ public class DefaultBlock extends Block
 			addToUpdateList();
 		}
 	}
-
-	@Override
-	public synchronized void forceVisiblilityCheck()
-	{
-		_needVisibilityCheck = true;
-		if (!_rendering)
-		{
-			checkVisibility();
-		}
-	}
-
+	
 	@Override
 	public boolean isMoving()
 	{

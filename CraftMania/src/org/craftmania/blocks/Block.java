@@ -174,7 +174,6 @@ public abstract class Block implements AABBObject
 
 	public abstract void update();
 	public abstract void render(byte[][][] lightBuffer);
-	public abstract void forceVisiblilityCheck();
 	public abstract boolean isVisible();
 	public abstract AABB getAABB();
 	public abstract void smash(InventoryItem item);

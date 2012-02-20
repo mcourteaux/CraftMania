@@ -106,12 +106,6 @@ public class TallGrass extends Block
 	}
 
 	@Override
-	public void forceVisiblilityCheck()
-	{
-
-	}
-
-	@Override
 	public boolean isVisible()
 	{
 		return true;
