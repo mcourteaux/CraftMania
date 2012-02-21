@@ -72,7 +72,7 @@ public class Camera
 		return viewFrustum;
 	}
 
-	public void lookThrough()
+	public void lookThrough(float viewingDistance)
 	{
 		// Change to projection matrix.
 		glMatrixMode(GL_PROJECTION);
@@ -80,7 +80,7 @@ public class Camera
 
 		// Perspective.
 		float widthHeightRatio = (float) Display.getWidth() / (float) Display.getHeight();
-		GLU.gluPerspective(fovy, widthHeightRatio, 0.1f, Game.getInstance().getConfiguration().getViewingDistance());
+		GLU.gluPerspective(fovy, widthHeightRatio, 0.1f, viewingDistance);
 
 		// Change back to model view matrix.
 		glMatrixMode(GL_MODELVIEW);

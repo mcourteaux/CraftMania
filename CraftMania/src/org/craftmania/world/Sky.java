@@ -49,8 +49,8 @@ public class Sky extends GameObject
 	public Sky()
 	{
 		_color = new Vec3f(COLOR);
-		_height = 160.0f;
-		_radius = Game.getInstance().getConfiguration().getViewingDistance() + 20.0f;
+		_height = 128.0f;
+		_radius = Game.getInstance().getConfiguration().getViewingDistance() * 4.0f;
 		_bend = 15.0f;
 		_vertices = 32;
 		_clouds = TextureStorage.getTexture("environment.clouds");
@@ -70,7 +70,7 @@ public class Sky extends GameObject
 
 		_cloudsX = MathHelper.simplify(_cloudsX, _cloudsTexWidth * _cloudsScale);
 		_cloudsZ = MathHelper.simplify(_cloudsZ, _cloudsTexHeight * _cloudsScale);
-		
+
 		_color.set(COLOR);
 		_color.scale(Game.getInstance().getWorld().getSunlight() - 0.15f);
 	}
@@ -85,15 +85,15 @@ public class Sky extends GameObject
 
 		/* Sphere */
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		drawShpere(playerPos.x(), _height, playerPos.z());
+		drawShpere(playerPos.x(), Math.max(_cloudsHeight + _bend + 10.0f, playerPos.y() + _height), playerPos.z());
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 
 		/* Clouds */
 		GL11.glEnable(GL11.GL_BLEND);
 		_clouds.bind();
 
-		int playerCloudGridX = MathHelper.floorDivision(MathHelper.floor(playerPos.x()), MathHelper.floor(_cloudsTexWidth * _cloudsScale));
-		int playerCloudGridZ = MathHelper.floorDivision(MathHelper.floor(playerPos.z()), MathHelper.floor(_cloudsHeight * _cloudsScale));
+		int playerCloudGridX = MathHelper.round(playerPos.x() / (_cloudsTexWidth * _cloudsScale));
+		int playerCloudGridZ = MathHelper.round(playerPos.z() / (_cloudsHeight * _cloudsScale));
 
 		GL11.glColor4f(1.0f, 1.0f, 1.0f, _cloudsAlpha);
 

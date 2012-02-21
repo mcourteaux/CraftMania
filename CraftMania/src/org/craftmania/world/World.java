@@ -15,15 +15,7 @@
  ******************************************************************************/
 package org.craftmania.world;
 
-import static org.lwjgl.opengl.GL11.GL_LINES;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glColor3f;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glLineWidth;
-import static org.lwjgl.opengl.GL11.glVertex3f;
+import static org.lwjgl.opengl.GL11.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,12 +32,11 @@ import org.craftmania.game.TextureStorage;
 import org.craftmania.inventory.Inventory;
 import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3f;
+import org.craftmania.rendering.ChunkMeshBuilder.MeshType;
 import org.craftmania.rendering.GLFont;
 import org.craftmania.rendering.GLUtils;
-import org.craftmania.rendering.ChunkMeshBuilder.MeshType;
 import org.craftmania.utilities.FastArrayList;
 import org.craftmania.utilities.IntList;
-import org.craftmania.utilities.MultiTimer;
 import org.craftmania.world.characters.Player;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -129,17 +120,24 @@ public class World
 	{
 		/* Prepare Matrixes */
 		Game.getInstance().initSceneRendering();
+		Configuration configuration = Game.getInstance().getConfiguration();
 
-		/* Look through the camera */
-		_player.getFirstPersonCamera().lookThrough();
+		/* Look through the camera with high viewing distance to render the sky */
+		_player.getFirstPersonCamera().lookThrough(512.0f);
 
 		/* Set the fog color based on time */
 		_fogColor.set(Game.getInstance().getConfiguration().getFogColor());
 		_fogColor.scale(_sunlight - 0.05f);
 		GL11.glFog(GL11.GL_FOG_COLOR, GLUtils.wrapDirect(_fogColor.x(), _fogColor.y(), _fogColor.z(), 1.0f));
 		GL11.glClearColor(_fogColor.x(), _fogColor.y(), _fogColor.z(), 1.0f);
+		glFogf(GL_FOG_START, 200);
+		glFogf(GL_FOG_END, 400);
 
 		_sky.render();
+		
+		/* Restore the fog distance */
+		glFogf(GL_FOG_START, configuration.getViewingDistance() * 0.55f);
+		glFogf(GL_FOG_END, configuration.getViewingDistance());
 
 		/* Select the visible blocks */
 		selectVisibleChunks(_player.getFirstPersonCamera().getViewFrustum());
@@ -152,7 +150,6 @@ public class World
 		{
 			_visibleChunks.get(i).render(MeshType.SOLID);
 		}
-//		for (int i = _visibleChunks.size() - 1; i >= 0; --i)
 		for (int i = 0; i < _visibleChunks.size(); ++i)
 		{
 			_visibleChunks.get(i).render(MeshType.TRANSLUCENT);
@@ -161,8 +158,7 @@ public class World
 
 		_player.render();
 
-		if (Game.RENDER_OVERLAY)
-			renderOverlay();
+		renderOverlay();
 	}
 
 	private void renderOverlay()
@@ -172,19 +168,23 @@ public class World
 		Game.getInstance().initOverlayRendering();
 
 		glColor3f(1, 1, 1);
-		GLFont infoFont = FontStorage.getFont("Monospaced_20");
 
-		/* Down Left Info */
-		infoFont.print(4, 4, "CraftMania");
-		infoFont.print(4, 30, _player.coordinatesToString());
-		infoFont.print(4, 45, "Visible Chunks:      " + _visibleChunks.size());
-		infoFont.print(4, 60, "Updading Blocks:     " + _updatingBlocks);
-		infoFont.print(4, 75, "Total Chunks in RAM: " + _chunkManager.getTotalChunkCount());
-		infoFont.print(4, 90, "Local Chunks:        " + _localChunks.size());
-		infoFont.print(4, 105, "Total Local Blocks:  " + _localBlockCount);
-		infoFont.print(4, 120, "Time:  " + _time);
-		infoFont.print(4, 135, "Sunlight:  " + _sunlight);
+		if (Game.RENDER_INFORMATION_OVERLAY)
+		{
+			GLFont infoFont = FontStorage.getFont("Monospaced_20");
 
+			/* Down Left Info */
+			infoFont.print(4, 4, "CraftMania");
+			infoFont.print(4, 30, _player.coordinatesToString());
+			infoFont.print(4, 45, "Visible Chunks:      " + _visibleChunks.size());
+			infoFont.print(4, 60, "Updading Blocks:     " + _updatingBlocks);
+			infoFont.print(4, 75, "Total Chunks in RAM: " + _chunkManager.getTotalChunkCount());
+			infoFont.print(4, 90, "Local Chunks:        " + _localChunks.size());
+			infoFont.print(4, 105, "Total Local Blocks:  " + _localBlockCount);
+			infoFont.print(4, 120, "Time:  " + _time);
+			infoFont.print(4, 135, "Sunlight:  " + _sunlight);
+			
+		}
 		/** RENDER **/
 		if (_activatedInventory != null)
 		{
@@ -286,7 +286,7 @@ public class World
 				System.out.println();
 			} else if (Keyboard.getEventKey() == KeyboardSettings.TOGGLE_OVERLAY && Keyboard.getEventKeyState())
 			{
-				Game.RENDER_OVERLAY = !Game.RENDER_OVERLAY;
+				Game.RENDER_INFORMATION_OVERLAY = !Game.RENDER_INFORMATION_OVERLAY;
 			} else if (Keyboard.getEventKey() == KeyboardSettings.TOGGLE_LIGHT_POINT && Keyboard.getEventKeyState())
 			{
 				_player.toggleLight();

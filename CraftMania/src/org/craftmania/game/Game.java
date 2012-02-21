@@ -89,7 +89,7 @@ public class Game
 	private int[] _fpsDataBuffer;
 	private float _averageFPS;
 
-	public static boolean RENDER_OVERLAY = true;
+	public static boolean RENDER_INFORMATION_OVERLAY = true;
 
 	public static Game getInstance()
 	{
@@ -265,7 +265,7 @@ public class Game
 			_world.render();
 		}
 
-		if (RENDER_OVERLAY)
+		if (RENDER_INFORMATION_OVERLAY)
 			renderOnScreenInfo();
 	}
 

@@ -362,6 +362,9 @@ public final class DefaultBlockBrush extends BlockBrush
 
 	}
 
+	/**
+	 * This display lists draws the whole cube at once. This isn't used anywhere. I guess I will delete this code soon.
+	 */
 	public void generateDisplayList()
 	{
 		displayList = glGenLists(1);

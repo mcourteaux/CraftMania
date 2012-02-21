@@ -160,17 +160,7 @@ public class ChunkGenerator extends Generator
 					}
 					if (biome == Biome.FOREST)
 					{
-						gen.generateNiceBroadLeavedTree(chunk, x, y, z); // ,
-																			// random.randomInt(5)
-																			// ==
-																			// 0);
-																			// gen.generateBroadLeavedTree(chunk,
-																			// x,
-																			// y,
-																			// z,
-																			// random.randomInt(4)
-																			// ==
-																			// 0);
+						gen.generateNiceBroadLeavedTree(chunk, x, y, z);
 						type = 0;
 					} else if (biome == Biome.DESERT)
 					{
@@ -248,7 +238,7 @@ public class ChunkGenerator extends Generator
 	}
 
 	/**
-	 * Based on the code of Benjamin Glatzel in his project Terasology
+	 * Based on the code of Benjamin Glatzel in his project Terasology.
 	 * 
 	 * @author Benjamin Glatzel
 	 * @author martijncourteaux

@@ -493,7 +493,13 @@ public class Player extends GameObject
 
 		rotY = MathHelper.simplifyRadians(rotY);
 		rotX = MathHelper.clamp(rotX, -MathHelper.f_PI / 2.001f, MathHelper.f_PI / 2.001f);
-		bobbing = MathHelper.sin(bobbingProcess) * 0.03f * speed;
+		if (_flying)
+		{
+			bobbing *= 0.8f;
+		} else
+		{
+			bobbing = MathHelper.sin(bobbingProcess) * 0.03f * speed;
+		}
 	}
 
 	private void physics()

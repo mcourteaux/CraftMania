@@ -8,7 +8,8 @@ Before I made my source public, I asked on [StackExchange](http://gamedev.stacke
 The answer was yes, as long as I don't use the name Minecraft and do not use any assets created by Mojang. So right now, all the source code 
 is available at my [GitHub repository](https://github.com/mcourteaux/CraftMania)! You can also visit the [blog](http://2dbrothers.comuf.com/wordpress)!
 
-I started the game in Java from scratch. I'm using OpenGL through [LWJGL](http://lwjgl.org/).
+I started the game in Java from scratch using some code snippets by Benjamin Glatzel for the advanced mathematical techniques he used in his
+game called [Terasology](http://blog.movingblocks.net/blockmania/). I'm using OpenGL through [LWJGL](http://lwjgl.org/).
 
 
 Setup
@@ -16,6 +17,7 @@ Setup
 
 You will need Oracle's [Java Virtual Machine (JVM)](http://www.java.com/de/download/). You should be sure that your Graphics Card (GPU) driver is up to date.
 It is recommended to take a look at "conf/conf.txt" and set the values you think are the best for your machine.
+
 
 Run the Game
 ------------
@@ -38,11 +40,11 @@ Controls
 Credits
 =======
 
- * Martijn Courteaux
+ * Martijn Courteaux: The core of the game.
+ * Banjamin Glatzel: Some code snippets.
 
 Texture Pack
 ------------
 
 I'm using the awesome <strong><a href="http://www.carrotcakestudios.co.uk/gmcraft/">Good Morning Craft!</a></strong> texture pack by Louis Durrant.
 Of course, this is a texture pack developed for Minecraft by Mojang. So, you might try his texture pack for Minecraft. Make sure you take a look at it!
-

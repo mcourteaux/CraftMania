@@ -8,7 +8,8 @@ Before I made my source public, I asked on [StackExchange](http://gamedev.stacke
 The answer was yes, as long as I don't use the name Minecraft and do not use any assets created by Mojang. So right now, all the source code 
 is available at my [GitHub repository](https://github.com/mcourteaux/CraftMania)! You can also visit the [blog](http://2dbrothers.comuf.com/wordpress)!
 
-I started the game in Java from scratch. I'm using OpenGL through [LWJGL](http://lwjgl.org/).
+I started the game in Java from scratch using some code snippets by Benjamin Glatzel for the advanced mathematical techniques he used in his
+game called [Terasology](http://blog.movingblocks.net/blockmania/). I'm using OpenGL through [LWJGL](http://lwjgl.org/).
 
 
 Setup
@@ -39,7 +40,8 @@ Controls
 Credits
 =======
 
- * Martijn Courteaux
+ * Martijn Courteaux: The core of the game.
+ * Banjamin Glatzel: Some code snippets.
 
 Texture Pack
 ------------
