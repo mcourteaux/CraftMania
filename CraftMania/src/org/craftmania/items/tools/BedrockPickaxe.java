@@ -13,37 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package org.craftmania.world;
+package org.craftmania.items.tools;
 
-import java.util.List;
+import org.craftmania.blocks.BlockManager;
+import org.craftmania.items.Tool;
+import org.craftmania.math.Vec2i;
 
-import org.craftmania.math.Vec3f;
-
-
-public abstract class WorldProvider
+public class BedrockPickaxe extends Tool
 {
-	public abstract int getHeightAt(int x, int z);
-	public abstract float getTemperatureAt(int x, int y, int z);
-	public abstract float getHumidityAt(int x, int y, int z);
-	public abstract Biome getBiomeAt(int x, int y, int z);
-	public abstract Vec3f getSpawnPoint();
-	public abstract List<TreeDefinition> getTrees();
-	
-	public abstract void save() throws Exception;
-	public abstract void load() throws Exception;
-	
-	public static class TreeDefinition
+	public BedrockPickaxe()
 	{
-		public TreeDefinition(int x, int y, int z, int type)
-		{
-			this.x = x;
-			this.y = y;
-			this.z = z;
-			this.type = type;
-		}
-		
-		public int x, y, z;
-		public int type;
+		super("bedrock_pickaxe", null, Material.DIAMOND, new Vec2i(12, 6), 6.0f);
 	}
 	
+	@Override
+	public float calcDamageFactorToBlock(byte block)
+	{
+		if (block == BlockManager.getInstance().blockID("bedrock"))
+		{
+			return 100000.0f;
+		}
+		return 1.2f;
+	}
 }

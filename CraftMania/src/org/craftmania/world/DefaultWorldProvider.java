@@ -31,6 +31,7 @@ import org.craftmania.blocks.BlockManager;
 import org.craftmania.game.Game;
 import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3f;
+import org.craftmania.utilities.IOUtilities;
 import org.craftmania.utilities.SmartRandom;
 
 public class DefaultWorldProvider extends WorldProvider
@@ -51,7 +52,6 @@ public class DefaultWorldProvider extends WorldProvider
 	private List<DataPoint2D> _humidities;
 	private List<DataPoint2D> _temperatures;
 	private List<TreeDefinition> _trees;
-	private Vec3f _initialSpawnPoint;
 	private Vec3f _spawnPoint;
 
 	public DefaultWorldProvider(World world)
@@ -482,16 +482,6 @@ public class DefaultWorldProvider extends WorldProvider
 		return new Vec3f(_spawnPoint);
 	}
 
-	@Override
-	public Vec3f getInitialSpawnPoint()
-	{
-		if (_spawnPoint == null)
-		{
-			generateSpawnPoint();
-		}
-		return _initialSpawnPoint;
-	}
-
 	private void generateSpawnPoint()
 	{
 		SmartRandom random = new SmartRandom(new Random());
@@ -526,7 +516,6 @@ public class DefaultWorldProvider extends WorldProvider
 				}
 			}
 		}
-		_initialSpawnPoint = new Vec3f(_spawnPoint);
 	}
 
 	public static class DataPoint2D
@@ -772,9 +761,7 @@ public class DefaultWorldProvider extends WorldProvider
 
 		dos.writeFloat(_world.getTime());
 		
-		_initialSpawnPoint = new Vec3f(_world.getPlayer().getPosition());
-		writeVec3f(dos, _spawnPoint);
-		writeVec3f(dos, _initialSpawnPoint);
+		IOUtilities.writeVec3f(dos, _spawnPoint);
 
 		writeDataPointList(dos, _rawHeights);
 		writeDataPointList(dos, _heights);
@@ -798,12 +785,6 @@ public class DefaultWorldProvider extends WorldProvider
 		dos.close();
 	}
 
-	private void writeVec3f(DataOutputStream dos, Vec3f vec) throws IOException
-	{
-		dos.writeFloat(vec.x());
-		dos.writeFloat(vec.y());
-		dos.writeFloat(vec.z());
-	}
 
 	@Override
 	public void load() throws Exception
@@ -821,9 +802,7 @@ public class DefaultWorldProvider extends WorldProvider
 		_world.setTime(dis.readFloat());
 		
 		_spawnPoint = new Vec3f();
-		_initialSpawnPoint = new Vec3f();
-		readVec3f(dis, _spawnPoint);
-		readVec3f(dis, _initialSpawnPoint);
+		IOUtilities.readVec3f(dis, _spawnPoint);
 
 		readDataPointList(dis, _rawHeights);
 		readDataPointList(dis, _heights);
@@ -847,12 +826,6 @@ public class DefaultWorldProvider extends WorldProvider
 
 	}
 
-	private void readVec3f(DataInputStream dis, Vec3f vec) throws Exception
-	{
-		vec.x(dis.readFloat());
-		vec.y(dis.readFloat());
-		vec.z(dis.readFloat());
-	}
 
 	private void writeDataPointList(DataOutputStream dos, List<DataPoint2D> list) throws IOException
 	{

@@ -101,6 +101,7 @@ public class World
 
 	public void save() throws Exception
 	{
+		_player.save();
 		_worldProvider.save();
 
 		/* Make sure the BlockChunkLoader is free. */

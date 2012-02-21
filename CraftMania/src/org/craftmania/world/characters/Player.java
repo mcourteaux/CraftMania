@@ -15,19 +15,14 @@
  ******************************************************************************/
 package org.craftmania.world.characters;
 
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.*;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 import org.craftmania.GameObject;
@@ -40,6 +35,7 @@ import org.craftmania.game.Game;
 import org.craftmania.game.KeyboardSettings;
 import org.craftmania.inventory.DefaultPlayerInventory;
 import org.craftmania.inventory.Inventory.InventoryPlace;
+import org.craftmania.inventory.InventoryIO;
 import org.craftmania.inventory.InventoryItem;
 import org.craftmania.inventory.SharedInventoryContent;
 import org.craftmania.items.ItemManager;
@@ -48,6 +44,7 @@ import org.craftmania.math.RayBlockIntersection;
 import org.craftmania.math.Vec3f;
 import org.craftmania.math.Vec3i;
 import org.craftmania.rendering.Camera;
+import org.craftmania.utilities.IOUtilities;
 import org.craftmania.world.Chunk;
 import org.craftmania.world.Chunk.LightType;
 import org.craftmania.world.ChunkManager;
@@ -70,6 +67,9 @@ public class Player extends GameObject
 	/** Rotation of the players head, in radians */
 	private float rotX, rotY; // Radians
 	private float bobbing, bobbingProcess;
+
+	/* Spawn Point */
+	private Vec3f _spawnPoint;
 
 	/* Movement variables */
 	private float speedForward = 0.0f;
@@ -106,6 +106,8 @@ public class Player extends GameObject
 	public Player(float x, float y, float z)
 	{
 		_position = new Vec3f(x, y, z);
+		_spawnPoint = new Vec3f(x, y, z);
+
 		_chunkManager = Game.getInstance().getWorld().getChunkManager();
 		_body = new CharacterBody();
 
@@ -150,6 +152,11 @@ public class Player extends GameObject
 		return _position;
 	}
 
+	private Vec3f getSpawnPoint()
+	{
+		return _spawnPoint;
+	}
+
 	@Override
 	public void render()
 	{
@@ -176,14 +183,14 @@ public class Player extends GameObject
 			glDisable(GL_CULL_FACE);
 
 			_body.transformToRightHand();
-			
+
 			/* Prepare the light buffer */
 			Chunk c = Game.getInstance().getWorld().getChunkManager().getChunkContaining((int) _position.x(), (int) _position.y(), (int) _position.z(), false, false, false);
 			c.fillLightBuffer(c.getLightBuffer(), (int) _position.x(), (int) _position.y(), (int) _position.z());
-			
+
 			/* Render the object, with the lightbuffer */
 			_selectedItem.renderHoldableObject(c.getLightBuffer());
-			
+
 			glEnable(GL_CULL_FACE);
 			glPopMatrix();
 		}
@@ -752,4 +759,60 @@ public class Player extends GameObject
 			}
 		}
 	}
+
+	public void save() throws IOException
+	{
+		File file = Game.getInstance().getRelativeFile(Game.FILE_BASE_USER_DATA, "${world}/player.dat");
+
+		DataOutputStream dos = new DataOutputStream(new FileOutputStream(file));
+
+		/* Position */
+		IOUtilities.writeVec3f(dos, getPosition());
+		dos.writeInt(_rotationSegment);
+
+		/* Spawn Point */
+		IOUtilities.writeVec3f(dos, getSpawnPoint());
+
+		/* Inventory */
+		InventoryIO.writeInventory(getInventory(), dos);
+		
+		/* Selected inventory index */
+		dos.writeByte(_selectedInventoryItemIndex);
+
+	}
+
+	public boolean load() throws IOException
+	{
+		File file = Game.getInstance().getRelativeFile(Game.FILE_BASE_USER_DATA, "${world}/player.dat");
+
+		if (!file.exists())
+		{
+			return false;
+		}
+
+		DataInputStream dis = new DataInputStream(new FileInputStream(file));
+
+		/* Position */
+		IOUtilities.readVec3f(dis, getPosition());
+		x = getPosition().x();
+		y = getPosition().y();
+		z = getPosition().z();
+
+		/* Rotation */
+		_rotationSegment = dis.readInt();
+		rotY = _rotationSegment / 10.0f * MathHelper.f_PI;
+
+		/* Spawn Point */
+		IOUtilities.readVec3f(dis, getSpawnPoint());
+
+		/* Inventory */
+		InventoryIO.readInventory(dis, getInventory());
+		
+		/* Selected inventory index */
+		_selectedInventoryItemIndex = dis.readByte();
+		setSelectedInventoryItemIndex(_selectedInventoryItemIndex);
+
+		return true;
+	}
+
 }

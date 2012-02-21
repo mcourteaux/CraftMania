@@ -40,6 +40,11 @@ public abstract class Inventory
     {
         _places = new InventoryPlace[size];
     }
+    
+    public int size()
+    {
+    	return _places.length;
+    }
 
     public final void update()
     {

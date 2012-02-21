@@ -13,37 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package org.craftmania.world;
+package org.craftmania.utilities;
 
-import java.util.List;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 import org.craftmania.math.Vec3f;
 
-
-public abstract class WorldProvider
+public class IOUtilities
 {
-	public abstract int getHeightAt(int x, int z);
-	public abstract float getTemperatureAt(int x, int y, int z);
-	public abstract float getHumidityAt(int x, int y, int z);
-	public abstract Biome getBiomeAt(int x, int y, int z);
-	public abstract Vec3f getSpawnPoint();
-	public abstract List<TreeDefinition> getTrees();
 	
-	public abstract void save() throws Exception;
-	public abstract void load() throws Exception;
 	
-	public static class TreeDefinition
+	public static void writeVec3f(DataOutputStream dos, Vec3f vec) throws IOException
 	{
-		public TreeDefinition(int x, int y, int z, int type)
-		{
-			this.x = x;
-			this.y = y;
-			this.z = z;
-			this.type = type;
-		}
-		
-		public int x, y, z;
-		public int type;
+		dos.writeFloat(vec.x());
+		dos.writeFloat(vec.y());
+		dos.writeFloat(vec.z());
 	}
-	
+
+	public static void readVec3f(DataInputStream dis, Vec3f vec) throws IOException
+	{
+		vec.x(dis.readFloat());
+		vec.y(dis.readFloat());
+		vec.z(dis.readFloat());
+	}
+
 }
