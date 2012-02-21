@@ -816,7 +816,7 @@ public class Chunk implements AABBObject
 
 			special = ChunkData.dataIsSpecial(blockData);
 
-			if ((meshType == MeshType.SOLID && !type.isTranslucent() && type.hasNormalAABB()) || (meshType == MeshType.TRANSCULENT && (type.isTranslucent() || !type.hasNormalAABB())))
+			if ((meshType == MeshType.SOLID && !type.isTranslucent() && type.hasNormalAABB()) || (meshType == MeshType.TRANSLUCENT && (type.isTranslucent() || !type.hasNormalAABB())))
 			{
 				if (!special)
 				{
@@ -824,7 +824,6 @@ public class Chunk implements AABBObject
 					count += 4 * MathHelper.cardinality(faceMask);
 				} else
 				{
-					System.out.println("Block Data = " + Integer.toHexString(blockData));
 					block = _chunkData.getSpecialBlock(blockIndex);
 					if (block.isVisible() && !block.isRenderingManually())
 					{

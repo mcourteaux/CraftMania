@@ -77,39 +77,6 @@ public abstract class Tool extends TexturedItem
         }
         return bt.getResistance() * materialResistance;
     }
-    
-    
-
-    @Override
-    public void renderHoldableObject(byte[][][] lightBuffer)
-    {
-        _texture.bind();
-
-        float hw = 0.1f;
-        float hh = 0.1f;
-
-
-        glColor3f(0.5f, 0.5f, 0.5f);
-        /* Render the texture */
-        for (float i = 0.0f; i < 0.02f; i += 0.002f)
-        {
-            if (i > 0.016f)
-            {
-                glColor3f(1.0f, 1.0f, 1.0f);
-            }
-            glBegin(GL_QUADS);
-            glTexCoord2f(_texPosUpLeft.x(), _texPosUpLeft.y());
-            glVertex3f(-hw, hh, 0.0f + i);
-            glTexCoord2f(_texPosDownRight.x(), _texPosUpLeft.y());
-            glVertex3f(hw, hh, 0.0f + i);
-            glTexCoord2f(_texPosDownRight.x(), _texPosDownRight.y());
-            glVertex3f(hw, -hh, 0.0f + i);
-            glTexCoord2f(_texPosUpLeft.x(), _texPosDownRight.y());
-            glVertex3f(-hw, -hh, 0.0f + i);
-            glEnd();
-        }
-
-    }
 
     public BlockClass getBlockClass()
     {

@@ -50,10 +50,12 @@ public class ChunkMeshRenderer
 			{
 				GL11.glDisable(GL11.GL_BLEND);
 
-			} else if (meshType == MeshType.TRANSCULENT)
+			} else if (meshType == MeshType.TRANSLUCENT)
 			{
 				GL11.glDisable(GL11.GL_CULL_FACE);
 				GL11.glEnable(GL11.GL_BLEND);
+				GL11.glEnable(GL11.GL_ALPHA_TEST);
+				GL11.glAlphaFunc(GL11.GL_GREATER, 0.0f);
 			}
 
 			ChunkMesh mesh = chunk.getMesh();
@@ -83,10 +85,11 @@ public class ChunkMeshRenderer
 			GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
 			GL11.glDisableClientState(GL11.GL_COLOR_ARRAY);
 			GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-			
-			if (meshType == MeshType.TRANSCULENT)
+
+			if (meshType == MeshType.TRANSLUCENT)
 			{
 				GL11.glEnable(GL11.GL_CULL_FACE);
+				GL11.glDisable(GL11.GL_ALPHA_TEST);
 			}
 		}
 	}

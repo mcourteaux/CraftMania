@@ -17,14 +17,9 @@ package org.craftmania.inventory;
 
 
 
-import static org.lwjgl.opengl.GL11.glColor3f;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslatef;
+import static org.lwjgl.opengl.GL11.*;
 
 import org.craftmania.GameObject;
-import org.craftmania.blocks.Block;
 
 /**
  *
@@ -65,14 +60,15 @@ public abstract class InventoryItem extends GameObject
     {
         glPushMatrix();
         float scale = 0.1f / 16.0f;
+        float light = lightBuffer[1][1][1] / 30.001f;
         glScalef(scale, scale, scale);
-        glColor3f(0.5f, 0.5f, 0.5f);
+        glColor3f(0.5f * light, 0.5f * light, 0.5f * light);
         /* Render the texture */
         for (float i = 0.0f; i < 0.02f; i += 0.002f)
         {
             if (i > 0.016f)
             {
-                glColor3f(1.0f, 1.0f, 1.0f);
+                glColor3f(1.0f * light, 1.0f * light, 1.0f * light);
             }
             renderInventoryItem();
             glTranslatef(0, 0, 0.002f);

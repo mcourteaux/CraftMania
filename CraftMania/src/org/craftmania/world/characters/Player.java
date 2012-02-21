@@ -177,9 +177,13 @@ public class Player extends GameObject
 
 			_body.transformToRightHand();
 			
+			/* Prepare the light buffer */
 			Chunk c = Game.getInstance().getWorld().getChunkManager().getChunkContaining((int) _position.x(), (int) _position.y(), (int) _position.z(), false, false, false);
 			c.fillLightBuffer(c.getLightBuffer(), (int) _position.x(), (int) _position.y(), (int) _position.z());
+			
+			/* Render the object, with the lightbuffer */
 			_selectedItem.renderHoldableObject(c.getLightBuffer());
+			
 			glEnable(GL_CULL_FACE);
 			glPopMatrix();
 		}
@@ -637,8 +641,8 @@ public class Player extends GameObject
 				_aimedBlockAABB.getPosition().set(_aimedBlockPosition.x() + 0.5f, _aimedBlockPosition.y() + 0.5f, _aimedBlockPosition.z() + 0.5f);
 				_aimedBlockAABB.getDimensions().set(_blockManager.getBlockType(_aimedBlockType).getDimensions());
 				_aimedBlockAABB.recalcVertices();
-				_aimedAdjacentBlockPosition = closestIntersection.calcAdjacentBlockPos();
 			}
+			_aimedAdjacentBlockPosition = closestIntersection.calcAdjacentBlockPos();
 		} else
 		{
 			_aimedBlockPosition.setY(-1);

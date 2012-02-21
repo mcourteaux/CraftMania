@@ -148,6 +148,7 @@ public final class BlockType extends InventoryItem
 		float scale = 0.1f;
 		glScalef(scale, scale, scale);
 		glRotatef(-40, 0, 0, 1);
+		brush.setPosition(0, 0, 0);
 		brush.render(lightBuffer);
 	}
 

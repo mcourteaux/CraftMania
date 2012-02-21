@@ -147,34 +147,15 @@ public class World
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		TextureStorage.getTexture("terrain").bind();
 
-		MultiTimer timer = new MultiTimer(_visibleChunks.size());
-		int i = 0;
-		for (Chunk ch : _visibleChunks)
+		for (int i = 0; i < _visibleChunks.size(); ++i)
 		{
-			timer.start(i);
-			ch.render(MeshType.SOLID);
-			timer.stop(i);
-			i++;
+			_visibleChunks.get(i).render(MeshType.SOLID);
 		}
-		i = 0;
-		for (Chunk ch : _visibleChunks)
+//		for (int i = _visibleChunks.size() - 1; i >= 0; --i)
+		for (int i = 0; i < _visibleChunks.size(); ++i)
 		{
-			timer.start(i);
-			ch.render(MeshType.TRANSCULENT);
-			ch.renderManualBlocks();
-			timer.stop(i);
-			i++;
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_L))
-		{
-			System.out.println();
-
-			for (int j = 0; j < timer.getTimerCount(); ++j)
-			{
-				System.out.println("RT: " + _visibleChunks.get(j).toString() + ": " + timer.get(j));
-			}
-
-			System.out.println();
+			_visibleChunks.get(i).render(MeshType.TRANSLUCENT);
+			_visibleChunks.get(i).renderManualBlocks();
 		}
 
 		_player.render();

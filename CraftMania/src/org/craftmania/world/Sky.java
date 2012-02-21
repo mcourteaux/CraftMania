@@ -58,7 +58,7 @@ public class Sky extends GameObject
 		_cloudsTexHeight = _clouds.getImageHeight();
 		_cloudsHeight = 128.0f;
 		_cloudsAlpha = 0.8f;
-		_cloudsScale = 1.2f;
+		_cloudsScale = 2.0f;
 	}
 
 	@Override

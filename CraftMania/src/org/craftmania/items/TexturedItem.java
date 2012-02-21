@@ -17,15 +17,8 @@ package org.craftmania.items;
 
 
 
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glTexCoord2f;
-import static org.lwjgl.opengl.GL11.glVertex3f;
+import static org.lwjgl.opengl.GL11.*;
 
-import org.craftmania.blocks.Block;
 import org.craftmania.inventory.InventoryItem;
 import org.craftmania.math.Vec2f;
 import org.craftmania.math.Vec2i;

@@ -38,4 +38,5 @@
     <item name="stone_pickaxe" class="org.craftmania.items.tools.StonePickaxe" />
     <item name="stone_axe" class="org.craftmania.items.tools.StoneAxe" />
 
+	<item name="bedrock_pickaxe" class="org.craftmania.items.tools.BedrockPickaxe" />
 </root>

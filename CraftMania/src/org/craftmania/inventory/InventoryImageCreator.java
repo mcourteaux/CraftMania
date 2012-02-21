@@ -159,6 +159,8 @@ public class InventoryImageCreator
 		boolean hasAlpha = t.hasAlpha();
 		int bytesPerPixel = data.length / (w * h);
 		int imageFormat = 0;
+		System.out.println("Bytes per pixel = " + bytesPerPixel);
+		System.out.println("Has Alpha = " + hasAlpha);
 		if (hasAlpha)
 		{
 			if (bytesPerPixel == 4)
@@ -194,7 +196,7 @@ public class InventoryImageCreator
 				{
 					alpha = data[pixelOffset + 3];
 				}
-				int argb = (alpha << 24) + (red << 16) + (green << 8) + blue;
+				int argb = ((alpha << 24) & 0xFF000000) | ((red << 16) & 0xFF0000) | ((green << 8) & 0xFF00) | (blue & 0xFF);
 				bi.setRGB(x, y, argb);
 			}
 		}

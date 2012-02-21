@@ -73,6 +73,6 @@ public class ChunkMesh
 	public void destroyAllMeshes()
 	{
 		destroy(MeshType.SOLID);
-		destroy(MeshType.TRANSCULENT);
+		destroy(MeshType.TRANSLUCENT);
 	}
 }

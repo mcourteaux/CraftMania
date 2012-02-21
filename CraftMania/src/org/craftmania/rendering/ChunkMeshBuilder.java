@@ -37,7 +37,6 @@ public class ChunkMeshBuilder
 {
 	public static final Vec3f COLOR_WHITE = new Vec3f(1, 1, 1);
 
-
 	public static int STRIDE = 8;
 	public static int POSITION_SIZE = 3;
 	public static int POSITION_OFFSET = 0;
@@ -49,7 +48,7 @@ public class ChunkMeshBuilder
 
 	public static enum MeshType
 	{
-		SOLID, TRANSCULENT
+		SOLID, TRANSLUCENT
 	}
 
 	private static BlockManager _blockManager = BlockManager.getInstance();
@@ -62,6 +61,8 @@ public class ChunkMeshBuilder
 		synchronized (GLUtils.getOpenGLLock())
 		{
 
+			System.out.println("Building " + meshType.name() + " Mesh for " + chunk.toString() + "...");
+			
 			/* Make sure there are no list edits anymore */
 			chunk.performListChanges();
 
@@ -70,7 +71,7 @@ public class ChunkMeshBuilder
 
 			/* Compute vertex count */
 			int vertexCount = chunk.getVertexCount(meshType);
-			System.out.println("Vertex Count = " + vertexCount);
+			System.out.println("\tVertex Count = " + vertexCount);
 			/*
 			 * If there are no faces visible yet (because of generating busy),
 			 * don't create a buffer
@@ -80,7 +81,6 @@ public class ChunkMeshBuilder
 				return;
 			}
 			mesh.setVertexCount(meshType, vertexCount);
-
 
 			/* Create a buffer */
 			int vbo = ARBVertexBufferObject.glGenBuffersARB();
@@ -92,13 +92,13 @@ public class ChunkMeshBuilder
 			/* Allocate size for the buffer */
 			int size = vertexCount * STRIDE * FLOAT_SIZE;
 			ARBVertexBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, size, ARBVertexBufferObject.GL_STATIC_DRAW_ARB);
-			System.out.println("Create VBO: " + vbo + " with size = " + size + " for chunk (" + chunk.getX() + ", " + chunk.getZ() + ") (ERROR: " + GL11.glGetError() + ")");
+			System.out.println("\tCreate VBO: " + vbo + " with size = " + size + " (ERROR: " + GL11.glGetError() + ")");
 
 			/* Get the native buffer to write to */
 			ByteBuffer byteBuffer = ARBVertexBufferObject.glMapBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, ARBVertexBufferObject.GL_WRITE_ONLY_ARB, size, null);
 			if (byteBuffer == null)
 			{
-				System.out.println("Couldn't create a native VBO!: GL Error Code = " + GL11.glGetError());
+				System.out.println("\tCouldn't create a native VBO!: GL Error Code = " + GL11.glGetError());
 
 				ARBVertexBufferObject.glUnmapBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB);
 				ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, 0);
@@ -115,7 +115,7 @@ public class ChunkMeshBuilder
 
 			/* Store all vertices in the buffer */
 			USED_SIZE = 0;
-			
+
 			/* Local temporary variables, used to speed up */
 			IntList blockList = chunk.getVisibleBlocks();
 			int blockIndex = -1;
@@ -126,7 +126,7 @@ public class ChunkMeshBuilder
 			Block block = null;
 			byte[][][] lightBuffer = new byte[3][3][3];
 			byte faceMask = 0;
-			
+
 			/* Iterate over the blocks */
 			for (int i = 0; i < blockList.size(); ++i)
 			{
@@ -137,9 +137,9 @@ public class ChunkMeshBuilder
 				special = chunk.getChunkData().isSpecial(blockIndex);
 				type = _blockManager.getBlockType(blockType);
 
-				if ((meshType == MeshType.SOLID && !type.isTranslucent() && type.hasNormalAABB()) || (meshType == MeshType.TRANSCULENT && (type.isTranslucent() || !type.hasNormalAABB())))
+				if ((meshType == MeshType.SOLID && !type.isTranslucent() && type.hasNormalAABB()) || (meshType == MeshType.TRANSLUCENT && (type.isTranslucent() || !type.hasNormalAABB())))
 				{
-					
+
 					ChunkData.indexToPosition(blockIndex, vec);
 
 					/* Build the light buffer */
@@ -148,7 +148,7 @@ public class ChunkMeshBuilder
 					vec.setZ(vec.z() + chunk.getAbsoluteZ());
 
 					chunk.fillLightBuffer(lightBuffer, vec.x(), vec.y(), vec.z());
-					
+
 					if (special)
 					{
 						block = chunk.getChunkData().getSpecialBlock(blockIndex);
@@ -158,17 +158,23 @@ public class ChunkMeshBuilder
 						}
 					} else
 					{
-						faceMask = chunk.getChunkData().getFaceMask(blockIndex);
-						type.getDefaultBlockBrush().setFaceMask(faceMask);
-						type.getBrush().storeInVBO(vertexBuffer, vec.x() + 0.5f, vec.y() + 0.5f, vec.z() + 0.5f, lightBuffer);
+						if (type.isCrossed())
+						{
+							type.getCrossedBlockBrush().storeInVBO(vertexBuffer, vec.x() + 0.5f, vec.y() + 0.5f, vec.z() + 0.5f, lightBuffer);
+						} else
+						{
+							faceMask = chunk.getChunkData().getFaceMask(blockIndex);
+							type.getDefaultBlockBrush().setFaceMask(faceMask);
+							type.getBrush().storeInVBO(vertexBuffer, vec.x() + 0.5f, vec.y() + 0.5f, vec.z() + 0.5f, lightBuffer);
+						}
 					}
 				}
 			}
-			
+
 			/* Perform a check */
 			if (USED_SIZE != STRIDE * FLOAT_SIZE * mesh.getVertexCount(meshType))
 			{
-				System.out.println("[WARNING!]: Used size = " + USED_SIZE);
+				System.out.println("\t[WARNING!]: Used size = " + USED_SIZE);
 				mesh.setVertexCount(meshType, USED_SIZE / STRIDE / FLOAT_SIZE);
 			}
 
@@ -324,7 +330,7 @@ public class ChunkMeshBuilder
 		vertexBuffer.put(vec.z() * value);
 		USED_SIZE += 3 * FLOAT_SIZE;
 	}
-	
+
 	public static void putColorWithLight3(FloatBuffer vertexBuffer, Vec3f vec, byte light, byte light1, byte light2)
 	{
 		float value;
@@ -380,6 +386,6 @@ public class ChunkMeshBuilder
 	public static void generateChunkMeshes(Chunk chunk)
 	{
 		generateChunkMesh(chunk, MeshType.SOLID);
-		generateChunkMesh(chunk, MeshType.TRANSCULENT);
+		generateChunkMesh(chunk, MeshType.TRANSLUCENT);
 	}
 }

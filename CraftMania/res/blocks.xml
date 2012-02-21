@@ -148,11 +148,7 @@
     </block>
     
     <block id="15" name="torch">
-        <brush alphaBlending="true">
-            <mantle inset="0.4375">0,5</mantle>
-            <top>14,0</top>
-            <bottom>14,0</bottom>
-        </brush>
+        <crossedbrush>0,5</crossedbrush>
         <solid>false</solid>
         <normalAABB>false</normalAABB>
         <translucent>true</translucent>
@@ -206,5 +202,12 @@
     	<customClass>org.craftmania.blocks.customblocks.YellowFlower</customClass>
     	<solid>false</solid>
     	<translucent>true</translucent>
+    </block>
+    <block id="23" name="glass">
+    	<brush alphaBlending="true">
+    		<allsides>1,3</allsides>
+    	</brush>
+    	<translucent>true</translucent>
+    	<resistance>5</resistance>
     </block>
 </root>

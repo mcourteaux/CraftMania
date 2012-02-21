@@ -241,13 +241,7 @@ public final class DefaultBlockBrush extends BlockBrush
 
 		glEnable(GL_TEXTURE_2D);
 
-		glPushMatrix();
-		glTranslatef(x, y, z);
-		TextureStorage.getTexture("terrain").bind();
-		glColor3f(0.3f, 0.3f, 0.3f);
-		glCallList(displayList);
-
-		glPopMatrix();
+		renderFaces((byte) 0x3F, lightBuffer);
 	}
 
 	public void renderFaces(byte faceMask, byte[][][] lightBuffer)
@@ -261,6 +255,8 @@ public final class DefaultBlockBrush extends BlockBrush
 			glDisable(GL_BLEND);
 		}
 
+		float light = lightBuffer[1][1][1] / 30.0001f;
+		
 		glEnable(GL_TEXTURE_2D);
 		TextureStorage.getTexture("terrain").bind();
 		glPushMatrix();
@@ -269,7 +265,7 @@ public final class DefaultBlockBrush extends BlockBrush
 		{
 			if ((faceMask & bit) == bit)
 			{
-				glSetColor(colors[i]);
+				glSetColor(colors[i], light);
 				glCallList(displayListBase + i);
 			}
 		}
@@ -374,7 +370,7 @@ public final class DefaultBlockBrush extends BlockBrush
 		glBegin(GL_QUADS);
 
 		// TOP
-		glSetColor(colors[Side.TOP.ordinal()]);
+		glSetColor(colors[Side.TOP.ordinal()], 1.0f);
 		GL11.glTexCoord2f(calcTextureOffsetFor(Side.TOP).x(), calcTextureOffsetFor(Side.TOP).y());
 		GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
 		GL11.glTexCoord2f(calcTextureOffsetFor(Side.TOP).x() + 0.0624f, calcTextureOffsetFor(Side.TOP).y());
@@ -385,7 +381,7 @@ public final class DefaultBlockBrush extends BlockBrush
 		GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
 
 		// LEFT
-		glSetColor(colors[Side.LEFT.ordinal()]);
+		glSetColor(colors[Side.LEFT.ordinal()], 1.0f);
 		GL11.glTexCoord2f(calcTextureOffsetFor(Side.LEFT).x(), calcTextureOffsetFor(Side.LEFT).y() + 0.0624f);
 		GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
 		GL11.glTexCoord2f(calcTextureOffsetFor(Side.LEFT).x() + 0.0624f, calcTextureOffsetFor(Side.LEFT).y() + 0.0624f);
@@ -396,7 +392,7 @@ public final class DefaultBlockBrush extends BlockBrush
 		GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
 
 		// BACK
-		glSetColor(colors[Side.BACK.ordinal()]);
+		glSetColor(colors[Side.BACK.ordinal()], 1.0f);
 
 		GL11.glTexCoord2f(calcTextureOffsetFor(Side.BACK).x(), calcTextureOffsetFor(Side.BACK).y() + 0.0624f);
 		GL11.glVertex3f(-0.5f, -0.5f, 0.5f);
@@ -408,7 +404,7 @@ public final class DefaultBlockBrush extends BlockBrush
 		GL11.glVertex3f(-0.5f, 0.5f, 0.5f);
 
 		// RIGHT
-		glSetColor(colors[Side.RIGHT.ordinal()]);
+		glSetColor(colors[Side.RIGHT.ordinal()], 1.0f);
 		GL11.glTexCoord2f(calcTextureOffsetFor(Side.RIGHT).x(), calcTextureOffsetFor(Side.RIGHT).y());
 		GL11.glVertex3f(0.5f, 0.5f, -0.5f);
 		GL11.glTexCoord2f(calcTextureOffsetFor(Side.RIGHT).x() + 0.0624f, calcTextureOffsetFor(Side.RIGHT).y());
@@ -419,7 +415,7 @@ public final class DefaultBlockBrush extends BlockBrush
 		GL11.glVertex3f(0.5f, -0.5f, -0.5f);
 
 		// FRONT
-		glSetColor(colors[Side.FRONT.ordinal()]);
+		glSetColor(colors[Side.FRONT.ordinal()], 1.0f);
 		GL11.glTexCoord2f(calcTextureOffsetFor(Side.FRONT).x(), calcTextureOffsetFor(Side.FRONT).y());
 		GL11.glVertex3f(-0.5f, 0.5f, -0.5f);
 		GL11.glTexCoord2f(calcTextureOffsetFor(Side.FRONT).x() + 0.0624f, calcTextureOffsetFor(Side.FRONT).y());
@@ -430,7 +426,7 @@ public final class DefaultBlockBrush extends BlockBrush
 		GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
 
 		// BOTTOM
-		glSetColor(colors[Side.BOTTOM.ordinal()]);
+		glSetColor(colors[Side.BOTTOM.ordinal()], 1.0f);
 		GL11.glTexCoord2f(calcTextureOffsetFor(Side.BOTTOM).x(), calcTextureOffsetFor(Side.BOTTOM).y());
 		GL11.glVertex3f(-0.5f, -0.5f, -0.5f);
 		GL11.glTexCoord2f(calcTextureOffsetFor(Side.BOTTOM).x() + 0.0624f, calcTextureOffsetFor(Side.BOTTOM).y());
@@ -450,9 +446,9 @@ public final class DefaultBlockBrush extends BlockBrush
 		this.colors[side.ordinal()] = color;
 	}
 
-	private void glSetColor(Vec3f c)
+	private void glSetColor(Vec3f c, float light)
 	{
-		glColor3f(c.x(), c.y(), c.z());
+		glColor3f(c.x() * light, c.y() * light, c.z() * light);
 	}
 
 	public void setGlobalColor(Vec3f c)
