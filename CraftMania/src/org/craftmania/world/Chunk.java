@@ -36,7 +36,6 @@ import org.craftmania.rendering.ChunkMeshRenderer;
 import org.craftmania.utilities.FastArrayList;
 import org.craftmania.utilities.IntList;
 import org.craftmania.world.generators.ChunkGenerator;
-import org.lwjgl.input.Keyboard;
 
 public class Chunk implements AABBObject
 {
@@ -567,6 +566,11 @@ public class Chunk implements AABBObject
 		Chunk chunk = getChunkContaining(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
 		if (chunk != null)
 		{
+			if (chunk.getBlockTypeAbsolute(x, y, z, false, false, false) > 0)
+			{
+				chunk.removeBlockAbsolute(x, y, z);
+			}
+			
 			block.setChunk(chunk);
 			block.getPosition().set(x, y, z);
 			chunk._chunkData.setSpecialBlock(ChunkData.positionToIndex(x - chunk.getAbsoluteX(), y, z - chunk.getAbsoluteZ()), block);
@@ -575,6 +579,8 @@ public class Chunk implements AABBObject
 
 			/* Finally notify the neighbors */
 			chunk.notifyNeighborsOf(x, y, z);
+			
+			chunk.needsNewVBO();
 		}
 	}
 
