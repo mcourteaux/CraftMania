@@ -26,11 +26,16 @@ import org.craftmania.items.ItemManager;
 public class InventoryIO
 {
 
-	public static void writeInventory(Inventory inv, DataOutputStream dos) throws IOException
+	public static void writeInventory(Inventory inv, DataOutputStream dos, int offset, int length) throws IOException
 	{
-		dos.writeInt(inv.size());
+		if (offset + length > inv.size())
+		{
+			throw new IndexOutOfBoundsException("Inventory index out of bounds!");
+		}
+		
+		dos.writeInt(length);
 
-		for (int i = 0; i < inv.size(); ++i)
+		for (int i = offset; i < offset + length; ++i)
 		{
 			InventoryPlace place = inv.getInventoryPlace(i);
 			if (place == null)
@@ -55,16 +60,16 @@ public class InventoryIO
 		}
 	}
 
-	public static void readInventory(DataInputStream dis, Inventory inv) throws IOException
+	public static void readInventory(DataInputStream dis, Inventory inv, int offset) throws IOException
 	{
 		int length = dis.readInt();
 
-		if (length != inv.size())
+		if (offset + length > inv.size())
 		{
 			throw new IOException("Inventory size is invalid!");
 		}
 
-		for (int i = 0; i < inv.size(); ++i)
+		for (int i = offset; i < offset + length; ++i)
 		{
 			byte type = dis.readByte();
 			if (type == 0)
@@ -90,5 +95,6 @@ public class InventoryIO
 			}
 		}
 	}
+	
 
 }

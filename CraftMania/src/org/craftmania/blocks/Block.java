@@ -15,6 +15,9 @@
  ******************************************************************************/
 package org.craftmania.blocks;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.nio.FloatBuffer;
 
 import org.craftmania.Side;
@@ -185,6 +188,16 @@ public abstract class Block implements AABBObject
 	public abstract int getVertexCount();
 
 	public void performSpecialAction()
+	{
+		
+	}
+	
+	public void saveSpecialSaveData(DataOutputStream dos) throws IOException
+	{
+		
+	}
+	
+	public void readSpecialSaveData(DataInputStream dis) throws IOException
 	{
 		
 	}

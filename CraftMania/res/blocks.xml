@@ -98,6 +98,7 @@
         <blockClass>WOOD</blockClass>
         <customClass>org.craftmania.blocks.customblocks.CraftingTable</customClass>
         <hasSpecialAction>true</hasSpecialAction>
+        <hasSpecialSaveData>true</hasSpecialSaveData>
     </block>
     
     <block id="10" name="snow">

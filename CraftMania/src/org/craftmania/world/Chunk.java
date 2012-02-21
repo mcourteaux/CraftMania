@@ -899,53 +899,6 @@ public class Chunk implements AABBObject
 		}
 	}
 
-	// public void setSunlight(byte sunlight)
-	// {
-	// if (oldSunlight < sunlight)
-	// {
-	// raiseSunlight((byte) (sunlight - oldSunlight));
-	// } else if (oldSunlight > sunlight)
-	// {
-	// lowerSunlight((byte) (oldSunlight - sunlight));
-	// }
-	// }
-	//
-	// public void lowerSunlight(byte amount)
-	// {
-	// for (int i = 0; i < BLOCK_COUNT; ++i)
-	// {
-	// _chunkData.setSunlight(i, (byte) Math.max(0, _chunkData.getSunlight(i) -
-	// amount));
-	// }
-	// needsNewVBO();
-	// }
-	//
-	// public void raiseSunlight(byte amount)
-	// {
-	// IntList spreadpoints = new IntList();
-	// for (int i = 0; i < BLOCK_COUNT; ++i)
-	// {
-	// byte sunlight = _chunkData.getSunlight(i);
-	// if (sunlight != 0)
-	// {
-	// _chunkData.setSunlight(i, (byte) Math.min(15, sunlight + amount));
-	// if (sunlight == 1)
-	// {
-	// spreadpoints.add(i);
-	// }
-	// }
-	// }
-	// Vec3i v = new Vec3i();
-	// int absX = getAbsoluteX(), absZ = getAbsoluteZ();
-	// for (int i = 0; i < spreadpoints.size(); ++i)
-	// {
-	// ChunkData.indexToPosition(spreadpoints.get(i), v);
-	// spreadLight(absX + v.x(), v.y(), absZ + v.z(), (byte) (1 + amount),
-	// LightType.SUN);
-	// }
-	// needsNewVBO();
-	// }
-
 	public byte getLightAbsolute(int x, int y, int z, LightType type)
 	{
 		if (isInvalidHeight(y))

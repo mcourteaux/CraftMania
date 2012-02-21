@@ -34,6 +34,8 @@ import org.craftmania.math.Vec3i;
 
 public class ChunkLoader
 {
+	
+	private static final BlockManager _blockManager = BlockManager.getInstance();
 
 	private long getUniquePositionID(int x, int z)
 	{
@@ -92,6 +94,11 @@ public class ChunkLoader
 				{
 					Block block = BlockConstructor.construct(chunk.getAbsoluteX() + bx, by, chunk.getAbsoluteZ() + bz, chunk, b, metadata);
 					chunk.setSpecialBlockRelative(bx, by, bz, block, false, false, false);
+					
+					if (block.getBlockType().hasSpecialSaveData())
+					{
+						block.readSpecialSaveData(dis);
+					}
 				}
 			}
 		}
@@ -133,8 +140,14 @@ public class ChunkLoader
 			if (data.isSpecial(i))
 			{
 				Block bl = data.getSpecialBlock(i);
+				BlockType type = _blockManager.getBlockType(b);
 				dos.writeByte(b);
 				dos.writeByte(bl.getMetaData());
+				
+				if (type.hasSpecialSaveData())
+				{
+					bl.saveSpecialSaveData(dos);
+				}
 			} else if (b == 0)
 			{
 				dos.writeShort(0);

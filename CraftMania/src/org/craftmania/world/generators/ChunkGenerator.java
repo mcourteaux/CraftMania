@@ -164,7 +164,13 @@ public class ChunkGenerator extends Generator
 																			// random.randomInt(5)
 																			// ==
 																			// 0);
-//						gen.generateBroadLeavedTree(chunk, x, y, z, random.randomInt(4) == 0);
+																			// gen.generateBroadLeavedTree(chunk,
+																			// x,
+																			// y,
+																			// z,
+																			// random.randomInt(4)
+																			// ==
+																			// 0);
 						type = 0;
 					} else if (biome == Biome.DESERT)
 					{
@@ -200,7 +206,10 @@ public class ChunkGenerator extends Generator
 				Biome biome = _worldProvider.getBiomeAt(x, y, z);
 				if (biome == Biome.FIELDS || biome == Biome.FOREST)
 				{
-					chunk.setSpecialBlockAbsolute(x, y + 1, z, BlockConstructor.construct(x, y + 1, z, chunk, _blockManager.blockID("tallgrass"), (byte) random.randomInt(6)), false, false, false);
+					if (chunk.getBlockTypeAbsolute(x, y + 1, z, false, false, false) == 0)
+					{
+						chunk.setSpecialBlockAbsolute(x, y + 1, z, BlockConstructor.construct(x, y + 1, z, chunk, _blockManager.blockID("tallgrass"), (byte) random.randomInt(6)), false, false, false);
+					}
 				}
 			}
 		}
@@ -216,12 +225,15 @@ public class ChunkGenerator extends Generator
 				Biome biome = _worldProvider.getBiomeAt(x, y, z);
 				if (biome == Biome.FIELDS || biome == Biome.FOREST)
 				{
-					if (random.randomBoolean())
+					if (chunk.getBlockTypeAbsolute(x, y + 1, z, false, false, false) == 0)
 					{
-						chunk.setSpecialBlockAbsolute(x, y + 1, z, BlockConstructor.construct(x, y + 1, z, chunk, _blockManager.blockID("redflower"), (byte) 0), false, false, false);
-					} else
-					{
-						chunk.setSpecialBlockAbsolute(x, y + 1, z, BlockConstructor.construct(x, y + 1, z, chunk, _blockManager.blockID("yellowflower"), (byte) 0), false, false, false);
+						if (random.randomBoolean())
+						{
+							chunk.setSpecialBlockAbsolute(x, y + 1, z, BlockConstructor.construct(x, y + 1, z, chunk, _blockManager.blockID("redflower"), (byte) 0), false, false, false);
+						} else
+						{
+							chunk.setSpecialBlockAbsolute(x, y + 1, z, BlockConstructor.construct(x, y + 1, z, chunk, _blockManager.blockID("yellowflower"), (byte) 0), false, false, false);
+						}
 					}
 				}
 			}
@@ -235,6 +247,12 @@ public class ChunkGenerator extends Generator
 		return chunk;
 	}
 
+	/**
+	 * Based on the code of Benjamin Glatzel in his project Terasology
+	 * 
+	 * @author Benjamin Glatzel
+	 * @author martijncourteaux
+	 */
 	protected void triLerpDensityMap(float[][][] densityMap)
 	{
 		for (int x = 0; x < Chunk.CHUNK_SIZE_HORIZONTAL; x++)

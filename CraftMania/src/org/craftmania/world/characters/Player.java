@@ -186,10 +186,13 @@ public class Player extends GameObject
 
 			/* Prepare the light buffer */
 			Chunk c = Game.getInstance().getWorld().getChunkManager().getChunkContaining((int) _position.x(), (int) _position.y(), (int) _position.z(), false, false, false);
-			c.fillLightBuffer(c.getLightBuffer(), (int) _position.x(), (int) _position.y(), (int) _position.z());
+			if (c != null)
+			{
+				c.fillLightBuffer(c.getLightBuffer(), (int) _position.x(), (int) _position.y(), (int) _position.z());
 
-			/* Render the object, with the lightbuffer */
-			_selectedItem.renderHoldableObject(c.getLightBuffer());
+				/* Render the object, with the lightbuffer */
+				_selectedItem.renderHoldableObject(c.getLightBuffer());
+			}
 
 			glEnable(GL_CULL_FACE);
 			glPopMatrix();
@@ -774,8 +777,8 @@ public class Player extends GameObject
 		IOUtilities.writeVec3f(dos, getSpawnPoint());
 
 		/* Inventory */
-		InventoryIO.writeInventory(getInventory(), dos);
-		
+		InventoryIO.writeInventory(getInventory(), dos, 0, getInventory().size());
+
 		/* Selected inventory index */
 		dos.writeByte(_selectedInventoryItemIndex);
 
@@ -806,8 +809,8 @@ public class Player extends GameObject
 		IOUtilities.readVec3f(dis, getSpawnPoint());
 
 		/* Inventory */
-		InventoryIO.readInventory(dis, getInventory());
-		
+		InventoryIO.readInventory(dis, getInventory(), 0);
+
 		/* Selected inventory index */
 		_selectedInventoryItemIndex = dis.readByte();
 		setSelectedInventoryItemIndex(_selectedInventoryItemIndex);

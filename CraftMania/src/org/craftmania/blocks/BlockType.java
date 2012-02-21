@@ -56,6 +56,7 @@ public final class BlockType extends InventoryItem
 	}
 
 	private BlockClass blockClass;
+	private boolean hasSpecialSaveData;
 
 	public BlockType(int id, String name)
 	{
@@ -232,6 +233,11 @@ public final class BlockType extends InventoryItem
 	public boolean hasSpecialAction()
 	{
 		return hasSpecialAction;
+	}
+	
+	public boolean hasSpecialSaveData()
+	{
+		return hasSpecialSaveData;
 	}
 
 	public byte getLuminosity()
