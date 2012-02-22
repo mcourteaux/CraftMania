@@ -179,7 +179,7 @@
     	<resistance>6</resistance>
     	<blockClass>WOOD</blockClass>
     </block>
-    <block id="19" name="cobbelstone">
+    <block id="19" name="cobblestone">
     	<brush>
     		<allsides>0,1</allsides>
     	</brush>

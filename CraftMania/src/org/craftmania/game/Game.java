@@ -444,11 +444,13 @@ public class Game
 		/* Pickaxe */
 		RecipeManager.getInstance().addRecipe(new Recipe("planks,planks,planks;,stick;,stick", "wooden_pickaxe", 1));
 		RecipeManager.getInstance().addRecipe(new Recipe("stone,stone,stone;,stick;,stick", "stone_pickaxe", 1));
+		RecipeManager.getInstance().addRecipe(new Recipe("cobblestone,cobblestone,cobblestone;,stick;,stick", "stone_pickaxe", 1));
 		RecipeManager.getInstance().addRecipe(new Recipe("bedrock,bedrock,bedrock;,stick;,stick", "bedrock_pickaxe", 1));
 
 		/* Axes */
 		RecipeManager.getInstance().addRecipe(new Recipe("planks,planks;planks,stick;,stick", "wooden_axe", 1));
 		RecipeManager.getInstance().addRecipe(new Recipe("stone,stone;stone,stick;,stick", "stone_axe", 1));
+		RecipeManager.getInstance().addRecipe(new Recipe("cobblestone,cobblestone;cobblestone,stick;,stick", "stone_axe", 1));
 	}
 
 	private void loadItems()
