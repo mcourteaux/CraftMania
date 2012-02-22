@@ -439,6 +439,7 @@ public class Game
 
 		/* Shovels */
 		RecipeManager.getInstance().addRecipe(new Recipe("stone;stick;stick", "stone_shovel", 1));
+		RecipeManager.getInstance().addRecipe(new Recipe("cobblestone;stick;stick", "stone_shovel", 1));
 		RecipeManager.getInstance().addRecipe(new Recipe("planks;stick;stick", "wooden_shovel", 1));
 
 		/* Pickaxe */

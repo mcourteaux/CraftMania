@@ -48,6 +48,7 @@ public final class BlockType extends InventoryItem
 	private boolean hasSpecialAction;
 	private boolean crossed;
 	private byte luminosity;
+	private boolean supportNeeded;
 
 	public enum BlockClass
 	{
@@ -258,6 +259,11 @@ public final class BlockType extends InventoryItem
 	public boolean isCrossed()
 	{
 		return crossed;
+	}
+	
+	public boolean isSupportNeeded()
+	{
+		return supportNeeded;
 	}
 
 }

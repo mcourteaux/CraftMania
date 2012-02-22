@@ -117,6 +117,7 @@
             <mantle inset="0.0625">6,4</mantle>
             <bottom>5,4</bottom>
         </brush>
+        <supportNeeded>true</supportNeeded>
         <resistance>5</resistance>
         <normalAABB>false</normalAABB>
     </block>
@@ -187,6 +188,7 @@
     	<blockClass>STONE</blockClass>
     </block>
     <block id="20" name="tallgrass">
+ 		<supportNeeded>true</supportNeeded>
     	<customClass>org.craftmania.blocks.customblocks.TallGrass</customClass>
     	<solid>false</solid>
     	<translucent>true</translucent>
@@ -194,13 +196,13 @@
     </block>
     <block id="21" name="redflower">
     	<crossedbrush>12,0</crossedbrush>
-    	<customClass>org.craftmania.blocks.customblocks.RedFlower</customClass>
+    	<supportNeeded>true</supportNeeded>
     	<solid>false</solid>
     	<translucent>true</translucent>
     </block>
     <block id="22" name="yellowflower">
     	<crossedbrush>13,0</crossedbrush>
-    	<customClass>org.craftmania.blocks.customblocks.YellowFlower</customClass>
+    	<supportNeeded>true</supportNeeded>
     	<solid>false</solid>
     	<translucent>true</translucent>
     </block>

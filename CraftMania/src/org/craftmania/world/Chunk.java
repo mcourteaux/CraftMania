@@ -570,7 +570,7 @@ public class Chunk implements AABBObject
 			{
 				chunk.removeBlockAbsolute(x, y, z);
 			}
-			
+
 			block.setChunk(chunk);
 			block.getPosition().set(x, y, z);
 			chunk._chunkData.setSpecialBlock(ChunkData.positionToIndex(x - chunk.getAbsoluteX(), y, z - chunk.getAbsoluteZ()), block);
@@ -579,7 +579,7 @@ public class Chunk implements AABBObject
 
 			/* Finally notify the neighbors */
 			chunk.notifyNeighborsOf(x, y, z);
-			
+
 			chunk.needsNewVBO();
 		}
 	}
@@ -1330,14 +1330,21 @@ public class Chunk implements AABBObject
 				if (side == Side.BOTTOM && btype.isFixed())
 				{
 					// TODO: make non-fixed blocks fall
-				} else
+				} else if (side == Side.TOP && btype.isSupportNeeded())
 				{
-					boolean isSpecial = isBlockSpecialAbsolute(x + normal.x(), y + normal.y(), z + normal.z());
-					if (isSpecial)
+
+					if (getBlockTypeAbsolute(x, y, z, false, false, false) <= 0)
 					{
-						Block b = getSpecialBlockAbsolute(x + normal.x(), y + normal.y(), z + normal.z());
-						b.neighborChanged(Side.getOppositeSide(side));
+						removeBlockAbsolute(x, y + 1, z);
 					}
+
+				}
+
+				boolean isSpecial = isBlockSpecialAbsolute(x + normal.x(), y + normal.y(), z + normal.z());
+				if (isSpecial)
+				{
+					Block b = getSpecialBlockAbsolute(x + normal.x(), y + normal.y(), z + normal.z());
+					b.neighborChanged(Side.getOppositeSide(side));
 				}
 			}
 		}
