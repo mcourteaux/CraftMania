@@ -30,18 +30,26 @@ public class BlockConstructor
 			return null;
 		BlockType type = BlockManager.getInstance().getBlockType(blockType);
 		String customClass = type.getCustomClass();
-
-		if (customClass == null)
+		boolean crossed = type.isCrossed();
+		if (crossed)
 		{
-			return new DefaultBlock(type, chunk, new Vec3i(x, y, z));
+			if (customClass == null)
+			{
+				return new CrossedBlock(type, chunk, new Vec3i(x, y, z));
+			}
+		} else
+		{
+			if (customClass == null)
+			{
+				return new DefaultBlock(type, chunk, new Vec3i(x, y, z));
+			}
 		}
-		
+
 		if (blockType == BlockManager.getInstance().blockID("tallgrass"))
 		{
 			return new TallGrass(chunk, new Vec3i(x, y, z), metadata);
 		}
-		
-		
+
 		try
 		{
 			Class<? extends Block> blockClass = (Class<? extends Block>) Class.forName(customClass);
@@ -50,6 +58,7 @@ public class BlockConstructor
 			return block;
 		} catch (Exception e)
 		{
+			e.printStackTrace();
 			return null;
 		}
 	}

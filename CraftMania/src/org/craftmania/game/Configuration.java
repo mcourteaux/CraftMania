@@ -20,7 +20,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.craftmania.game.KeyboardSettings.KeyboardPreset;
+import org.craftmania.game.ControlSettings.KeyboardPreset;
 import org.craftmania.math.Vec3f;
 
 /**
@@ -39,6 +39,7 @@ public class Configuration
 
 	/* Configurations */
 	private float _viewingDistance;
+	private float _fireViewingDistance;
 	private float _maxPlayerEditingDistance;
 	private float _fovy;
 	private int _width;
@@ -49,7 +50,7 @@ public class Configuration
 	private boolean _updateVisibleOnly;
 	private String _texturePack;
 	private Vec3f _fogColor;
-	private KeyboardSettings.KeyboardPreset _keyboard;
+	private ControlSettings.KeyboardPreset _keyboard;
 
 	public Configuration()
 	{
@@ -102,7 +103,7 @@ public class Configuration
 	{
 		return _fogColor;
 	}
-	
+
 	public int getFPS()
 	{
 		return _fps;
@@ -127,7 +128,7 @@ public class Configuration
 	{
 		return _texturePack;
 	}
-	
+
 	public float getFOVY()
 	{
 		return _fovy;
@@ -171,6 +172,9 @@ public class Configuration
 			} else if (p.equals("viewing_distance"))
 			{
 				_viewingDistance = Float.parseFloat(v);
+			} else if (p.equals("fire_viewing_distance"))
+			{
+				_fireViewingDistance = Float.parseFloat(v);
 			} else if (p.equals("texture_pack"))
 			{
 				_texturePack = v;
@@ -180,10 +184,15 @@ public class Configuration
 			} else if (p.equals("keyboard"))
 			{
 				_keyboard = KeyboardPreset.valueOf(v.toUpperCase());
-				KeyboardSettings.initialize(_keyboard);
+				ControlSettings.initialize(_keyboard);
 			}
 
 		}
 
+	}
+
+	public float getFireViewingDistance()
+	{
+		return Math.min(_fireViewingDistance, _viewingDistance);
 	}
 }

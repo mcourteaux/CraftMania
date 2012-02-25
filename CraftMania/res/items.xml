@@ -1,42 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  Copyright 2012 Martijn Courteaux <martijn.courteaux@skynet.be>
-  
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-  
-    http://www.apache.org/licenses/LICENSE-2.0
-  
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
--->
+<!-- Copyright 2012 Martijn Courteaux <martijn.courteaux@skynet.be> Licensed 
+	under the Apache License, Version 2.0 (the "License"); you may not use this 
+	file except in compliance with the License. You may obtain a copy of the 
+	License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by 
+	applicable law or agreed to in writing, software distributed under the License 
+	is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY 
+	KIND, either express or implied. See the License for the specific language 
+	governing permissions and limitations under the License. -->
 <root>
-    <item name="stick">
-        <texture>5,3</texture>
-        <stackable>true</stackable>
-    </item>
-    
-    <item name="coal">
-        <texture>7,0</texture>
-        <stackable>true</stackable>
-    </item>
-    
-    <item name="feather">
-        <texture>8,1</texture>
-        <stackable>true</stackable>
-    </item>
+	<item name="stick">
+		<texture>5,3</texture>
+		<stackable>true</stackable>
+	</item>
 
-    <item name="wooden_shovel" class="org.craftmania.items.tools.WoodenShovel" />
-    <item name="wooden_pickaxe" class="org.craftmania.items.tools.WoodenPickaxe" />
-    <item name="wooden_axe" class="org.craftmania.items.tools.WoodenAxe" />
-    
-    <item name="stone_shovel" class="org.craftmania.items.tools.StoneShovel" />
-    <item name="stone_pickaxe" class="org.craftmania.items.tools.StonePickaxe" />
-    <item name="stone_axe" class="org.craftmania.items.tools.StoneAxe" />
+	<item name="coal">
+		<texture>7,0</texture>
+		<stackable>true</stackable>
+	</item>
+
+	<item name="feather">
+		<texture>8,1</texture>
+		<stackable>true</stackable>
+	</item>
+
+	<item name="wooden_shovel" class="org.craftmania.items.tools.WoodenShovel" />
+	<item name="wooden_pickaxe" class="org.craftmania.items.tools.WoodenPickaxe" />
+	<item name="wooden_axe" class="org.craftmania.items.tools.WoodenAxe" />
+	<item name="wooden_sword" class="org.craftmania.items.tools.WoodenSword" />
+
+	<item name="stone_shovel" class="org.craftmania.items.tools.StoneShovel" />
+	<item name="stone_pickaxe" class="org.craftmania.items.tools.StonePickaxe" />
+	<item name="stone_axe" class="org.craftmania.items.tools.StoneAxe" />
 
 	<item name="bedrock_pickaxe" class="org.craftmania.items.tools.BedrockPickaxe" />
 </root>

@@ -17,7 +17,7 @@ package org.craftmania.game;
 
 import org.lwjgl.input.Keyboard;
 
-public class KeyboardSettings
+public class ControlSettings
 {
 	
 	public static enum KeyboardPreset
@@ -36,6 +36,7 @@ public class KeyboardSettings
 	public static int JUMP;
 	public static int CROUCH;
 	public static int INVENTORY;
+	public static int SMASH;
 	
 	/* Debug */
 	public static int TOGGLE_LIGHT_POINT;
@@ -91,4 +92,5 @@ public class KeyboardSettings
 		TOGGLE_LIGHT_POINT = Keyboard.KEY_L;
 		TOGGLE_OVERLAY = Keyboard.KEY_O;
 	}
+	
 }

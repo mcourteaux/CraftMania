@@ -31,6 +31,7 @@ import org.craftmania.world.ChunkData;
 
 public abstract class Block implements AABBObject
 {
+
 	protected BlockType _blockType;
 	protected Vec3i _postion;
 	protected Chunk _chunk;

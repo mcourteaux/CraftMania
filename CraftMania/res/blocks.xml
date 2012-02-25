@@ -151,6 +151,7 @@
     
     <block id="15" name="torch">
         <crossedbrush>0,5</crossedbrush>
+        <customClass>org.craftmania.blocks.customblocks.Torch</customClass>
         <solid>false</solid>
         <normalAABB>false</normalAABB>
         <translucent>true</translucent>

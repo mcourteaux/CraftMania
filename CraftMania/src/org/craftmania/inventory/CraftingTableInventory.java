@@ -15,7 +15,6 @@
  ******************************************************************************/
 package org.craftmania.inventory;
 
-import static org.lwjgl.opengl.GL11.*;
 
 import org.craftmania.game.Configuration;
 import org.craftmania.game.Game;
@@ -25,6 +24,7 @@ import org.craftmania.math.Vec2f;
 import org.craftmania.recipes.Recipe;
 import org.craftmania.recipes.RecipeManager;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.Point;
 import org.lwjgl.util.ReadablePoint;
 import org.lwjgl.util.Rectangle;
@@ -37,23 +37,66 @@ import org.newdawn.slick.opengl.Texture;
 public class CraftingTableInventory extends Inventory
 {
 
-	/* STATIC OPENGL SHIT */
-	private static int _inventoryDrawList = -1;
-	private static Vec2f _texPosUpLeft;
-	private static Vec2f _texPosDownRight;
-	private static Texture _tex;
-	private static int _hw = 176;
-	private static int _hh = 167;
-	/** INVENTORY VARIABLES */
-	private static boolean _validRecipePresent = false;
 
+	
+	/* STATIC OPENGL SHIT */
+	private static final int _inventoryDrawList;
+	private static final Vec2f _texPosUpLeft;
+	private static final Vec2f _texPosDownRight;
+	private static final Texture _tex;
+	private static final int _hw = 176;
+	private static final int _hh = 167;
+	/** INVENTORY VARIABLES */
+	@SuppressWarnings("unused")
+	private boolean _validRecipePresent = false;
+
+	static
+	{
+		_texPosUpLeft = new Vec2f(0, 0);
+		_texPosDownRight = new Vec2f(_texPosUpLeft.x() + _hw, _texPosUpLeft.y() + _hh);
+
+		_tex = TextureStorage.getTexture("gui.crafting");
+		_texPosUpLeft.x(_texPosUpLeft.x() / _tex.getTextureWidth());
+		_texPosUpLeft.y(_texPosUpLeft.y() / _tex.getTextureHeight());
+		_texPosDownRight.x(_texPosDownRight.x() / _tex.getTextureWidth());
+		_texPosDownRight.y(_texPosDownRight.y() / _tex.getTextureHeight());
+
+		
+		_inventoryDrawList = GL11.glGenLists(1);
+		GL11.glNewList(_inventoryDrawList, GL11.GL_COMPILE);
+
+		GL11.glColor3f(1, 1, 1);
+		GL11.glBegin(GL11.GL_QUADS);
+		GL11.glTexCoord2f(_texPosUpLeft.x(), _texPosUpLeft.y());
+		GL11.glVertex2f(-_hw, _hh);
+		GL11.glTexCoord2f(_texPosDownRight.x(), _texPosUpLeft.y());
+		GL11.glVertex2f(_hw, _hh);
+		GL11.glTexCoord2f(_texPosDownRight.x(), _texPosDownRight.y());
+		GL11.glVertex2f(_hw, -_hh);
+		GL11.glTexCoord2f(_texPosUpLeft.x(), _texPosDownRight.y());
+		GL11.glVertex2f(-_hw, -_hh);
+		GL11.glEnd();
+
+		GL11.glEndList();
+
+
+	}
+	
+	public static void UNLOAD_STATIC_CONTENT()
+	{
+		GL11.glDeleteLists(_inventoryDrawList, 1);
+	}
+	
 	public CraftingTableInventory()
 	{
 		super(46);
 		_raster = new CraftingTableInventoryRaster();
 	}
 
-	private void checkForRecipe()
+	/**
+	 * Checks if there is a valid recipe on the table by comparing with every recipe from the recipe manager.
+	 */
+	public void checkForRecipe()
 	{
 		/* Check for valid crafting recipes */
 		int[][] table = getCraftingTable();
@@ -80,6 +123,9 @@ public class CraftingTableInventory extends Inventory
 		}
 	}
 
+	/**
+	 * @return A 3x3 int matrix representing the table. The int values are the Item ID's.
+	 */
 	public int[][] getCraftingTable()
 	{
 		int[][] table = new int[3][3];
@@ -95,61 +141,41 @@ public class CraftingTableInventory extends Inventory
 		return table;
 	}
 
-	private static void createRenderList()
-	{
-		_inventoryDrawList = glGenLists(1);
-		glNewList(_inventoryDrawList, GL_COMPILE);
-
-		glColor3f(1, 1, 1);
-		glBegin(GL_QUADS);
-		glTexCoord2f(_texPosUpLeft.x(), _texPosUpLeft.y());
-		glVertex2f(-_hw, _hh);
-		glTexCoord2f(_texPosDownRight.x(), _texPosUpLeft.y());
-		glVertex2f(_hw, _hh);
-		glTexCoord2f(_texPosDownRight.x(), _texPosDownRight.y());
-		glVertex2f(_hw, -_hh);
-		glTexCoord2f(_texPosUpLeft.x(), _texPosDownRight.y());
-		glVertex2f(-_hw, -_hh);
-		glEnd();
-
-		glEndList();
-	}
 
 	@Override
 	public void renderInventory()
 	{
-		Configuration conf = Game.getInstance().getConfiguration();
-
 		if (_inventoryDrawList == -1)
 		{
-			loadStaticContent();
-			createRenderList();
+			return;
 		}
+		
+		Configuration conf = Game.getInstance().getConfiguration();
 
-		glPushMatrix();
-		glTranslatef(conf.getWidth() / 2.0f, conf.getHeight() / 2.0f, 0.0f);
+		GL11.glPushMatrix();
+		GL11.glTranslatef(conf.getWidth() / 2.0f, conf.getHeight() / 2.0f, 0.0f);
 
 		_tex.bind();
 
-		glCallList(_inventoryDrawList);
-		glPopMatrix();
+		GL11.glCallList(_inventoryDrawList);
+		GL11.glPopMatrix();
 
 		for (int i = 0; i < _raster.getCellCount(); ++i)
 		{
-			glPushMatrix();
+			GL11.glPushMatrix();
 			ReadablePoint r = _raster.getCenterOfCell(i);
-			glTranslatef(r.getX(), r.getY(), 0);
+			GL11.glTranslatef(r.getX(), r.getY(), 0);
 			if (Mouse.getX() < r.getX() + 16 && Mouse.getX() > r.getX() - 16 && Mouse.getY() < r.getY() + 16 && Mouse.getY() > r.getY() - 16)
 			{
-				glDisable(GL_TEXTURE_2D);
-				glColor4f(1.0f, 1.0f, 1.0f, 0.2f);
-				glBegin(GL_QUADS);
-				glVertex2i(-16, -16);
-				glVertex2i(+16, -16);
-				glVertex2i(+16, +16);
-				glVertex2i(-16, +16);
-				glEnd();
-				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+				GL11.glDisable(GL11.GL_TEXTURE_2D);
+				GL11.glColor4f(1.0f, 1.0f, 1.0f, 0.2f);
+				GL11.glBegin(GL11.GL_QUADS);
+				GL11.glVertex2i(-16, -16);
+				GL11.glVertex2i(+16, -16);
+				GL11.glVertex2i(+16, +16);
+				GL11.glVertex2i(-16, +16);
+				GL11.glEnd();
+				GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
 			}
 
@@ -158,31 +184,19 @@ public class CraftingTableInventory extends Inventory
 			{
 				place.render();
 			}
-			glPopMatrix();
+			GL11.glPopMatrix();
 		}
 
 		/* Draggin item */
 		if (_dragging && _draggingItem != null)
 		{
-			glPushMatrix();
-			glTranslatef(Mouse.getX(), Mouse.getY(), 0);
+			GL11.glPushMatrix();
+			GL11.glTranslatef(Mouse.getX(), Mouse.getY(), 0);
 			_draggingItem.render();
-			glPopMatrix();
+			GL11.glPopMatrix();
 		}
 	}
 
-	public static void loadStaticContent()
-	{
-		_texPosUpLeft = new Vec2f(0, 0);
-		_texPosDownRight = new Vec2f(_texPosUpLeft.x() + _hw, _texPosUpLeft.y() + _hh);
-
-		_tex = TextureStorage.getTexture("gui.crafting");
-		_texPosUpLeft.x(_texPosUpLeft.x() / _tex.getTextureWidth());
-		_texPosUpLeft.y(_texPosUpLeft.y() / _tex.getTextureHeight());
-		_texPosDownRight.x(_texPosDownRight.x() / _tex.getTextureWidth());
-		_texPosDownRight.y(_texPosDownRight.y() / _tex.getTextureHeight());
-
-	}
 
 	@Override
 	protected void inventoryEvent(InventoryEvent evt)
@@ -228,7 +242,7 @@ public class CraftingTableInventory extends Inventory
 			}
 		}
 
-		Game.getInstance().getWorld().getPlayer().inventoryContentChanged();
+		Game.getInstance().getWorld().getActivePlayer().inventoryContentChanged();
 	}
 
 	@Override

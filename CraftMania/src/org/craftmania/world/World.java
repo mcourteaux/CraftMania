@@ -25,9 +25,10 @@ import org.craftmania.blocks.Block;
 import org.craftmania.datastructures.AABB;
 import org.craftmania.datastructures.ViewFrustum;
 import org.craftmania.game.Configuration;
+import org.craftmania.game.ControlSettings;
+import org.craftmania.game.Controls;
 import org.craftmania.game.FontStorage;
 import org.craftmania.game.Game;
-import org.craftmania.game.KeyboardSettings;
 import org.craftmania.game.TextureStorage;
 import org.craftmania.inventory.Inventory;
 import org.craftmania.math.MathHelper;
@@ -45,6 +46,7 @@ import org.lwjgl.opengl.GL11;
 public class World
 {
 
+	private Controls _controls;
 	private static final float SECONDS_IN_DAY = 60f * 10f; // 15 minutes / day
 
 	private WorldProvider _worldProvider;
@@ -86,7 +88,7 @@ public class World
 		_chunkVisibilityTestingAABB = new AABB(new Vec3f(), new Vec3f());
 		_chunkDistanceComparator = new ChunkDistanceComparator();
 		_fogColor = new Vec3f();
-
+		_controls = new Controls();
 		_time = SECONDS_IN_DAY * 0.3f;
 	}
 
@@ -255,10 +257,12 @@ public class World
 		}
 
 		_sky.update();
+		
+		_controls.process();
 
 		while (Keyboard.next())
 		{
-			if (Keyboard.getEventKey() == KeyboardSettings.INVENTORY && Keyboard.getEventKeyState())
+			if (Keyboard.getEventKey() == ControlSettings.INVENTORY && Keyboard.getEventKeyState())
 			{
 				if (_activatedInventory != null)
 				{
@@ -284,14 +288,15 @@ public class World
 					}
 				}
 				System.out.println();
-			} else if (Keyboard.getEventKey() == KeyboardSettings.TOGGLE_OVERLAY && Keyboard.getEventKeyState())
+			} else if (Keyboard.getEventKey() == ControlSettings.TOGGLE_OVERLAY && Keyboard.getEventKeyState())
 			{
 				Game.RENDER_INFORMATION_OVERLAY = !Game.RENDER_INFORMATION_OVERLAY;
-			} else if (Keyboard.getEventKey() == KeyboardSettings.TOGGLE_LIGHT_POINT && Keyboard.getEventKeyState())
+			} else if (Keyboard.getEventKey() == ControlSettings.TOGGLE_LIGHT_POINT && Keyboard.getEventKeyState())
 			{
 				_player.toggleLight();
 			}
 		}
+		
 		if (_activatedInventory == null)
 		{
 			if (!(_localChunks.size() < 4 && _oldChunkList.size() < 4))
@@ -333,10 +338,10 @@ public class World
 		int distance = MathHelper.ceil(viewingDistance);
 		int distanceSq = distance * distance;
 
-		int centerX = MathHelper.floor(getPlayer().getPosition().x() / Chunk.CHUNK_SIZE_HORIZONTAL);
-		int centerZ = MathHelper.floor(getPlayer().getPosition().z() / Chunk.CHUNK_SIZE_HORIZONTAL);
+		int centerX = MathHelper.floor(getActivePlayer().getPosition().x() / Chunk.CHUNK_SIZE_HORIZONTAL);
+		int centerZ = MathHelper.floor(getActivePlayer().getPosition().z() / Chunk.CHUNK_SIZE_HORIZONTAL);
 
-		ViewFrustum frustum = getPlayer().getFirstPersonCamera().getViewFrustum();
+		ViewFrustum frustum = getActivePlayer().getFirstPersonCamera().getViewFrustum();
 
 		boolean generate = false;
 		int xToGenerate = 0, zToGenerate = 0;
@@ -481,7 +486,7 @@ public class World
 		Collections.sort(_visibleChunks, _chunkDistanceComparator);
 	}
 
-	public Player getPlayer()
+	public Player getActivePlayer()
 	{
 		return _player;
 	}
@@ -530,7 +535,6 @@ public class World
 
 		_sunlight = -MathHelper.cos(todNew * MathHelper.f_2PI) * 0.5f + 0.5f;
 		_sunlight = Math.max(0.2f, _sunlight);
-		_sunlight *= 15.0f;
 
 		if (oldSunlight != MathHelper.round(_sunlight))
 		{

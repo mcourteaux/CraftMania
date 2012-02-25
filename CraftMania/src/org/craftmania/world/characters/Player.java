@@ -32,7 +32,7 @@ import org.craftmania.blocks.BlockManager;
 import org.craftmania.blocks.BlockType;
 import org.craftmania.datastructures.AABB;
 import org.craftmania.game.Game;
-import org.craftmania.game.KeyboardSettings;
+import org.craftmania.game.ControlSettings;
 import org.craftmania.inventory.DefaultPlayerInventory;
 import org.craftmania.inventory.Inventory.InventoryPlace;
 import org.craftmania.inventory.InventoryIO;
@@ -147,6 +147,11 @@ public class Player extends GameObject
 		this.z = position.z();
 	}
 
+	/**
+	 * The returned vector is the single instanced vector representing the players position.
+	 * DO NOT MODIFY THIS VECTOR
+	 * @return the position of the player
+	 */
 	public Vec3f getPosition()
 	{
 		return _position;
@@ -355,10 +360,10 @@ public class Player extends GameObject
 		float zStep = 0.0f;
 		// Forward movement
 		{
-			if (Keyboard.isKeyDown(KeyboardSettings.MOVE_FORWARD))
+			if (Keyboard.isKeyDown(ControlSettings.MOVE_FORWARD))
 			{
 				speedForward = Math.min(maxSpeed * (_flying ? 3.0f : 1.0f), speedForward + acceleration * step);
-			} else if (Keyboard.isKeyDown(KeyboardSettings.MOVE_BACK))
+			} else if (Keyboard.isKeyDown(ControlSettings.MOVE_BACK))
 			{
 				speedForward = Math.max(-maxSpeed * (_flying ? 3.0f : 1.0f), speedForward - acceleration * step);
 			} else
@@ -392,10 +397,10 @@ public class Player extends GameObject
 		}
 		// Side movement
 		{
-			if (Keyboard.isKeyDown(KeyboardSettings.MOVE_LEFT))
+			if (Keyboard.isKeyDown(ControlSettings.MOVE_LEFT))
 			{
 				speedSide = Math.max(-maxSpeed * (_flying ? 3.0f : 1.0f), speedSide - acceleration * step);
-			} else if (Keyboard.isKeyDown(KeyboardSettings.MOVE_RIGHT))
+			} else if (Keyboard.isKeyDown(ControlSettings.MOVE_RIGHT))
 			{
 				speedSide = Math.min(maxSpeed * (_flying ? 3.0f : 1.0f), speedSide + acceleration * step);
 			} else
@@ -510,7 +515,7 @@ public class Player extends GameObject
 		byte subSupport = chunkManager.getBlock(MathHelper.floor(x), MathHelper.floor(y) - 2, MathHelper.floor(z), false, false, false);
 		float supportHeight = Float.NEGATIVE_INFINITY;
 
-		if (Keyboard.isKeyDown(KeyboardSettings.JUMP))
+		if (Keyboard.isKeyDown(ControlSettings.JUMP))
 		{
 			if (onGround)
 			{
@@ -520,7 +525,7 @@ public class Player extends GameObject
 			{
 				ySpeed += 14f * step;
 			}
-		} else if (_flying && Keyboard.isKeyDown(KeyboardSettings.CROUCH))
+		} else if (_flying && Keyboard.isKeyDown(ControlSettings.CROUCH))
 		{
 			ySpeed -= 14f * step;
 		}

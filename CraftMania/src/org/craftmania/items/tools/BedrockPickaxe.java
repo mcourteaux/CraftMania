@@ -23,7 +23,7 @@ public class BedrockPickaxe extends Tool
 {
 	public BedrockPickaxe()
 	{
-		super("bedrock_pickaxe", null, Material.DIAMOND, new Vec2i(12, 6), 6.0f);
+		super("bedrock_pickaxe", null, Material.DIAMOND, new Vec2i(0, 13), 6.0f);
 	}
 	
 	@Override
@@ -31,8 +31,8 @@ public class BedrockPickaxe extends Tool
 	{
 		if (block == BlockManager.getInstance().blockID("bedrock"))
 		{
-			return 100000.0f;
+			return 20000.0f;
 		}
-		return 1.2f;
+		return super.calcDamageFactorToBlock(block) * 2.0f;
 	}
 }

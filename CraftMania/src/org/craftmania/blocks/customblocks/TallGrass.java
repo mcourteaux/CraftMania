@@ -43,6 +43,14 @@ public class TallGrass extends CrossedBlock
 	}
 	
 	
+	public static void RELEASE_STATIC_CONTENT()
+	{
+		for (int i = 0; i < LENGHT_COUNT; ++i)
+		{
+			BLOCK_BRUSHES[i].release();
+		}
+	}
+	
 	private int _length;
 
 	public TallGrass(Chunk chunk, Vec3i pos, int length)

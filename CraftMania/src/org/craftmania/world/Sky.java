@@ -78,7 +78,7 @@ public class Sky extends GameObject
 	@Override
 	public void render()
 	{
-		Vec3f playerPos = Game.getInstance().getWorld().getPlayer().getPosition();
+		Vec3f playerPos = Game.getInstance().getWorld().getActivePlayer().getPosition();
 
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_CULL_FACE);

@@ -61,6 +61,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.craftmania.blocks.BlockManager;
 import org.craftmania.blocks.BlockXMLLoader;
 import org.craftmania.items.ItemXMLLoader;
 import org.craftmania.math.MathHelper;
@@ -89,7 +90,7 @@ public class Game
 	private int[] _fpsDataBuffer;
 	private float _averageFPS;
 
-	public static boolean RENDER_INFORMATION_OVERLAY = true;
+	public static boolean RENDER_INFORMATION_OVERLAY = false;
 
 	public static Game getInstance()
 	{
@@ -202,7 +203,19 @@ public class Game
 		loadItems();
 		loadBlocks();
 		loadRecipes();
+		loadSpecialStuff();
 		Mouse.setGrabbed(true);
+	}
+
+	private void loadSpecialStuff()
+	{
+		try
+		{
+			Class.forName("org.craftmania.rendering.particles.Smoke");
+		} catch (Exception e)
+		{
+			// TODO: handle exception
+		}
 	}
 
 	public void initOpenGL() throws IOException
@@ -405,6 +418,7 @@ public class Game
 			}
 		}
 
+		BlockManager.getInstance().release();
 		TextureStorage.release();
 		FontStorage.release();
 		Display.destroy();
@@ -414,7 +428,8 @@ public class Game
 	{
 		TextureStorage.setTexturePack(_configuration.getTexturePack());
 		TextureStorage.loadTexture("terrain", "PNG", "terrain.png");
-		TextureStorage.loadTexture("items", "PNG", "gui/items.png");
+		TextureStorage.loadTexture("particles", "PNG", "particles.png");
+		TextureStorage.loadTexture("items", "PNG", "gui/items_edit.png");
 		TextureStorage.loadTexture("gui.inventory", "PNG", "gui/inventory.png");
 		TextureStorage.loadTexture("gui.crafting", "PNG", "gui/crafting.png");
 		TextureStorage.loadTexture("environment.clouds", "PNG", "environment/clouds.png");
@@ -452,6 +467,9 @@ public class Game
 		RecipeManager.getInstance().addRecipe(new Recipe("planks,planks;planks,stick;,stick", "wooden_axe", 1));
 		RecipeManager.getInstance().addRecipe(new Recipe("stone,stone;stone,stick;,stick", "stone_axe", 1));
 		RecipeManager.getInstance().addRecipe(new Recipe("cobblestone,cobblestone;cobblestone,stick;,stick", "stone_axe", 1));
+		
+		/* Swords */
+		RecipeManager.getInstance().addRecipe(new Recipe("planks;planks;stick", "wooden_sword", 1));
 	}
 
 	private void loadItems()

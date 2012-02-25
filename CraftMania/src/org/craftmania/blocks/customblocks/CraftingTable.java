@@ -29,6 +29,17 @@ import org.craftmania.world.Chunk;
 
 public class CraftingTable extends DefaultBlock
 {
+	
+	static
+	{
+		try
+		{
+			Class.forName("org.craftmania.inventory.CraftingTableInventory");
+		} catch (ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+	}
 
 	private CraftingTableInventory _inventory;
 	
@@ -36,7 +47,7 @@ public class CraftingTable extends DefaultBlock
 	{
 		super(BlockManager.getInstance().getBlockType(BlockManager.getInstance().blockID("crafting_table")), chunk, pos);
 		_inventory = new CraftingTableInventory();
-		_inventory.setSharedContent(Game.getInstance().getWorld().getPlayer().getSharedInventoryContent());
+		_inventory.setSharedContent(Game.getInstance().getWorld().getActivePlayer().getSharedInventoryContent());
 	}
 	
 	@Override
@@ -60,6 +71,7 @@ public class CraftingTable extends DefaultBlock
 		int offset = CraftingTableInventory.CraftingTableInventoryRaster.CRAFTING_OFFSET;
 		
 		InventoryIO.readInventory(dis, _inventory, offset);
+		_inventory.checkForRecipe();
 	}
 	
 }

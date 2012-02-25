@@ -366,6 +366,27 @@ public class MathHelper
 		return (float) Math.sqrt(f);
 	}
 
+	public static float atan2(float y, float x)
+	{
+		return (float) Math.atan2(y, x);
+	}
+
+	/**
+	 * Converts an angle given in radians to an angle in degrees.
+	 */
+	public static float toDegrees(float radians)
+	{
+		return radians * 180.0f / f_PI;
+	}
+	
+	/**
+	 * Converts an angle given in degrees to an angle in radians.
+	 */
+	public static float toRadians(float degrees)
+	{
+		return degrees / 180.0f * f_PI;
+	}
+
 
 
 }

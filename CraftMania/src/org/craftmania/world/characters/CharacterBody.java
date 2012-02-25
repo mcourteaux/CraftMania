@@ -110,6 +110,6 @@ public class CharacterBody
 		glRotated(_progressRightHand * 50 - 10.0d, 0, 0, 1);
 		glRotated(_progressRightHand * 20, 1, 1, 0);
 		glRotatef(90, 0, 0, 1);
-//		glRotatef(20, 0, 1, 0);
+		glRotatef(20, 0, 1, 0);
 	}
 }

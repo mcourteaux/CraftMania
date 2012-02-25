@@ -196,7 +196,7 @@ public class DefaultPlayerInventory extends Inventory
 
     public void inventoryContentChanged()
     {
-        Game.getInstance().getWorld().getPlayer().inventoryContentChanged();
+        Game.getInstance().getWorld().getActivePlayer().inventoryContentChanged();
     }
 
     @Override

@@ -18,6 +18,7 @@ package org.craftmania.blocks;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,6 +80,7 @@ public class BlockManager
 				{
 					try
 					{
+						System.out.println("Loading static content for " + bt.getCustomClass());
 						Class.forName(bt.getCustomClass());						
 					} catch (Exception e)
 					{
@@ -100,6 +102,47 @@ public class BlockManager
 		System.out.println(_blockTypes);
 	}
 
+	public void release()
+	{
+		for (int i = 0; i < _blockTypes.length; ++i)
+		{
+			BlockType bt = _blockTypes[i];
+
+			if (bt != null)
+			{
+				/* Brush might be null like in case of Tall Grass, where there are six block brushes. Initialized by the class itself */
+				if (bt.getBrush() != null)
+				{
+					bt.getBrush().create();
+				}
+				
+				/* Make sure all static initializer bodies are called */
+				if (bt.getCustomClass() != null)
+				{
+					try
+					{
+						Class<?> clazz = Class.forName(bt.getCustomClass());			
+						Method[] methods = clazz.getDeclaredMethods();
+						
+						for (int m = 0; m < methods.length; ++m)
+						{
+							Method method = methods[m];
+							if (method.getName().equals("RELEASE_STATIC_CONTENT"))
+							{
+								System.out.println("Releasing static content from " + clazz.getName());
+								method.invoke(null);
+							}
+						}
+					} catch (Exception e)
+					{
+						System.err.println("Custom Block class is not found!");
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+	
 	public byte blockID(String id)
 	{
 		Byte bt = _typeStrings.get(id);

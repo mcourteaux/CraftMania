@@ -152,7 +152,7 @@ public class ChunkMeshBuilder
 					if (special)
 					{
 						block = chunk.getChunkData().getSpecialBlock(blockIndex);
-						if (block.isVisible() && !block.isRenderingManually())
+						if (block.isVisible())
 						{
 							block.storeInVBO(vertexBuffer, lightBuffer);
 						}

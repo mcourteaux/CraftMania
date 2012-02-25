@@ -61,6 +61,7 @@ public abstract class Tool extends TexturedItem
 
         if (bt.getBlockClass() == getBlockClass())
         {
+        	if (_material == null) return 4.0f;
             return (_material.ordinal() / 4.0f) + 4.0f;
         }
         return 1.2f;

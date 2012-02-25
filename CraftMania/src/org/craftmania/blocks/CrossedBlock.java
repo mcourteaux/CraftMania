@@ -24,7 +24,7 @@ import org.craftmania.math.Vec3f;
 import org.craftmania.math.Vec3i;
 import org.craftmania.world.Chunk;
 
-public abstract class CrossedBlock extends Block
+public class CrossedBlock extends Block
 {
 
 	public CrossedBlock(BlockType type, Chunk chunk, Vec3i pos)

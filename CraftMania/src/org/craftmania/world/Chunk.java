@@ -576,6 +576,9 @@ public class Chunk implements AABBObject
 			chunk._chunkData.setSpecialBlock(ChunkData.positionToIndex(x - chunk.getAbsoluteX(), y, z - chunk.getAbsoluteZ()), block);
 			chunk.updateVisibilityFor(x, y, z);
 			chunk.updateVisibilityForNeigborsOf(x, y, z);
+			
+			/* Spread light produced by this block */
+			chunk.spreadLight(x, y, z, block.getBlockType().getLuminosity(), LightType.BLOCK);
 
 			/* Finally notify the neighbors */
 			chunk.notifyNeighborsOf(x, y, z);
@@ -611,6 +614,11 @@ public class Chunk implements AABBObject
 		if (chunk != null)
 		{
 			int index = ChunkData.positionToIndex(x - chunk.getAbsoluteX(), y, z - chunk.getAbsoluteZ());
+
+			/* To start with, check if there is actually a block */
+			if (chunk._chunkData.getBlockType(index) == 0)
+				return;
+
 			/*
 			 * Remove from the old one from the visibility/update/render list
 			 */
@@ -825,7 +833,7 @@ public class Chunk implements AABBObject
 				} else
 				{
 					block = _chunkData.getSpecialBlock(blockIndex);
-					if (block.isVisible() && !block.isRenderingManually())
+					if (block.isVisible())
 					{
 						count += block.getVertexCount();
 					}
@@ -1337,7 +1345,6 @@ public class Chunk implements AABBObject
 					{
 						removeBlockAbsolute(x, y + 1, z);
 					}
-
 				}
 
 				boolean isSpecial = isBlockSpecialAbsolute(x + normal.x(), y + normal.y(), z + normal.z());

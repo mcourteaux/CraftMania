@@ -290,7 +290,10 @@ public class DefaultBlock extends Block
 	@Override
 	public void storeInVBO(FloatBuffer vbo, byte[][][] lightBuffer)
 	{
-//		System.out.println("Store " + getClass().getSimpleName() + " in VBO at " + _postion + " with facemask " + Integer.toBinaryString(_faceMask));
+		if (_blockType.getBrush() instanceof CrossedBlockBrush)
+		{
+			System.out.println(this.toString());
+		}
 		_blockType.getDefaultBlockBrush().setFaceMask(_faceMask);
 		_blockType.getDefaultBlockBrush().storeInVBO(vbo, getX() + 0.5f, getY() + 0.5f, getZ() + 0.5f, lightBuffer);
 	}

@@ -61,7 +61,7 @@ public class Vec3f
 	}
 
 	/**
-	 * Subtracts this vector with the passed vector.
+	 * Subtracts this vector by the passed vector.
 	 * 
 	 * @param v
 	 *            the vector to subtract from this
@@ -70,6 +70,19 @@ public class Vec3f
 	public Vec3f sub(Vec3f v)
 	{
 		set(x - v.x, y - v.y, z - v.z);
+		return this;
+	}
+	
+	/**
+	 * Subtracts this vector by the passed vector.
+	 * 
+	 * @param v
+	 *            the vector to subtract from this
+	 * @return {@code this}
+	 */
+	public Vec3f sub(Vec3i v)
+	{
+		set(x - v.x(), y - v.y(), z - v.z());
 		return this;
 	}
 
@@ -248,6 +261,7 @@ public class Vec3f
 		scale(1.0f / len);
 		return len;
 	}
+
 
 
 
