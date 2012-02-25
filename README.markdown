@@ -1,7 +1,7 @@
 CraftMania
 ==========
 
-![CraftMania](http://2dbrothers.comuf.com/wordpress/wp-content/uploads/2012/02/Schermafbeelding-2012-02-20-om-02.17.17.png "CraftMania")
+![CraftMania](http://2dbrothers.comuf.com/wordpress/wp-content/gallery/craftmania/schermafbeelding-2012-02-25-om-12-01-25.png "CraftMania")
 
 CraftMania is my open-source game. It is supposed to look like Minecraft by Mojang. I am trying to make the game as close as possible to Minecraft. 
 Before I made my source public, I asked on [StackExchange](http://gamedev.stackexchange.com/questions/22247/am-i-allowed-to-make-my-minecraft-clone-open-source) if it is actually legal to do so. 
@@ -48,3 +48,4 @@ Texture Pack
 
 I'm using the awesome <strong><a href="http://www.carrotcakestudios.co.uk/gmcraft/">Good Morning Craft!</a></strong> texture pack by Louis Durrant.
 Of course, this is a texture pack developed for Minecraft by Mojang. So, you might try his texture pack for Minecraft. Make sure you take a look at it!
+
