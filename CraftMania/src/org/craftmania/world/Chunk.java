@@ -576,7 +576,7 @@ public class Chunk implements AABBObject
 			chunk._chunkData.setSpecialBlock(ChunkData.positionToIndex(x - chunk.getAbsoluteX(), y, z - chunk.getAbsoluteZ()), block);
 			chunk.updateVisibilityFor(x, y, z);
 			chunk.updateVisibilityForNeigborsOf(x, y, z);
-			
+
 			/* Spread light produced by this block */
 			chunk.spreadLight(x, y, z, block.getBlockType().getLuminosity(), LightType.BLOCK);
 
@@ -828,8 +828,14 @@ public class Chunk implements AABBObject
 			{
 				if (!special)
 				{
-					byte faceMask = ChunkData.dataGetFaceMask(blockData);
-					count += 4 * MathHelper.cardinality(faceMask);
+					if (type.isCrossed())
+					{
+						count += 8;
+					} else
+					{
+						byte faceMask = ChunkData.dataGetFaceMask(blockData);
+						count += 4 * MathHelper.cardinality(faceMask);
+					}
 				} else
 				{
 					block = _chunkData.getSpecialBlock(blockIndex);

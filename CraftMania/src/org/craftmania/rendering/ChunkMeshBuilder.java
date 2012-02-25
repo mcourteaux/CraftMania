@@ -175,6 +175,7 @@ public class ChunkMeshBuilder
 			if (USED_SIZE != STRIDE * FLOAT_SIZE * mesh.getVertexCount(meshType))
 			{
 				System.out.println("\t[WARNING!]: Used size = " + USED_SIZE);
+				System.out.println("\t[WARNING!]: Vertex count = " + USED_SIZE / STRIDE / FLOAT_SIZE);
 				mesh.setVertexCount(meshType, USED_SIZE / STRIDE / FLOAT_SIZE);
 			}
 
