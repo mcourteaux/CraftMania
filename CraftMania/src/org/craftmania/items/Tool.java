@@ -16,8 +16,6 @@
 package org.craftmania.items;
 
 
-import static org.lwjgl.opengl.GL11.*;
-
 import org.craftmania.blocks.BlockManager;
 import org.craftmania.blocks.BlockType;
 import org.craftmania.blocks.BlockType.BlockClass;
@@ -34,7 +32,7 @@ public abstract class Tool extends TexturedItem
     public enum Material
     {
 
-        WOOD, STONE, IRON, DIAMOND, GOLD
+        WOOD, STONE, IRON, DIAMOND, GOLD, BEDROCK
     }
     private BlockClass _blockClass;
     private float _health;
@@ -70,6 +68,10 @@ public abstract class Tool extends TexturedItem
     @Override
     public float calcDamageInflictedByBlock(byte block)
     {
+    	if (_material == Material.BEDROCK)
+    	{
+    		return 0.0f;
+    	}
         BlockType bt = BlockManager.getInstance().getBlockType(block);
         float materialResistance = (0.2f / (float) Math.pow(_material.ordinal(), 1.2d));
         if (bt.getBlockClass() == getBlockClass())

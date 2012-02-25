@@ -31,8 +31,8 @@ import org.craftmania.blocks.BlockConstructor;
 import org.craftmania.blocks.BlockManager;
 import org.craftmania.blocks.BlockType;
 import org.craftmania.datastructures.AABB;
-import org.craftmania.game.Game;
 import org.craftmania.game.ControlSettings;
+import org.craftmania.game.Game;
 import org.craftmania.inventory.DefaultPlayerInventory;
 import org.craftmania.inventory.Inventory.InventoryPlace;
 import org.craftmania.inventory.InventoryIO;
@@ -48,7 +48,6 @@ import org.craftmania.utilities.IOUtilities;
 import org.craftmania.world.Chunk;
 import org.craftmania.world.Chunk.LightType;
 import org.craftmania.world.ChunkManager;
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 /**
@@ -228,125 +227,14 @@ public class Player extends GameObject
 		}
 
 		rayCastBlock();
-
-		while (Mouse.next())
+		
+		if (ControlSettings.isActionHold(ControlSettings.SMASH))
 		{
-			int button = Mouse.getEventButton();
-			if (button != -1)
-			{
-				/* Create OR Do Action */
-				if (button == 0 && Mouse.getEventButtonState())
-				{
-					if (_aimedBlockPosition.y() != -1)
-					{
-						if (getAimedBlockType().hasSpecialAction())
-						{
-							Block block = _chunkManager.getSpecialBlock(_aimedBlockPosition.x(), _aimedBlockPosition.y(), _aimedAdjacentBlockPosition.z());
-							block.performSpecialAction();
-						} else if (_selectedItem instanceof BlockType)
-						{
-							int bX = _aimedAdjacentBlockPosition.x();
-							int bY = _aimedAdjacentBlockPosition.y();
-							int bZ = _aimedAdjacentBlockPosition.z();
-
-							int pX = MathHelper.floor(x);
-							int pY = MathHelper.floor(y);
-							int pZ = MathHelper.floor(z);
-
-							if (bX == pX && (bY == pY || bY == pY + 1) && bZ == pZ)
-							{
-								// Player is where the block has to come
-							} else
-							{
-								Chunk bc = _chunkManager.getChunkContaining(bX, bY, bZ, true, true, true);
-								byte currentBlock = bc.getBlockTypeAbsolute(bX, bY, bZ, false, false, false);
-								if (currentBlock == 0)
-								{
-									BlockType type = ((BlockType) _selectedItem);
-									if (type.getCustomClass() == null)
-									{
-										bc.setDefaultBlockAbsolute(bX, bY, bZ, type, (byte) 0, true, true, true);
-									} else
-									{
-										Block block = BlockConstructor.construct(bX, bY, bZ, bc, type.getID(), (byte) 0);
-										bc.setSpecialBlockAbsolute(bX, bY, bZ, block, true, true, true);
-									}
-
-									_inventory.getInventoryPlace(_selectedInventoryItemIndex).getStack().decreaseItemCount();
-									setSelectedInventoryItemIndex(_selectedInventoryItemIndex);
-								}
-							}
-						}
-					}
-				}
-			} else
-			{
-				int wheel = Mouse.getEventDWheel();
-				if (wheel != 0)
-				{
-					wheel /= 100;
-					setSelectedInventoryItemIndex(MathHelper.clamp(_selectedInventoryItemIndex + wheel, 0, 8));
-				}
-			}
-
-		}
+			smash();
+		} else
 		{
-			if (Mouse.isButtonDown(1)) // Destroy
-			{
-				if (_aimedBlockType != 0)
-				{
-					_destroying = true;
-					float toolDamage = 0.0f;
-					if (_selectedItem != null)
-					{
-						_body.enableUsingRightHand();
-						toolDamage = _selectedItem.calcDamageInflictedByBlock(_aimedBlockType);
-						_aimedBlockHealth -= _selectedItem.calcDamageFactorToBlock(_aimedBlockType) * Game.getInstance().getStep() * 5.0f;
-					} else
-					{
-						_aimedBlockHealth -= Game.getInstance().getStep() * 5.0f;
-					}
-					boolean destroy = _aimedBlockHealth <= 0.0f;
-					if (destroy)
-					{
-						_chunkManager.removeBlock(_aimedBlockPosition.x(), _aimedBlockPosition.y(), _aimedBlockPosition.z());
-
-						/* Add block to the inventory */
-						int mineResult = getAimedBlockType().getMineResult();
-						int mineResultCount = getAimedBlockType().getMineResultCount();
-						if (mineResult != 0)
-						{
-							for (int i = 0; i < mineResultCount; ++i)
-							{
-								boolean added = _inventory.addToInventory(ItemManager.getInstance().getInventoryItem((short) (mineResult == -1 ? getAimedBlockType().getInventoryTypeID() : mineResult)));
-
-								if (added)
-								{
-									// TODO Play sound for taking an item
-								}
-							}
-						}
-						_aimedBlockPosition.set(0, -1, 0);
-						_aimedAdjacentBlockPosition = null;
-						_aimedBlockType = 0;
-						if (_selectedItem != null)
-						{
-							_selectedItem.inflictDamage(toolDamage);
-						}
-					}
-				} else if (_selectedItem != null)
-				{
-					if (!_airSmashed && !_destroying)
-					{
-						_body.airSmash();
-						_airSmashed = true;
-					}
-				}
-			} else
-			{
-				_airSmashed = false;
-				_destroying = false;
-			}
+			_destroying = false;
+			_airSmashed = false;
 		}
 	}
 
@@ -360,10 +248,10 @@ public class Player extends GameObject
 		float zStep = 0.0f;
 		// Forward movement
 		{
-			if (Keyboard.isKeyDown(ControlSettings.MOVE_FORWARD))
+			if (ControlSettings.isActionHold(ControlSettings.MOVE_FORWARD))
 			{
 				speedForward = Math.min(maxSpeed * (_flying ? 3.0f : 1.0f), speedForward + acceleration * step);
-			} else if (Keyboard.isKeyDown(ControlSettings.MOVE_BACK))
+			} else if (ControlSettings.isActionHold(ControlSettings.MOVE_BACK))
 			{
 				speedForward = Math.max(-maxSpeed * (_flying ? 3.0f : 1.0f), speedForward - acceleration * step);
 			} else
@@ -397,10 +285,10 @@ public class Player extends GameObject
 		}
 		// Side movement
 		{
-			if (Keyboard.isKeyDown(ControlSettings.MOVE_LEFT))
+			if (ControlSettings.isActionHold(ControlSettings.MOVE_LEFT))
 			{
 				speedSide = Math.max(-maxSpeed * (_flying ? 3.0f : 1.0f), speedSide - acceleration * step);
-			} else if (Keyboard.isKeyDown(ControlSettings.MOVE_RIGHT))
+			} else if (ControlSettings.isActionHold(ControlSettings.MOVE_RIGHT))
 			{
 				speedSide = Math.min(maxSpeed * (_flying ? 3.0f : 1.0f), speedSide + acceleration * step);
 			} else
@@ -515,7 +403,7 @@ public class Player extends GameObject
 		byte subSupport = chunkManager.getBlock(MathHelper.floor(x), MathHelper.floor(y) - 2, MathHelper.floor(z), false, false, false);
 		float supportHeight = Float.NEGATIVE_INFINITY;
 
-		if (Keyboard.isKeyDown(ControlSettings.JUMP))
+		if (ControlSettings.isActionHold(ControlSettings.JUMP))
 		{
 			if (onGround)
 			{
@@ -525,7 +413,7 @@ public class Player extends GameObject
 			{
 				ySpeed += 14f * step;
 			}
-		} else if (_flying && Keyboard.isKeyDown(ControlSettings.CROUCH))
+		} else if (_flying && ControlSettings.isActionHold(ControlSettings.CROUCH))
 		{
 			ySpeed -= 14f * step;
 		}
@@ -827,6 +715,114 @@ public class Player extends GameObject
 		setSelectedInventoryItemIndex(_selectedInventoryItemIndex);
 
 		return true;
+	}
+	
+	public void smash()
+	{
+		if (_aimedBlockType != 0)
+		{
+			_destroying = true;
+			float toolDamage = 0.0f;
+			if (_selectedItem != null)
+			{
+				_body.enableUsingRightHand();
+				toolDamage = _selectedItem.calcDamageInflictedByBlock(_aimedBlockType);
+				_aimedBlockHealth -= _selectedItem.calcDamageFactorToBlock(_aimedBlockType) * Game.getInstance().getStep() * 5.0f;
+			} else
+			{
+				_aimedBlockHealth -= Game.getInstance().getStep() * 5.0f;
+			}
+			boolean destroy = _aimedBlockHealth <= 0.0f;
+			if (destroy)
+			{
+				_chunkManager.removeBlock(_aimedBlockPosition.x(), _aimedBlockPosition.y(), _aimedBlockPosition.z());
+
+				/* Add block to the inventory */
+				int mineResult = getAimedBlockType().getMineResult();
+				int mineResultCount = getAimedBlockType().getMineResultCount();
+				if (mineResult != 0)
+				{
+					for (int i = 0; i < mineResultCount; ++i)
+					{
+						boolean added = _inventory.addToInventory(ItemManager.getInstance().getInventoryItem((short) (mineResult == -1 ? getAimedBlockType().getInventoryTypeID() : mineResult)));
+
+						if (added)
+						{
+							// TODO Play sound for taking an item
+						}
+					}
+				}
+				_aimedBlockPosition.set(0, -1, 0);
+				_aimedAdjacentBlockPosition = null;
+				_aimedBlockType = 0;
+				if (_selectedItem != null)
+				{
+					_selectedItem.inflictDamage(toolDamage);
+				}
+			}
+		} else if (_selectedItem != null)
+		{
+			if (!_airSmashed && !_destroying)
+			{
+				_body.airSmash();
+				_airSmashed = true;
+			}
+		}
+	}
+	
+	public void buildOrAction()
+	{
+		if (_aimedBlockPosition.y() != -1)
+		{
+			if (getAimedBlockType().hasSpecialAction())
+			{
+				Block block = _chunkManager.getSpecialBlock(_aimedBlockPosition.x(), _aimedBlockPosition.y(), _aimedAdjacentBlockPosition.z());
+				block.performSpecialAction();
+			} else if (_selectedItem instanceof BlockType)
+			{
+				int bX = _aimedAdjacentBlockPosition.x();
+				int bY = _aimedAdjacentBlockPosition.y();
+				int bZ = _aimedAdjacentBlockPosition.z();
+
+				int pX = MathHelper.floor(x);
+				int pY = MathHelper.floor(y);
+				int pZ = MathHelper.floor(z);
+
+				if (bX == pX && (bY == pY || bY == pY + 1) && bZ == pZ)
+				{
+					// Player is where the block has to come
+				} else
+				{
+					Chunk bc = _chunkManager.getChunkContaining(bX, bY, bZ, true, true, true);
+					byte currentBlock = bc.getBlockTypeAbsolute(bX, bY, bZ, false, false, false);
+					if (currentBlock == 0)
+					{
+						BlockType type = ((BlockType) _selectedItem);
+						if (type.getCustomClass() == null)
+						{
+							bc.setDefaultBlockAbsolute(bX, bY, bZ, type, (byte) 0, true, true, true);
+						} else
+						{
+							Block block = BlockConstructor.construct(bX, bY, bZ, bc, type.getID(), (byte) 0);
+							bc.setSpecialBlockAbsolute(bX, bY, bZ, block, true, true, true);
+						}
+
+						_inventory.getInventoryPlace(_selectedInventoryItemIndex).getStack().decreaseItemCount();
+						setSelectedInventoryItemIndex(_selectedInventoryItemIndex);
+					}
+				}
+			}
+		}
+	}
+	
+	public void scrollInventoryItem()
+	{
+		int wheel = Mouse.getEventDWheel();
+		if (wheel != 0)
+		{
+			wheel /= 100;
+			setSelectedInventoryItemIndex(MathHelper.clamp(_selectedInventoryItemIndex + wheel, 0, 8));
+		}
 	}
 
 }

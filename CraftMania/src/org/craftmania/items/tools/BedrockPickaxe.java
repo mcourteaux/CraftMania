@@ -23,7 +23,7 @@ public class BedrockPickaxe extends Tool
 {
 	public BedrockPickaxe()
 	{
-		super("bedrock_pickaxe", null, Material.DIAMOND, new Vec2i(0, 13), 6.0f);
+		super("bedrock_pickaxe", null, Material.BEDROCK, new Vec2i(0, 13), 6.0f);
 	}
 	
 	@Override

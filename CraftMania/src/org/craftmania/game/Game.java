@@ -470,6 +470,8 @@ public class Game
 		
 		/* Swords */
 		RecipeManager.getInstance().addRecipe(new Recipe("planks;planks;stick", "wooden_sword", 1));
+		RecipeManager.getInstance().addRecipe(new Recipe("bedrock;bedrock;stick", "bedrock_sword", 1));
+		
 	}
 
 	private void loadItems()

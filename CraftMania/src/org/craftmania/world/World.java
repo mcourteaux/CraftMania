@@ -26,7 +26,6 @@ import org.craftmania.datastructures.AABB;
 import org.craftmania.datastructures.ViewFrustum;
 import org.craftmania.game.Configuration;
 import org.craftmania.game.ControlSettings;
-import org.craftmania.game.Controls;
 import org.craftmania.game.FontStorage;
 import org.craftmania.game.Game;
 import org.craftmania.game.TextureStorage;
@@ -46,7 +45,6 @@ import org.lwjgl.opengl.GL11;
 public class World
 {
 
-	private Controls _controls;
 	private static final float SECONDS_IN_DAY = 60f * 10f; // 15 minutes / day
 
 	private WorldProvider _worldProvider;
@@ -88,7 +86,6 @@ public class World
 		_chunkVisibilityTestingAABB = new AABB(new Vec3f(), new Vec3f());
 		_chunkDistanceComparator = new ChunkDistanceComparator();
 		_fogColor = new Vec3f();
-		_controls = new Controls();
 		_time = SECONDS_IN_DAY * 0.3f;
 	}
 
@@ -136,7 +133,7 @@ public class World
 		glFogf(GL_FOG_END, 400);
 
 		_sky.render();
-		
+
 		/* Restore the fog distance */
 		glFogf(GL_FOG_START, configuration.getViewingDistance() * 0.55f);
 		glFogf(GL_FOG_END, configuration.getViewingDistance());
@@ -185,7 +182,7 @@ public class World
 			infoFont.print(4, 105, "Total Local Blocks:  " + _localBlockCount);
 			infoFont.print(4, 120, "Time:  " + _time);
 			infoFont.print(4, 135, "Sunlight:  " + _sunlight);
-			
+
 		}
 		/** RENDER **/
 		if (_activatedInventory != null)
@@ -241,7 +238,7 @@ public class World
 		int oldSunlight = MathHelper.floor(_sunlight * 29.99f);
 
 		_sunlight = -MathHelper.cos(todNew * MathHelper.f_2PI) * 0.5f + 0.5f;
-		_sunlight = Math.max(0.2f, _sunlight);
+		_sunlight = Math.max(0.15f, _sunlight);
 
 		if (oldSunlight != MathHelper.floor(_sunlight * 29.99f))
 		{
@@ -257,46 +254,9 @@ public class World
 		}
 
 		_sky.update();
-		
-		_controls.process();
 
-		while (Keyboard.next())
-		{
-			if (Keyboard.getEventKey() == ControlSettings.INVENTORY && Keyboard.getEventKeyState())
-			{
-				if (_activatedInventory != null)
-				{
-					setActivatedInventory(null);
-				} else
-				{
-					setActivatedInventory(_player.getInventory());
-				}
-			} else if (Keyboard.getEventKey() == Keyboard.KEY_F && Keyboard.getEventKeyState())
-			{
-				_player.toggleFlying();
-			} else if (Keyboard.getEventKey() == Keyboard.KEY_C && Keyboard.getEventKeyState())
-			{
-				System.out.println("Rebuiling Visibility Buffers...");
-				for (Chunk c : _localChunks)
-				{
-					System.out.print(c.getVisibleBlocks().size() + " --> ");
-					c.rebuildVisibilityBuffer();
-					System.out.println(c.getVisibleBlocks().size());
-					if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT))
-					{
-						c.unsetNetVBONeeded();
-					}
-				}
-				System.out.println();
-			} else if (Keyboard.getEventKey() == ControlSettings.TOGGLE_OVERLAY && Keyboard.getEventKeyState())
-			{
-				Game.RENDER_INFORMATION_OVERLAY = !Game.RENDER_INFORMATION_OVERLAY;
-			} else if (Keyboard.getEventKey() == ControlSettings.TOGGLE_LIGHT_POINT && Keyboard.getEventKeyState())
-			{
-				_player.toggleLight();
-			}
-		}
-		
+		processInput();
+
 		if (_activatedInventory == null)
 		{
 			if (!(_localChunks.size() < 4 && _oldChunkList.size() < 4))
@@ -534,7 +494,7 @@ public class World
 		int oldSunlight = MathHelper.round(_sunlight);
 
 		_sunlight = -MathHelper.cos(todNew * MathHelper.f_2PI) * 0.5f + 0.5f;
-		_sunlight = Math.max(0.2f, _sunlight);
+		_sunlight = Math.max(0.15f, _sunlight);
 
 		if (oldSunlight != MathHelper.round(_sunlight))
 		{
@@ -546,4 +506,52 @@ public class World
 		}
 
 	}
+
+	private void processInput()
+	{
+		/* Keyboard */
+		while (Keyboard.next())
+		{
+			processInputSection(false);
+		}
+		while (Mouse.next())
+		{
+			processInputSection(true);
+			if (_activatedInventory == null)
+			{
+				_player.scrollInventoryItem();
+			} else
+			{
+				_activatedInventory.mouseEvent();
+			}
+		}
+	}
+
+	public void processInputSection(boolean mouse)
+	{
+		if (ControlSettings.isCurrentEvent(ControlSettings.INVENTORY, mouse))
+		{
+			if (_activatedInventory != null)
+			{
+				setActivatedInventory(null);
+			} else
+			{
+				setActivatedInventory(_player.getInventory());
+			}
+		} else if (ControlSettings.isCurrentEvent(ControlSettings.TOGGLE_GOD_MODE, mouse))
+		{
+			_player.toggleFlying();
+		} else if (ControlSettings.isCurrentEvent(ControlSettings.TOGGLE_OVERLAY, mouse))
+		{
+			Game.RENDER_INFORMATION_OVERLAY = !Game.RENDER_INFORMATION_OVERLAY;
+		} else if (ControlSettings.isCurrentEvent(ControlSettings.TOGGLE_LIGHT_POINT, mouse))
+		{
+			_player.toggleLight();
+		} else if (ControlSettings.isCurrentEvent(ControlSettings.BUILD_OR_ACTION, mouse))
+		{
+			_player.buildOrAction();
+		}
+
+	}
+
 }
