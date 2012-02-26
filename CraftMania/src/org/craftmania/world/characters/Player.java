@@ -147,8 +147,9 @@ public class Player extends GameObject
 	}
 
 	/**
-	 * The returned vector is the single instanced vector representing the players position.
-	 * DO NOT MODIFY THIS VECTOR
+	 * The returned vector is the single instanced vector representing the
+	 * players position. DO NOT MODIFY THIS VECTOR
+	 * 
 	 * @return the position of the player
 	 */
 	public Vec3f getPosition()
@@ -227,7 +228,7 @@ public class Player extends GameObject
 		}
 
 		rayCastBlock();
-		
+
 		if (ControlSettings.isActionHold(ControlSettings.SMASH))
 		{
 			smash();
@@ -391,7 +392,7 @@ public class Player extends GameObject
 			bobbing *= 0.8f;
 		} else
 		{
-			bobbing = MathHelper.sin(bobbingProcess) * 0.03f * speed;
+			bobbing = MathHelper.sin(bobbingProcess) * 0.03f * speed * (MathHelper.f_PI / 2.0f - Math.abs(rotX)) / (MathHelper.f_PI / 2.0f);
 		}
 	}
 
@@ -499,6 +500,7 @@ public class Player extends GameObject
 		Vec3f v = new Vec3f();
 		Vec3i newAimedBlockPosition = new Vec3i();
 		byte bl = 0;
+		boolean special = false;
 		Chunk chunk = Game.getInstance().getWorld().getChunkManager().getChunkContaining(aabbX, aabbY, aabbZ, false, false, false);
 		if (chunk == null)
 			return;
@@ -511,10 +513,15 @@ public class Player extends GameObject
 					if (bl == 0 || bl == -1)
 						continue;
 
-					// if (bl.isMoving())
-					// {
-					// continue;
-					// }
+					special = chunk.isBlockSpecialAbsolute(x, y, z);
+					if (special)
+					{
+						Block block = chunk.getSpecialBlockAbsolute(x, y, z);
+						if (block.isMoving())
+						{
+							continue;
+						}
+					}
 
 					v.set(x + 0.5f, y + 0.5f, z + 0.5f);
 
@@ -716,7 +723,7 @@ public class Player extends GameObject
 
 		return true;
 	}
-	
+
 	public void smash()
 	{
 		if (_aimedBlockType != 0)
@@ -769,7 +776,7 @@ public class Player extends GameObject
 			}
 		}
 	}
-	
+
 	public void buildOrAction()
 	{
 		if (_aimedBlockPosition.y() != -1)
@@ -814,20 +821,25 @@ public class Player extends GameObject
 			}
 		}
 	}
-	
+
 	public void scrollInventoryItem()
 	{
-		int wheel = Mouse.getEventDWheel();
+		float wheel = Mouse.getEventDWheel();
 		if (wheel != 0)
 		{
-			wheel /= 100;
-			setSelectedInventoryItemIndex(MathHelper.clamp(_selectedInventoryItemIndex + wheel, 0, 8));
+			wheel /= 210.0f;
+			setSelectedInventoryItemIndex(MathHelper.clamp(_selectedInventoryItemIndex + MathHelper.round(wheel), 0, 8));
 		}
 	}
 
 	public float getEyeHeight()
 	{
 		return eyeHeight;
+	}
+
+	public int getSelectedInventoryItemIndex()
+	{
+		return _selectedInventoryItemIndex;
 	}
 
 }

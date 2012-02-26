@@ -15,8 +15,14 @@
  ******************************************************************************/
 package org.craftmania.recipes;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.craftmania.game.Game;
 
 public class RecipeManager
 {
@@ -29,6 +35,32 @@ public class RecipeManager
 			__instance = new RecipeManager();
 		}
 		return __instance;
+	}
+	
+	public void loadRecipes() throws IOException
+	{
+		File file = Game.getInstance().getRelativeFile(Game.FILE_BASE_APPLICATION, "res/recipes.txt");
+		
+		BufferedReader br = new BufferedReader(new FileReader(file));
+		
+		for (String line = br.readLine(); line != null; line = br.readLine())
+		{
+			line = line.trim();
+			if (line.isEmpty() || line.startsWith("/*") || line.startsWith("//"))
+			{
+				continue;
+			}
+			
+			String[] parts = line.split(" ");
+			
+			String recipe = parts[0];
+			String result = parts[1];
+			int amount = Integer.parseInt(parts[2]);
+			
+			addRecipe(new Recipe(recipe, result, amount));
+		}
+		
+		br.close();
 	}
 
 	private List<Recipe> _recipes;

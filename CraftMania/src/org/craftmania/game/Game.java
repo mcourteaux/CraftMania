@@ -15,46 +15,7 @@
  ******************************************************************************/
 package org.craftmania.game;
 
-import static org.lwjgl.opengl.GL11.GL_ALPHA_TEST;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_COLOR_MATERIAL;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_FOG;
-import static org.lwjgl.opengl.GL11.GL_FOG_COLOR;
-import static org.lwjgl.opengl.GL11.GL_FOG_END;
-import static org.lwjgl.opengl.GL11.GL_FOG_HINT;
-import static org.lwjgl.opengl.GL11.GL_FOG_MODE;
-import static org.lwjgl.opengl.GL11.GL_FOG_START;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_NICEST;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_PERSPECTIVE_CORRECTION_HINT;
-import static org.lwjgl.opengl.GL11.GL_PROJECTION;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.glColor3f;
-import static org.lwjgl.opengl.GL11.glColor4f;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glFog;
-import static org.lwjgl.opengl.GL11.glFogf;
-import static org.lwjgl.opengl.GL11.glFogi;
-import static org.lwjgl.opengl.GL11.glHint;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glOrtho;
-import static org.lwjgl.opengl.GL11.glVertex2i;
+import static org.lwjgl.opengl.GL11.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,12 +27,13 @@ import org.craftmania.blocks.BlockXMLLoader;
 import org.craftmania.items.ItemXMLLoader;
 import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3f;
-import org.craftmania.recipes.Recipe;
 import org.craftmania.recipes.RecipeManager;
+import org.craftmania.rendering.BufferManager;
 import org.craftmania.rendering.GLFont;
 import org.craftmania.rendering.GLUtils;
 import org.craftmania.world.World;
 import org.lwjgl.LWJGLException;
+import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -132,7 +94,6 @@ public class Game
 				for (int i = 0; i < modes.length; i++)
 				{
 					DisplayMode current = modes[i];
-
 					if ((current.getWidth() == width) && (current.getHeight() == height))
 					{
 						if ((targetDisplayMode == null) || (current.getFrequency() >= freq))
@@ -149,8 +110,7 @@ public class Game
 						// original display mode then it's probably best to go
 						// for this one
 						// since it's most likely compatible with the monitor
-						if ((current.getBitsPerPixel() == Display.getDesktopDisplayMode().getBitsPerPixel())
-								&& (current.getFrequency() == Display.getDesktopDisplayMode().getFrequency()))
+						if ((current.getBitsPerPixel() == Display.getDesktopDisplayMode().getBitsPerPixel()) && (current.getFrequency() == Display.getDesktopDisplayMode().getFrequency()))
 						{
 							targetDisplayMode = current;
 							break;
@@ -167,7 +127,6 @@ public class Game
 				System.out.println("Failed to find value mode: " + width + "x" + height + " fs=" + fullscreen);
 				return;
 			}
-
 			Display.setDisplayMode(targetDisplayMode);
 			Display.setFullscreen(fullscreen);
 
@@ -185,6 +144,7 @@ public class Game
 		try
 		{
 			Display.setTitle("CraftMania");
+
 			setDisplayMode(_configuration.getWidth(), _configuration.getHeight(), _configuration.isFullscreen());
 			if (_configuration.getVSync())
 			{
@@ -197,12 +157,15 @@ public class Game
 			System.exit(0);
 		}
 
+		System.out.println("LWJGL Version: " + Sys.getVersion());
+		System.out.println("GPU: " + Display.getAdapter());
+
 		initOpenGL();
 		loadTextures();
 		loadFonts();
 		loadItems();
 		loadBlocks();
-		loadRecipes();
+		RecipeManager.getInstance().loadRecipes();
 		loadSpecialStuff();
 		Mouse.setGrabbed(true);
 	}
@@ -248,6 +211,9 @@ public class Game
 		glHint(GL_FOG_HINT, GL_NICEST);
 
 		System.out.println("VBO Supported: " + GLUtils.isVBOSupported());
+
+		/* Instantiate the BufferManager */
+		BufferManager.getInstance();
 	}
 
 	public float getFPS()
@@ -266,6 +232,7 @@ public class Game
 		{
 			_world.update();
 		}
+		BufferManager.getInstance().deleteQueuedBuffers();
 	}
 
 	public void render()
@@ -291,8 +258,8 @@ public class Game
 		infoFont.print(4, _configuration.getHeight() - 20, String.format("FPS: %5.1f", getAverageFPS()));
 		infoFont.print(4, _configuration.getHeight() - 20 - 15, "Sleeping: " + String.format("%4d", Game.getInstance().getSleepTime()));
 		infoFont.print(4, _configuration.getHeight() - 20 - 30, "Heap Size: " + MathHelper.bytesToMagaBytes(Runtime.getRuntime().totalMemory()) + " MB");
-		infoFont.print(4, _configuration.getHeight() - 20 - 45, "Heap Use:  " + MathHelper.bytesToMagaBytes(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory())
-				+ " MB");
+		infoFont.print(4, _configuration.getHeight() - 20 - 45, "Heap Use:  " + MathHelper.bytesToMagaBytes(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) + " MB");
+		infoFont.print(4, _configuration.getHeight() - 20 - 60, "Buffers: " + BufferManager.getInstance().getAliveBuffers());
 	}
 
 	public void initOverlayRendering()
@@ -324,7 +291,6 @@ public class Game
 		glDisable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
-		// glDepthFunc(GL_ALWAYS);
 		glEnable(GL_CULL_FACE);
 
 		glMatrixMode(GL_PROJECTION);
@@ -418,6 +384,7 @@ public class Game
 			}
 		}
 
+		BufferManager.getInstance().deleteQueuedBuffers();
 		BlockManager.getInstance().release();
 		TextureStorage.release();
 		FontStorage.release();
@@ -430,6 +397,7 @@ public class Game
 		TextureStorage.loadTexture("terrain", "PNG", "terrain.png");
 		TextureStorage.loadTexture("particles", "PNG", "particles.png");
 		TextureStorage.loadTexture("items", "PNG", "gui/items_edit.png");
+		TextureStorage.loadTexture("gui.gui", "PNG", "gui/gui.png");
 		TextureStorage.loadTexture("gui.inventory", "PNG", "gui/inventory.png");
 		TextureStorage.loadTexture("gui.crafting", "PNG", "gui/crafting.png");
 		TextureStorage.loadTexture("environment.clouds", "PNG", "environment/clouds.png");
@@ -439,41 +407,6 @@ public class Game
 	{
 		FontStorage.loadFont("Monospaced_20", "novamono.ttf", 22);
 		FontStorage.loadFont("InventoryAmount", "visitor1.ttf", 14);
-	}
-
-	private void loadRecipes()
-	{
-		RecipeManager.getInstance().addRecipe(new Recipe("wood0", "planks", 4));
-		RecipeManager.getInstance().addRecipe(new Recipe("wood1", "planks", 4));
-		RecipeManager.getInstance().addRecipe(new Recipe("planks,planks;planks,planks", "crafting_table", 1));
-		RecipeManager.getInstance().addRecipe(new Recipe("planks;planks", "stick", 4));
-		RecipeManager.getInstance().addRecipe(new Recipe("coal;stick", "torch", 4));
-		RecipeManager.getInstance().addRecipe(new Recipe("sand,sand;torch,torch", "glass", 8));
-		RecipeManager.getInstance().addRecipe(new Recipe("gravel,gravel;gravel,gravel", "gravel", 8));
-		RecipeManager.getInstance().addRecipe(new Recipe("torch,gravel,torch;cactus,yellowflower,cactus;dirt,wood1,dirt", "bedrock", 32));
-
-		/* Shovels */
-		RecipeManager.getInstance().addRecipe(new Recipe("stone;stick;stick", "stone_shovel", 1));
-		RecipeManager.getInstance().addRecipe(new Recipe("cobblestone;stick;stick", "stone_shovel", 1));
-		RecipeManager.getInstance().addRecipe(new Recipe("planks;stick;stick", "wooden_shovel", 1));
-		RecipeManager.getInstance().addRecipe(new Recipe("bedrock;stick;stick", "bedrock_shovel", 1));
-
-		/* Pickaxe */
-		RecipeManager.getInstance().addRecipe(new Recipe("planks,planks,planks;,stick;,stick", "wooden_pickaxe", 1));
-		RecipeManager.getInstance().addRecipe(new Recipe("stone,stone,stone;,stick;,stick", "stone_pickaxe", 1));
-		RecipeManager.getInstance().addRecipe(new Recipe("cobblestone,cobblestone,cobblestone;,stick;,stick", "stone_pickaxe", 1));
-		RecipeManager.getInstance().addRecipe(new Recipe("bedrock,bedrock,bedrock;,stick;,stick", "bedrock_pickaxe", 1));
-
-		/* Axes */
-		RecipeManager.getInstance().addRecipe(new Recipe("planks,planks;planks,stick;,stick", "wooden_axe", 1));
-		RecipeManager.getInstance().addRecipe(new Recipe("stone,stone;stone,stick;,stick", "stone_axe", 1));
-		RecipeManager.getInstance().addRecipe(new Recipe("cobblestone,cobblestone;cobblestone,stick;,stick", "stone_axe", 1));
-		RecipeManager.getInstance().addRecipe(new Recipe("bedrock,bedrock;bedrock,stick;,stick", "bedrock_axe", 1));
-		
-		/* Swords */
-		RecipeManager.getInstance().addRecipe(new Recipe("planks;planks;stick", "wooden_sword", 1));
-		RecipeManager.getInstance().addRecipe(new Recipe("bedrock;bedrock;stick", "bedrock_sword", 1));
-		
 	}
 
 	private void loadItems()
@@ -540,7 +473,10 @@ public class Game
 
 	public File getRelativeFile(int fileBase, String string)
 	{
-		string = string.replace("${world}", getWorld().getWorldName());
+		if (string.contains("${world}"))
+		{
+			string = string.replace("${world}", getWorld().getWorldName());
+		}
 		switch (fileBase)
 		{
 		case FILE_BASE_USER_DATA:

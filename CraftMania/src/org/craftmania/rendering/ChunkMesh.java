@@ -16,7 +16,6 @@
 package org.craftmania.rendering;
 
 import org.craftmania.rendering.ChunkMeshBuilder.MeshType;
-import org.lwjgl.opengl.ARBVertexBufferObject;
 
 public class ChunkMesh
 {
@@ -60,11 +59,7 @@ public class ChunkMesh
 	{
 		if (_vbos[meshType.ordinal()] != 0 && _vbos[meshType.ordinal()] != -1)
 		{
-			synchronized (GLUtils.getOpenGLLock())
-			{
-				ARBVertexBufferObject.glDeleteBuffersARB(_vbos[meshType.ordinal()]);
-			}
-//			System.out.println("Delete VBO: " + _vbo);
+			BufferManager.getInstance().deleteBuffer(_vbos[meshType.ordinal()]);
 			_vbos[meshType.ordinal()] = 0;
 			_vertexCount[meshType.ordinal()] = 0;
 		}

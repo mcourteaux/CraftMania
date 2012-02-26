@@ -19,8 +19,6 @@ import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 
 import org.lwjgl.opengl.ContextCapabilities;
 import org.lwjgl.opengl.GLContext;
@@ -29,11 +27,9 @@ public class GLUtils
 {
 	
 	private static boolean _vboSupported;
-	private static Object _openGL_lock;
 	
 	static
 	{
-		_openGL_lock = new Object();
 		try
 		{
 			ContextCapabilities cap = GLContext.getCapabilities();
@@ -70,10 +66,5 @@ public class GLUtils
 			return (Long) value;
 		}
 		throw new NoSuchFieldException(function);
-	}
-	
-	public static Object getOpenGLLock()
-	{
-		return _openGL_lock;
 	}
 }

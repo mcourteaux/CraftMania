@@ -245,6 +245,9 @@ public class BlockXMLLoader
 				} else if (settingsType == byte.class)
 				{
 					value = Byte.parseByte(valueStr);
+				} else if (settingsType == Vec3f.class)
+				{
+					value = parseVec3f(valueStr);
 				}
 
 				bm.setBlockTypeSetting(blockType, settingName, value);
@@ -306,4 +309,29 @@ public class BlockXMLLoader
 
 		return new Vec2i(x, y);
 	}
+	
+	private static Vec3f parseVec3f(String str)
+	{
+		float x = 0.0f;
+		float y = 0.0f;
+		float z = 0.0f;
+		int indexOfComa0 = str.indexOf(",");
+		int indexOfComa1 = str.indexOf(",", indexOfComa0 + 1);
+		if (indexOfComa0 == -1 || indexOfComa1 == -1)
+		{
+			throw new IllegalArgumentException("For string input: " + str);
+		}
+		try
+		{
+			x = Float.parseFloat(str.substring(0, indexOfComa0));
+			y = Float.parseFloat(str.substring(indexOfComa0 + 1, indexOfComa1));
+			z = Float.parseFloat(str.substring(indexOfComa1 + 1));
+		} catch (Exception e)
+		{
+			throw new IllegalArgumentException("Cannot parse Vec3f", e);
+		}
+
+		return new Vec3f(x, y, z);
+	}
+	
 }

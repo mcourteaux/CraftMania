@@ -30,6 +30,8 @@ import org.craftmania.game.FontStorage;
 import org.craftmania.game.Game;
 import org.craftmania.game.TextureStorage;
 import org.craftmania.inventory.Inventory;
+import org.craftmania.inventory.InventoryItem;
+import org.craftmania.inventory.Inventory.InventoryPlace;
 import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3f;
 import org.craftmania.rendering.ChunkMeshBuilder.MeshType;
@@ -41,11 +43,14 @@ import org.craftmania.world.characters.Player;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
+import org.newdawn.slick.opengl.Texture;
 
 public class World
 {
 
 	private static final float SECONDS_IN_DAY = 60f * 10f; // 15 minutes / day
+	private int CENTER_CROSS_CALL_LIST;
+	private int INVENTORY_BAR_CALL_LIST;
 
 	private WorldProvider _worldProvider;
 	private ChunkManager _chunkManager;
@@ -167,7 +172,6 @@ public class World
 			_sky.render();
 		}
 
-		
 		_player.render();
 
 		renderOverlay();
@@ -204,14 +208,18 @@ public class World
 			_activatedInventory.renderInventory();
 		} else
 		{
+			int width = conf.getWidth();
+			int height = conf.getHeight();
 			// Center Cross
+			glDisable(GL_TEXTURE_2D);
+			if (CENTER_CROSS_CALL_LIST == 0)
 			{
-				int width = conf.getWidth();
-				int height = conf.getHeight();
+				CENTER_CROSS_CALL_LIST = GL11.glGenLists(1);
+				GL11.glNewList(CENTER_CROSS_CALL_LIST, GL11.GL_COMPILE_AND_EXECUTE);
+
 				int crossSize = 10;
 				int crossHole = 5;
 
-				glDisable(GL_TEXTURE_2D);
 				glLineWidth(2.5f);
 
 				glColor3f(0, 0, 0);
@@ -229,8 +237,86 @@ public class World
 				glVertex3f(width / 2, height / 2 + crossHole, 0);
 
 				glEnd();
-				glEnable(GL_TEXTURE_2D);
+				GL11.glEndList();
+			} else
+			{
+				GL11.glCallList(CENTER_CROSS_CALL_LIST);
 			}
+			glEnable(GL_TEXTURE_2D);
+
+			// Inventory bar
+			GL11.glPushMatrix();
+			Texture texGui = TextureStorage.getTexture("gui.gui");
+			texGui.bind();
+			float tileSize = 20.0f / texGui.getImageWidth();
+			if (INVENTORY_BAR_CALL_LIST == 0)
+			{
+				INVENTORY_BAR_CALL_LIST = GL11.glGenLists(2);
+
+				/* Bar */
+				GL11.glNewList(INVENTORY_BAR_CALL_LIST, GL11.GL_COMPILE_AND_EXECUTE);
+
+				GL11.glTranslatef(width / 2.0f - 9 * 20, 10, 0);
+				GL11.glColor3f(1.0f, 1.0f, 1.0f);
+				GL11.glBegin(GL11.GL_QUADS);
+
+				GL11.glTexCoord2f(0, 0);
+				GL11.glVertex2f(0, 40);
+
+				GL11.glTexCoord2f(tileSize * 9, 0);
+				GL11.glVertex2f(9 * 40, 40);
+
+				GL11.glTexCoord2f(tileSize * 9, tileSize);
+				GL11.glVertex2f(9 * 40, 0);
+
+				GL11.glTexCoord2f(0, tileSize);
+				GL11.glVertex2f(0, 0);
+
+				GL11.glEnd();
+				GL11.glEndList();
+
+				/* Little frame around selected item */
+				float frameTileSize = 24.0f / texGui.getImageWidth();
+				float frameTileY = 22.0f / texGui.getImageHeight();
+
+				GL11.glNewList(INVENTORY_BAR_CALL_LIST + 1, GL11.GL_COMPILE);
+				GL11.glBegin(GL11.GL_QUADS);
+
+				GL11.glTexCoord2f(0, frameTileY);
+				GL11.glVertex2f(0, 48);
+
+				GL11.glTexCoord2f(frameTileSize, frameTileY);
+				GL11.glVertex2f(48, 48);
+
+				GL11.glTexCoord2f(frameTileSize, frameTileY + frameTileSize);
+				GL11.glVertex2f(48, 0);
+
+				GL11.glTexCoord2f(0, frameTileY + frameTileSize);
+				GL11.glVertex2f(0, 0);
+
+				GL11.glEnd();
+				GL11.glEndList();
+			} else
+			{
+				GL11.glCallList(INVENTORY_BAR_CALL_LIST);
+			}
+
+			/* Content */
+			GL11.glPushMatrix();
+			GL11.glTranslatef(20, 20, 0);
+			for (int i = 0; i < 9; ++i)
+			{
+				InventoryPlace place = getActivePlayer().getInventory().getInventoryPlace(i);
+				if (place != null)
+					place.render();
+				GL11.glTranslatef(40, 0, 0);
+			}
+			texGui.bind();
+			GL11.glPopMatrix();
+			GL11.glTranslatef(getActivePlayer().getSelectedInventoryItemIndex() * 40.0f - 4, -4, 0);
+			GL11.glCallList(INVENTORY_BAR_CALL_LIST + 1);
+
+			GL11.glPopMatrix();
 		}
 	}
 

@@ -469,7 +469,7 @@ public abstract class Inventory
 			{
 				if (currentMousePlaceContainsObject && currentMousePlace.isStack())
 				{
-					int newStackSize = MathHelper.ceil(currentMousePlace.getItemCount() / 2.0f);
+					int newStackSize = MathHelper.round(currentMousePlace.getItemCount() / 2.0f);
 					_dragging = true;
 					_draggingItem = new InventoryPlace(currentMouseIndex, new InventoryItemStack((short) currentMousePlace.getItemTypeOrStackType(), newStackSize));
 					currentMousePlace.getStack().subtractAmount(newStackSize);

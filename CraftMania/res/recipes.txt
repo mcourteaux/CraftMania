@@ -1,0 +1,30 @@
+wood0 planks 4
+wood1 planks 4
+planks,planks;planks,planks crafting_table 1
+planks;planks stick 4
+coal;stick torch 4
+sand,sand;torch,torch glass 8
+gravel,gravel;gravel,gravel gravel 8
+torch,gravel,torch;cactus,yellowflower,cactus;dirt,wood1,dirt bedrock 32
+
+/* Shovels */
+stone;stick;stick stone_shovel 1
+cobblestone;stick;stick stone_shovel 1
+planks;stick;stick wooden_shovel 1
+bedrock;stick;stick bedrock_shovel 1
+
+/* Pickaxe */
+planks,planks,planks;,stick;,stick wooden_pickaxe 1
+stone,stone,stone;,stick;,stick stone_pickaxe 1
+cobblestone,cobblestone,cobblestone;,stick;,stick stone_pickaxe 1
+bedrock,bedrock,bedrock;,stick;,stick bedrock_pickaxe 1
+
+/* Axes */
+planks,planks;planks,stick;,stick wooden_axe 1
+stone,stone;stone,stick;,stick stone_axe 1
+cobblestone,cobblestone;cobblestone,stick;,stick stone_axe 1
+bedrock,bedrock;bedrock,stick;,stick bedrock_axe 1
+
+/* Swords */
+planks;planks;stick wooden_sword 1
+bedrock;bedrock;stick bedrock_sword 1

@@ -23,7 +23,7 @@ import static org.lwjgl.opengl.GL11.glLineWidth;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslatef;
-import static org.lwjgl.opengl.GL11.glVertex3d;
+import static org.lwjgl.opengl.GL11.glVertex3f;
 
 import org.craftmania.math.Vec3f;
 
@@ -231,7 +231,7 @@ public class AABB
 	 */
 	public void render(float r, float g, float b, float a)
 	{
-		double offset = 0.01;
+		float offset = 0.001f;
 
 		glPushMatrix();
 		glTranslatef(getPosition().x(), getPosition().y(), getPosition().z());
@@ -241,50 +241,50 @@ public class AABB
 
 		// FRONT
 		glBegin(GL_LINE_LOOP);
-		glVertex3d(-_dimensions.x() - offset, -_dimensions.y() - offset, -_dimensions.z() - offset);
-		glVertex3d(+_dimensions.x() + offset, -_dimensions.y() - offset, -_dimensions.z() - offset);
-		glVertex3d(+_dimensions.x() + offset, +_dimensions.y() + offset, -_dimensions.z() - offset);
-		glVertex3d(-_dimensions.x() - offset, +_dimensions.y() + offset, -_dimensions.z() - offset);
+		glVertex3f(-_dimensions.x() - offset, -_dimensions.y() - offset, -_dimensions.z() - offset);
+		glVertex3f(+_dimensions.x() + offset, -_dimensions.y() - offset, -_dimensions.z() - offset);
+		glVertex3f(+_dimensions.x() + offset, +_dimensions.y() + offset, -_dimensions.z() - offset);
+		glVertex3f(-_dimensions.x() - offset, +_dimensions.y() + offset, -_dimensions.z() - offset);
 		glEnd();
 
 		// BACK
 		glBegin(GL_LINE_LOOP);
-		glVertex3d(-_dimensions.x() - offset, -_dimensions.y() - offset, +_dimensions.z() + offset);
-		glVertex3d(+_dimensions.x() + offset, -_dimensions.y() - offset, +_dimensions.z() + offset);
-		glVertex3d(+_dimensions.x() + offset, +_dimensions.y() + offset, +_dimensions.z() + offset);
-		glVertex3d(-_dimensions.x() - offset, +_dimensions.y() + offset, +_dimensions.z() + offset);
+		glVertex3f(-_dimensions.x() - offset, -_dimensions.y() - offset, +_dimensions.z() + offset);
+		glVertex3f(+_dimensions.x() + offset, -_dimensions.y() - offset, +_dimensions.z() + offset);
+		glVertex3f(+_dimensions.x() + offset, +_dimensions.y() + offset, +_dimensions.z() + offset);
+		glVertex3f(-_dimensions.x() - offset, +_dimensions.y() + offset, +_dimensions.z() + offset);
 		glEnd();
 
 		// TOP
 		glBegin(GL_LINE_LOOP);
-		glVertex3d(-_dimensions.x() - offset, -_dimensions.y() - offset, -_dimensions.z() - offset);
-		glVertex3d(+_dimensions.x() + offset, -_dimensions.y() - offset, -_dimensions.z() - offset);
-		glVertex3d(+_dimensions.x() + offset, -_dimensions.y() - offset, +_dimensions.z() + offset);
-		glVertex3d(-_dimensions.x() - offset, -_dimensions.y() - offset, +_dimensions.z() + offset);
+		glVertex3f(-_dimensions.x() - offset, -_dimensions.y() - offset, -_dimensions.z() - offset);
+		glVertex3f(+_dimensions.x() + offset, -_dimensions.y() - offset, -_dimensions.z() - offset);
+		glVertex3f(+_dimensions.x() + offset, -_dimensions.y() - offset, +_dimensions.z() + offset);
+		glVertex3f(-_dimensions.x() - offset, -_dimensions.y() - offset, +_dimensions.z() + offset);
 		glEnd();
 
 		// BOTTOM
 		glBegin(GL_LINE_LOOP);
-		glVertex3d(-_dimensions.x() - offset, +_dimensions.y() + offset, -_dimensions.z() - offset);
-		glVertex3d(+_dimensions.x() + offset, +_dimensions.y() + offset, -_dimensions.z() - offset);
-		glVertex3d(+_dimensions.x() + offset, +_dimensions.y() + offset, +_dimensions.z() + offset);
-		glVertex3d(-_dimensions.x() - offset, +_dimensions.y() + offset, +_dimensions.z() + offset);
+		glVertex3f(-_dimensions.x() - offset, +_dimensions.y() + offset, -_dimensions.z() - offset);
+		glVertex3f(+_dimensions.x() + offset, +_dimensions.y() + offset, -_dimensions.z() - offset);
+		glVertex3f(+_dimensions.x() + offset, +_dimensions.y() + offset, +_dimensions.z() + offset);
+		glVertex3f(-_dimensions.x() - offset, +_dimensions.y() + offset, +_dimensions.z() + offset);
 		glEnd();
 
 		// LEFT
 		glBegin(GL_LINE_LOOP);
-		glVertex3d(-_dimensions.x() - offset, -_dimensions.y() - offset, -_dimensions.z() - offset);
-		glVertex3d(-_dimensions.x() - offset, -_dimensions.y() - offset, +_dimensions.z() + offset);
-		glVertex3d(-_dimensions.x() - offset, +_dimensions.y() + offset, +_dimensions.z() + offset);
-		glVertex3d(-_dimensions.x() - offset, +_dimensions.y() + offset, -_dimensions.z() - offset);
+		glVertex3f(-_dimensions.x() - offset, -_dimensions.y() - offset, -_dimensions.z() - offset);
+		glVertex3f(-_dimensions.x() - offset, -_dimensions.y() - offset, +_dimensions.z() + offset);
+		glVertex3f(-_dimensions.x() - offset, +_dimensions.y() + offset, +_dimensions.z() + offset);
+		glVertex3f(-_dimensions.x() - offset, +_dimensions.y() + offset, -_dimensions.z() - offset);
 		glEnd();
 
 		// RIGHT
 		glBegin(GL_LINE_LOOP);
-		glVertex3d(+_dimensions.x() + offset, -_dimensions.y() - offset, -_dimensions.z() - offset);
-		glVertex3d(+_dimensions.x() + offset, -_dimensions.y() - offset, +_dimensions.z() + offset);
-		glVertex3d(+_dimensions.x() + offset, +_dimensions.y() + offset, +_dimensions.z() + offset);
-		glVertex3d(+_dimensions.x() + offset, +_dimensions.y() + offset, -_dimensions.z() - offset);
+		glVertex3f(+_dimensions.x() + offset, -_dimensions.y() - offset, -_dimensions.z() - offset);
+		glVertex3f(+_dimensions.x() + offset, -_dimensions.y() - offset, +_dimensions.z() + offset);
+		glVertex3f(+_dimensions.x() + offset, +_dimensions.y() + offset, +_dimensions.z() + offset);
+		glVertex3f(+_dimensions.x() + offset, +_dimensions.y() + offset, -_dimensions.z() - offset);
 		glEnd();
 		glPopMatrix();
 	}

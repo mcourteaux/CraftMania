@@ -30,8 +30,8 @@ import org.craftmania.math.Vec3i;
 import org.craftmania.utilities.IntList;
 import org.craftmania.world.Chunk;
 import org.craftmania.world.ChunkData;
-import org.lwjgl.opengl.ARBVertexBufferObject;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
 
 public class ChunkMeshBuilder
 {
@@ -58,132 +58,129 @@ public class ChunkMeshBuilder
 
 	public static void generateChunkMesh(Chunk chunk, MeshType meshType)
 	{
-		synchronized (GLUtils.getOpenGLLock())
+		System.out.println("Building " + meshType.name() + " Mesh for " + chunk.toString() + "...");
+
+		/* Make sure there are no list edits anymore */
+		chunk.performListChanges();
+
+		ChunkMesh mesh = chunk.getMesh();
+		mesh.destroy(meshType);
+
+		/* Compute vertex count */
+		int vertexCount = chunk.getVertexCount(meshType);
+		System.out.println("\tVertex Count = " + vertexCount);
+		/*
+		 * If there are no faces visible yet (because of generating busy), don't
+		 * create a buffer
+		 */
+		if (vertexCount == 0)
 		{
+			return;
+		}
+		mesh.setVertexCount(meshType, vertexCount);
 
-			System.out.println("Building " + meshType.name() + " Mesh for " + chunk.toString() + "...");
-			
-			/* Make sure there are no list edits anymore */
-			chunk.performListChanges();
+		/* Create a buffer */
+		int vbo = BufferManager.getInstance().createBuffer();
+		mesh.setVBO(meshType, vbo);
 
-			ChunkMesh mesh = chunk.getMesh();
+		/* Bind the buffer */
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
+
+		/* Allocate size for the buffer */
+		int size = vertexCount * STRIDE * FLOAT_SIZE;
+		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, size, GL15.GL_STATIC_DRAW);
+		System.out.println("\tCreate VBO: " + vbo + " with size = " + size + " (ERROR: " + GL11.glGetError() + ")");
+
+		/* Get the native buffer to write to */
+		ByteBuffer byteBuffer = GL15.glMapBuffer(GL15.GL_ARRAY_BUFFER, GL15.GL_WRITE_ONLY, size, null);
+		if (byteBuffer == null)
+		{
+			System.out.println("\tCouldn't create a native VBO!: GL Error Code = " + GL11.glGetError());
+
+			GL15.glUnmapBuffer(GL15.GL_ARRAY_BUFFER);
+			GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+
 			mesh.destroy(meshType);
+			Thread.dumpStack();
+			mesh.setVBO(meshType, -1);
+			mesh.setVertexCount(meshType, 0);
 
-			/* Compute vertex count */
-			int vertexCount = chunk.getVertexCount(meshType);
-			System.out.println("\tVertex Count = " + vertexCount);
-			/*
-			 * If there are no faces visible yet (because of generating busy),
-			 * don't create a buffer
-			 */
-			if (vertexCount == 0)
+			return;
+		}
+
+		FloatBuffer vertexBuffer = byteBuffer.asFloatBuffer();
+
+		/* Store all vertices in the buffer */
+		USED_SIZE = 0;
+
+		/* Local temporary variables, used to speed up */
+		IntList blockList = chunk.getVisibleBlocks();
+		int blockIndex = -1;
+		byte blockType = 0;
+		boolean special = false;
+		Vec3i vec = new Vec3i();
+		BlockType type;
+		Block block = null;
+		byte[][][] lightBuffer = new byte[3][3][3];
+		byte faceMask = 0;
+
+		/* Iterate over the blocks */
+		for (int i = 0; i < blockList.size(); ++i)
+		{
+			blockIndex = blockList.get(i);
+			blockType = chunk.getChunkData().getBlockType(blockIndex);
+			if (blockType == 0)
+				continue;
+			special = chunk.getChunkData().isSpecial(blockIndex);
+			type = _blockManager.getBlockType(blockType);
+
+			if ((meshType == MeshType.SOLID && !type.isTranslucent() && type.hasNormalAABB()) || (meshType == MeshType.TRANSLUCENT && (type.isTranslucent() || !type.hasNormalAABB())))
 			{
-				return;
-			}
-			mesh.setVertexCount(meshType, vertexCount);
 
-			/* Create a buffer */
-			int vbo = ARBVertexBufferObject.glGenBuffersARB();
-			mesh.setVBO(meshType, vbo);
+				ChunkData.indexToPosition(blockIndex, vec);
 
-			/* Bind the buffer */
-			ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, vbo);
+				/* Build the light buffer */
 
-			/* Allocate size for the buffer */
-			int size = vertexCount * STRIDE * FLOAT_SIZE;
-			ARBVertexBufferObject.glBufferDataARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, size, ARBVertexBufferObject.GL_STATIC_DRAW_ARB);
-			System.out.println("\tCreate VBO: " + vbo + " with size = " + size + " (ERROR: " + GL11.glGetError() + ")");
+				vec.setX(vec.x() + chunk.getAbsoluteX());
+				vec.setZ(vec.z() + chunk.getAbsoluteZ());
 
-			/* Get the native buffer to write to */
-			ByteBuffer byteBuffer = ARBVertexBufferObject.glMapBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, ARBVertexBufferObject.GL_WRITE_ONLY_ARB, size, null);
-			if (byteBuffer == null)
-			{
-				System.out.println("\tCouldn't create a native VBO!: GL Error Code = " + GL11.glGetError());
+				chunk.fillLightBuffer(lightBuffer, vec.x(), vec.y(), vec.z());
 
-				ARBVertexBufferObject.glUnmapBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB);
-				ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, 0);
-
-				mesh.destroy(meshType);
-				Thread.dumpStack();
-				mesh.setVBO(meshType, -1);
-				mesh.setVertexCount(meshType, 0);
-
-				return;
-			}
-
-			FloatBuffer vertexBuffer = byteBuffer.asFloatBuffer();
-
-			/* Store all vertices in the buffer */
-			USED_SIZE = 0;
-
-			/* Local temporary variables, used to speed up */
-			IntList blockList = chunk.getVisibleBlocks();
-			int blockIndex = -1;
-			byte blockType = 0;
-			boolean special = false;
-			Vec3i vec = new Vec3i();
-			BlockType type;
-			Block block = null;
-			byte[][][] lightBuffer = new byte[3][3][3];
-			byte faceMask = 0;
-
-			/* Iterate over the blocks */
-			for (int i = 0; i < blockList.size(); ++i)
-			{
-				blockIndex = blockList.get(i);
-				blockType = chunk.getChunkData().getBlockType(blockIndex);
-				if (blockType == 0)
-					continue;
-				special = chunk.getChunkData().isSpecial(blockIndex);
-				type = _blockManager.getBlockType(blockType);
-
-				if ((meshType == MeshType.SOLID && !type.isTranslucent() && type.hasNormalAABB()) || (meshType == MeshType.TRANSLUCENT && (type.isTranslucent() || !type.hasNormalAABB())))
+				if (special)
 				{
-
-					ChunkData.indexToPosition(blockIndex, vec);
-
-					/* Build the light buffer */
-
-					vec.setX(vec.x() + chunk.getAbsoluteX());
-					vec.setZ(vec.z() + chunk.getAbsoluteZ());
-
-					chunk.fillLightBuffer(lightBuffer, vec.x(), vec.y(), vec.z());
-
-					if (special)
+					block = chunk.getChunkData().getSpecialBlock(blockIndex);
+					if (block.isVisible())
 					{
-						block = chunk.getChunkData().getSpecialBlock(blockIndex);
-						if (block.isVisible())
-						{
-							block.storeInVBO(vertexBuffer, lightBuffer);
-						}
+						block.storeInVBO(vertexBuffer, lightBuffer);
+					}
+				} else
+				{
+					if (type.isCrossed())
+					{
+						type.getCrossedBlockBrush().storeInVBO(vertexBuffer, vec.x() + 0.5f, vec.y() + 0.5f, vec.z() + 0.5f, lightBuffer);
 					} else
 					{
-						if (type.isCrossed())
-						{
-							type.getCrossedBlockBrush().storeInVBO(vertexBuffer, vec.x() + 0.5f, vec.y() + 0.5f, vec.z() + 0.5f, lightBuffer);
-						} else
-						{
-							faceMask = chunk.getChunkData().getFaceMask(blockIndex);
-							type.getDefaultBlockBrush().setFaceMask(faceMask);
-							type.getBrush().storeInVBO(vertexBuffer, vec.x() + 0.5f, vec.y() + 0.5f, vec.z() + 0.5f, lightBuffer);
-						}
+						faceMask = chunk.getChunkData().getFaceMask(blockIndex);
+						type.getDefaultBlockBrush().setFaceMask(faceMask);
+						type.getBrush().storeInVBO(vertexBuffer, vec.x() + 0.5f, vec.y() + 0.5f, vec.z() + 0.5f, lightBuffer);
 					}
 				}
 			}
-
-			/* Perform a check */
-			if (USED_SIZE != STRIDE * FLOAT_SIZE * mesh.getVertexCount(meshType))
-			{
-				System.out.println("\t[WARNING!]: Used size = " + USED_SIZE);
-				System.out.println("\t[WARNING!]: Vertex count = " + USED_SIZE / STRIDE / FLOAT_SIZE);
-				mesh.setVertexCount(meshType, USED_SIZE / STRIDE / FLOAT_SIZE);
-			}
-
-			byteBuffer.flip();
-
-			ARBVertexBufferObject.glUnmapBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB);
-			ARBVertexBufferObject.glBindBufferARB(ARBVertexBufferObject.GL_ARRAY_BUFFER_ARB, 0);
 		}
+
+		/* Perform a check */
+		if (USED_SIZE != STRIDE * FLOAT_SIZE * mesh.getVertexCount(meshType))
+		{
+			System.out.println("\t[WARNING!]: Used size = " + USED_SIZE);
+			System.out.println("\t[WARNING!]: Vertex count = " + USED_SIZE / STRIDE / FLOAT_SIZE);
+			mesh.setVertexCount(meshType, USED_SIZE / STRIDE / FLOAT_SIZE);
+		}
+
+		byteBuffer.flip();
+
+		GL15.glUnmapBuffer(GL15.GL_ARRAY_BUFFER);
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+
 	}
 
 	public static void storeVertexData(FloatBuffer vertexBuffer, int x, int y, int z, byte faceMask, BlockType blockType, byte[][][] lightBuffer)
