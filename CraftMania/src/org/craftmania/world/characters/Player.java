@@ -825,4 +825,9 @@ public class Player extends GameObject
 		}
 	}
 
+	public float getEyeHeight()
+	{
+		return eyeHeight;
+	}
+
 }

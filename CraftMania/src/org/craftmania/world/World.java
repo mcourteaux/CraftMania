@@ -129,10 +129,14 @@ public class World
 		_fogColor.scale(_sunlight - 0.05f);
 		GL11.glFog(GL11.GL_FOG_COLOR, GLUtils.wrapDirect(_fogColor.x(), _fogColor.y(), _fogColor.z(), 1.0f));
 		GL11.glClearColor(_fogColor.x(), _fogColor.y(), _fogColor.z(), 1.0f);
-		glFogf(GL_FOG_START, 200);
-		glFogf(GL_FOG_END, 400);
 
-		_sky.render();
+		if (_player.getPosition().y() + _player.getEyeHeight() < _sky.getCloudsHeight())
+		{
+			glFogf(GL_FOG_START, 200);
+			glFogf(GL_FOG_END, 400);
+
+			_sky.render();
+		}
 
 		/* Restore the fog distance */
 		glFogf(GL_FOG_START, configuration.getViewingDistance() * 0.55f);
@@ -155,6 +159,15 @@ public class World
 			_visibleChunks.get(i).renderManualBlocks();
 		}
 
+		if (_player.getPosition().y() + _player.getEyeHeight() > _sky.getCloudsHeight())
+		{
+			glFogf(GL_FOG_START, 200);
+			glFogf(GL_FOG_END, 400);
+
+			_sky.render();
+		}
+
+		
 		_player.render();
 
 		renderOverlay();

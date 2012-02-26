@@ -16,6 +16,7 @@
 package org.craftmania.items.tools;
 
 import org.craftmania.blocks.BlockManager;
+import org.craftmania.blocks.BlockType.BlockClass;
 import org.craftmania.items.Tool;
 import org.craftmania.math.Vec2i;
 
@@ -23,7 +24,7 @@ public class BedrockPickaxe extends Tool
 {
 	public BedrockPickaxe()
 	{
-		super("bedrock_pickaxe", null, Material.BEDROCK, new Vec2i(0, 13), 6.0f);
+		super("bedrock_pickaxe", BlockClass.STONE, Material.BEDROCK, new Vec2i(0, 13), 6.0f);
 	}
 	
 	@Override
@@ -31,7 +32,7 @@ public class BedrockPickaxe extends Tool
 	{
 		if (block == BlockManager.getInstance().blockID("bedrock"))
 		{
-			return 20000.0f;
+			return 15000.0f;
 		}
 		return super.calcDamageFactorToBlock(block) * 2.0f;
 	}

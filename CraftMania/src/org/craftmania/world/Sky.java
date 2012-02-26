@@ -80,7 +80,6 @@ public class Sky extends GameObject
 	{
 		Vec3f playerPos = Game.getInstance().getWorld().getActivePlayer().getPosition();
 
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_CULL_FACE);
 
 		/* Sphere */
@@ -106,7 +105,6 @@ public class Sky extends GameObject
 		}
 
 		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
 	}
 
@@ -173,6 +171,11 @@ public class Sky extends GameObject
 			GL11.glCallList(_cloudsCallList);
 		}
 		GL11.glPopMatrix();
+	}
+
+	public float getCloudsHeight()
+	{
+		return _cloudsHeight;
 	}
 
 }

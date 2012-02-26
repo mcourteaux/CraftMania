@@ -34,4 +34,6 @@
 
 	<item name="bedrock_pickaxe" class="org.craftmania.items.tools.BedrockPickaxe" />
 	<item name="bedrock_sword" class="org.craftmania.items.tools.BedrockSword" />
+	<item name="bedrock_shovel" class="org.craftmania.items.tools.BedrockShovel" />
+	<item name="bedrock_axe" class="org.craftmania.items.tools.BedrockAxe" />
 </root>

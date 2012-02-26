@@ -456,6 +456,7 @@ public class Game
 		RecipeManager.getInstance().addRecipe(new Recipe("stone;stick;stick", "stone_shovel", 1));
 		RecipeManager.getInstance().addRecipe(new Recipe("cobblestone;stick;stick", "stone_shovel", 1));
 		RecipeManager.getInstance().addRecipe(new Recipe("planks;stick;stick", "wooden_shovel", 1));
+		RecipeManager.getInstance().addRecipe(new Recipe("bedrock;stick;stick", "bedrock_shovel", 1));
 
 		/* Pickaxe */
 		RecipeManager.getInstance().addRecipe(new Recipe("planks,planks,planks;,stick;,stick", "wooden_pickaxe", 1));
@@ -467,6 +468,7 @@ public class Game
 		RecipeManager.getInstance().addRecipe(new Recipe("planks,planks;planks,stick;,stick", "wooden_axe", 1));
 		RecipeManager.getInstance().addRecipe(new Recipe("stone,stone;stone,stick;,stick", "stone_axe", 1));
 		RecipeManager.getInstance().addRecipe(new Recipe("cobblestone,cobblestone;cobblestone,stick;,stick", "stone_axe", 1));
+		RecipeManager.getInstance().addRecipe(new Recipe("bedrock,bedrock;bedrock,stick;,stick", "bedrock_axe", 1));
 		
 		/* Swords */
 		RecipeManager.getInstance().addRecipe(new Recipe("planks;planks;stick", "wooden_sword", 1));

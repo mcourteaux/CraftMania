@@ -5,7 +5,7 @@ width=1280
 height=800
 fovy=65
 fps=40
-viewing_distance=100
+viewing_distance=150
 vsync=false
 
 fire_viewing_distance=25
