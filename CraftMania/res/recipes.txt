@@ -2,6 +2,8 @@ wood0 planks 4
 wood1 planks 4
 planks,planks;planks,planks crafting_table 1
 planks;planks stick 4
+planks,planks,planks;planks,,planks;planks,planks,planks container 1
+
 coal;stick torch 4
 sand,sand;torch,torch glass 8
 gravel,gravel;gravel,gravel gravel 8

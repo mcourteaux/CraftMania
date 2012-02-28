@@ -615,13 +615,18 @@ public class World
 		}
 		while (Mouse.next())
 		{
+			boolean invActive = _activatedInventory != null;
 			processInputSection(true);
 			if (_activatedInventory == null)
 			{
 				_player.scrollInventoryItem();
 			} else
 			{
-				_activatedInventory.mouseEvent();
+				/* Make sure the inventory doesn't handle the event that made the inventory become active */
+				if (invActive)
+				{
+					_activatedInventory.mouseEvent();
+				}
 			}
 		}
 	}
@@ -636,6 +641,9 @@ public class World
 			} else
 			{
 				setActivatedInventory(_player.getInventory());
+				/* Consume all remaining mouse events */
+				while (Mouse.next())
+					;
 			}
 		} else if (ControlSettings.isCurrentEvent(ControlSettings.TOGGLE_GOD_MODE, mouse))
 		{

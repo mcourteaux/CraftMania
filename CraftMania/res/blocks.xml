@@ -219,4 +219,19 @@
     	<translucent>true</translucent>
     	<resistance>5</resistance>
     </block>
+    <block id="24" name="container">
+    	<brush>
+    		<top>9,1</top>
+    		<left>10,1</left>
+    		<right>10,1</right>
+    		<front>10,1</front>
+    		<back>11,1</back>
+    		<bottom>9,1</bottom>
+    	</brush>
+    	<blockClass>WOOD</blockClass>
+    	<customClass>org.craftmania.blocks.customblocks.Container</customClass>
+    	<resistance>9</resistance>
+    	<hasSpecialAction>true</hasSpecialAction>
+    	<hasSpecialSaveData>true</hasSpecialSaveData>
+    </block>
 </root>

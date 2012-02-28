@@ -398,6 +398,7 @@ public class Game
 		TextureStorage.loadTexture("particles", "PNG", "particles.png");
 		TextureStorage.loadTexture("items", "PNG", "gui/items_edit.png");
 		TextureStorage.loadTexture("gui.gui", "PNG", "gui/gui.png");
+		TextureStorage.loadTexture("gui.container", "PNG", "gui/container.png");
 		TextureStorage.loadTexture("gui.inventory", "PNG", "gui/inventory.png");
 		TextureStorage.loadTexture("gui.crafting", "PNG", "gui/crafting.png");
 		TextureStorage.loadTexture("environment.clouds", "PNG", "environment/clouds.png");
