@@ -16,7 +16,6 @@
 package org.craftmania.blocks;
 
 import static org.craftmania.rendering.ChunkMeshBuilder.*;
-
 import static org.lwjgl.opengl.GL11.*;
 
 import java.nio.FloatBuffer;
@@ -25,6 +24,7 @@ import org.craftmania.Side;
 import org.craftmania.game.TextureStorage;
 import org.craftmania.math.Vec2f;
 import org.craftmania.math.Vec3f;
+import org.craftmania.math.Vec3i;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
 
@@ -255,17 +255,20 @@ public final class DefaultBlockBrush extends BlockBrush
 			glDisable(GL_BLEND);
 		}
 
-		float light = lightBuffer[1][1][1] / 30.0001f;
 		
 		glEnable(GL_TEXTURE_2D);
 		TextureStorage.getTexture("terrain").bind();
 		glPushMatrix();
 		glTranslatef(x, y, z);
+		Side side = null;
+		Vec3i normal = null;
 		for (int i = 0, bit = 1; i < 6; ++i, bit <<= 1)
 		{
 			if ((faceMask & bit) == bit)
 			{
-				glSetColor(colors[i], light);
+				side = Side.getSide(i);
+				normal = side.getNormal();
+				glSetColor(colors[i], lightBuffer[1 + normal.x()][1 + normal.y()][1 + normal.z()] / 30.0001f);
 				glCallList(displayListBase + i);
 			}
 		}

@@ -70,6 +70,7 @@ public class BlockMovementPlugin
 		if (moveX != 0 || moveY != 0 || moveZ != 0)
 		{
 			Game.getInstance().getWorld().getChunkManager().rememberBlockMovement(_block.getX(), _block.getY(), _block.getZ(), _block.getX() + moveX, _block.getY() + moveY, _block.getZ() + moveZ);
+//			_additionalCoordinates.sub(moveX, moveY, moveZ);
 		}
 		
 		if (_block.getY() < -40)

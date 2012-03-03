@@ -29,6 +29,7 @@ public class ControlSettings
 		AZERTY, QWERTY
 	}
 
+
 	private static Map<Integer, Boolean> MAP_MOUSE = new HashMap<Integer, Boolean>();
 	private static Map<Integer, Integer> MAP_SETTINGS = new HashMap<Integer, Integer>();
 
@@ -49,6 +50,7 @@ public class ControlSettings
 	public static int TOGGLE_GOD_MODE = 100;
 	public static int TOGGLE_LIGHT_POINT = 101;
 	public static int TOGGLE_OVERLAY = 102;
+	public static int SET_SUN_HIGHT = 103;
 
 	public static void initialize(KeyboardPreset preset)
 	{
@@ -84,6 +86,7 @@ public class ControlSettings
 		configureAction(TOGGLE_LIGHT_POINT, false, Keyboard.KEY_L);
 		configureAction(TOGGLE_OVERLAY, false, Keyboard.KEY_O);
 		configureAction(TOGGLE_GOD_MODE, false, Keyboard.KEY_F);
+		configureAction(SET_SUN_HIGHT, false, Keyboard.KEY_P);
 	}
 
 	public static void intializeQwerty()
@@ -106,6 +109,7 @@ public class ControlSettings
 		configureAction(TOGGLE_LIGHT_POINT, false, Keyboard.KEY_L);
 		configureAction(TOGGLE_GOD_MODE, false, Keyboard.KEY_F);
 		configureAction(TOGGLE_OVERLAY, false, Keyboard.KEY_O);
+		configureAction(SET_SUN_HIGHT, false, Keyboard.KEY_P);
 	}
 
 	public static boolean isKeyboard(int action)

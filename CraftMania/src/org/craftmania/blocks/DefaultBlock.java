@@ -51,6 +51,11 @@ public class DefaultBlock extends Block
 		_movement = new BlockMovementPlugin(this);
 	}
 
+	private void destoryMovementPlugin()
+	{
+		_movement = null;
+	}
+
 	public boolean hasMovementPlugin()
 	{
 		return _movement != null;
@@ -75,6 +80,8 @@ public class DefaultBlock extends Block
 						_chunk.needsNewVBO();
 					}
 					_movement.setFalling(true);
+					_chunk.updateVisibilityFor(getX(), getY(), getZ());
+					_chunk.updateVisibilityForNeigborsOf(getX(), getY(), getZ());
 					_chunk.notifyNeighborsOf(getX(), getY(), getZ());
 				}
 			} else
@@ -83,6 +90,8 @@ public class DefaultBlock extends Block
 				{
 					/* Stop falling */
 					_movement.setFalling(false);
+					_chunk.updateVisibilityFor(getX(), getY(), getZ());
+					_chunk.updateVisibilityForNeigborsOf(getX(), getY(), getZ());
 					_chunk.notifyNeighborsOf(getX(), getY(), getZ());
 					removeFromManualRenderList();
 					_needVisibilityCheck = true;
@@ -107,16 +116,22 @@ public class DefaultBlock extends Block
 		if (isMoving())
 		{
 			_movement.solveMotion();
-			if (!_movement.isMoving())
-			{
-				/* Destroy the plug-in */
-				_movement = null;
-			}
 		} else
 		{
+			destoryMovementPlugin();
+
 			/* Remove this block from the update list */
 			removeFromUpdateList();
+			removeFromManualRenderList();
+
+			/* Un-specialize this block */
+			unspecialize();
 		}
+	}
+
+	private void unspecialize()
+	{
+		_chunk.setDefaultBlockAbsolute(getX(), getY(), getZ(), _blockType, (byte) 0, false, false, false);
 	}
 
 	private boolean isFalling()
@@ -149,7 +164,7 @@ public class DefaultBlock extends Block
 		_rendering = true;
 		if (isVisible())
 		{
-			_blockType.getBrush().setPosition(_aabb.getPosition());
+			_blockType.getBrush().setPosition(getAABB().getPosition());
 			_blockType.getDefaultBlockBrush().renderFaces(_faceMask, lightBuffer);
 		}
 	}
@@ -187,7 +202,6 @@ public class DefaultBlock extends Block
 					} else
 					{
 						byte block = chunk.getBlockTypeAbsolute(getX() + normal.x(), getY() + normal.y(), getZ() + normal.z(), false, false, false);
-						System.out.println(side.name() + " " + block);
 						if (block != 0)
 						{
 							if (false || !BlockManager.getInstance().getBlockType(block).hasNormalAABB())
@@ -278,7 +292,14 @@ public class DefaultBlock extends Block
 	@Override
 	public int getVertexCount()
 	{
-		return 4 * MathHelper.cardinality(_faceMask);
+		if (isRenderingManually())
+		{
+			return 0;
+		} else
+		{
+			return 4 * MathHelper.cardinality(_faceMask);
+		}
+
 	}
 
 	@Override
@@ -286,16 +307,15 @@ public class DefaultBlock extends Block
 	{
 		return _blockType.getName() + " " + _postion.toString();
 	}
-	
+
 	@Override
 	public void storeInVBO(FloatBuffer vbo, byte[][][] lightBuffer)
 	{
-		if (_blockType.getBrush() instanceof CrossedBlockBrush)
+		if (!isRenderingManually())
 		{
-			System.out.println(this.toString());
+			_blockType.getDefaultBlockBrush().setFaceMask(_faceMask);
+			_blockType.getDefaultBlockBrush().storeInVBO(vbo, getX() + 0.5f, getY() + 0.5f, getZ() + 0.5f, lightBuffer);
 		}
-		_blockType.getDefaultBlockBrush().setFaceMask(_faceMask);
-		_blockType.getDefaultBlockBrush().storeInVBO(vbo, getX() + 0.5f, getY() + 0.5f, getZ() + 0.5f, lightBuffer);
 	}
 
 }

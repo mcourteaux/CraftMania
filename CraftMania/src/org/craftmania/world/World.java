@@ -657,6 +657,9 @@ public class World
 		} else if (ControlSettings.isCurrentEvent(ControlSettings.BUILD_OR_ACTION, mouse))
 		{
 			_player.buildOrAction();
+		} else if (ControlSettings.isCurrentEvent(ControlSettings.SET_SUN_HIGHT, mouse))
+		{
+			setTime(SECONDS_IN_DAY * 0.4f);
 		}
 
 	}

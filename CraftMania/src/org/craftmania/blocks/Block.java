@@ -223,11 +223,18 @@ public abstract class Block implements AABBObject
 	{
 		return _renderManually;
 	}
+	
+	public boolean isUpdating()
+	{
+		return _updating;
+	}
 
 	public byte getMetaData()
 	{
 		return 0;
 	}
+
+
 
 
 }

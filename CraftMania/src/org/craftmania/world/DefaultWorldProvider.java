@@ -554,6 +554,7 @@ public class DefaultWorldProvider extends WorldProvider
 	private class WorldProviderGenerator
 	{
 
+		@SuppressWarnings("unused")
 		private class DataResults
 		{
 
@@ -604,7 +605,7 @@ public class DefaultWorldProvider extends WorldProvider
 				return data;
 			} else
 			{
-				float diff = _random.exponentialRandom(30.0f, 6);
+				float diff = _random.exponentialRandom(35.0f, 6);
 
 				float height = rawHeight * 0.6f + td.avg * 0.4f + diff;
 
@@ -636,7 +637,7 @@ public class DefaultWorldProvider extends WorldProvider
 
 			if (td.count == 0)
 			{
-				DataPoint2D data = new DataPoint2D(x, z, MathHelper.floor(_random.randomFloat(15, 23)));
+				DataPoint2D data = new DataPoint2D(x, z, MathHelper.floor(_random.randomFloat(40, 53)));
 				if (DEBUG_WOLRD_PROVIDER)
 					System.out.println("Height (" + x + ", " + z + ") = " + data.getData());
 				_rawHeights.add(data);

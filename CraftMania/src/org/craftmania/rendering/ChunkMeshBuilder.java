@@ -35,6 +35,8 @@ import org.lwjgl.opengl.GL15;
 
 public class ChunkMeshBuilder
 {
+	private static final boolean DEBUG = false;
+	
 	public static final Vec3f COLOR_WHITE = new Vec3f(1, 1, 1);
 
 	public static int STRIDE = 8;
@@ -58,6 +60,7 @@ public class ChunkMeshBuilder
 
 	public static void generateChunkMesh(Chunk chunk, MeshType meshType)
 	{
+		if (DEBUG)
 		System.out.println("Building " + meshType.name() + " Mesh for " + chunk.toString() + "...");
 
 		/* Make sure there are no list edits anymore */
@@ -68,6 +71,7 @@ public class ChunkMeshBuilder
 
 		/* Compute vertex count */
 		int vertexCount = chunk.getVertexCount(meshType);
+		if (DEBUG)
 		System.out.println("\tVertex Count = " + vertexCount);
 		/*
 		 * If there are no faces visible yet (because of generating busy), don't
@@ -89,6 +93,8 @@ public class ChunkMeshBuilder
 		/* Allocate size for the buffer */
 		int size = vertexCount * STRIDE * FLOAT_SIZE;
 		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, size, GL15.GL_STATIC_DRAW);
+		
+		if (DEBUG)
 		System.out.println("\tCreate VBO: " + vbo + " with size = " + size + " (ERROR: " + GL11.glGetError() + ")");
 
 		/* Get the native buffer to write to */

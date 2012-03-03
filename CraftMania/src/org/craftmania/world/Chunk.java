@@ -19,8 +19,10 @@ import java.util.List;
 
 import org.craftmania.Side;
 import org.craftmania.blocks.Block;
+import org.craftmania.blocks.BlockConstructor;
 import org.craftmania.blocks.BlockManager;
 import org.craftmania.blocks.BlockType;
+import org.craftmania.blocks.CrossedBlock;
 import org.craftmania.blocks.DefaultBlock;
 import org.craftmania.datastructures.AABB;
 import org.craftmania.datastructures.AABBObject;
@@ -378,7 +380,7 @@ public class Chunk implements AABBObject
 		performListChanges();
 	}
 
-	private void updateVisibilityForNeigborsOf(int x, int y, int z)
+	public void updateVisibilityForNeigborsOf(int x, int y, int z)
 	{
 		updateVisibilityFor(x - 1, y, z);
 		updateVisibilityFor(x + 1, y, z);
@@ -414,30 +416,43 @@ public class Chunk implements AABBObject
 				{
 					Side s = Side.getSide(i);
 					Vec3i normal = s.getNormal();
-					byte block = chunk.getBlockTypeAbsolute(x + normal.x(), y + normal.y(), z + normal.z(), false, false, false);
 
-					if (block == -1)
+					byte block = chunk.getBlockTypeAbsolute(x + normal.x(), y + normal.y(), z + normal.z(), false, false, false);
+					boolean special2 = chunk.isBlockSpecialAbsolute(x + normal.x(), y + normal.y(), z + normal.z());
+					if (special2)
 					{
-						/*
-						 * If the block should be in a neighboring chunk, but
-						 * the neighbor doesn't exist, make it invisible
-						 */
-						faceMask = MathHelper.setBit(faceMask, i, false);
-					} else
-					{
-						if (block != 0)
+						Block b = chunk.getSpecialBlockAbsolute(x + normal.x(), y + normal.y(), z + normal.z());
+						if (b.isMoving())
 						{
-							BlockType blockType = _blockManager.getBlockType(block);
-							if (blockType.hasNormalAABB() && btype.isTranslucent() == blockType.isTranslucent())
+							faceMask = MathHelper.setBit(faceMask, i, true);
+							continue;
+						}
+					}
+					{
+
+						if (block == -1)
+						{
+							/*
+							 * If the block should be in a neighboring chunk,
+							 * but the neighbor doesn't exist, make it invisible
+							 */
+							faceMask = MathHelper.setBit(faceMask, i, false);
+						} else
+						{
+							if (block != 0)
 							{
-								faceMask = MathHelper.setBit(faceMask, i, false);
+								BlockType blockType = _blockManager.getBlockType(block);
+								if (blockType.hasNormalAABB() && btype.isTranslucent() == blockType.isTranslucent())
+								{
+									faceMask = MathHelper.setBit(faceMask, i, false);
+								} else
+								{
+									faceMask = MathHelper.setBit(faceMask, i, true);
+								}
 							} else
 							{
 								faceMask = MathHelper.setBit(faceMask, i, true);
 							}
-						} else
-						{
-							faceMask = MathHelper.setBit(faceMask, i, true);
 						}
 					}
 				}
@@ -498,9 +513,12 @@ public class Chunk implements AABBObject
 
 			if (blockType == newBlockType)
 			{
-				/* TODO: Check Metadata */
-
-				return;
+				/* Check if the previous one was special */
+				if (!chunk._chunkData.isSpecial(index))
+				{
+					/* TODO: Check Metadata */
+					return;
+				}
 			}
 
 			byte blocklight = chunk._chunkData.getBlockLight(index);
@@ -573,7 +591,7 @@ public class Chunk implements AABBObject
 
 			block.setChunk(chunk);
 			block.getPosition().set(x, y, z);
-			chunk._chunkData.setSpecialBlock(ChunkData.positionToIndex(x - chunk.getAbsoluteX(), y, z - chunk.getAbsoluteZ()), block);
+			chunk._chunkData.setSpecialBlock(block.getChunkDataIndex(), block);
 			chunk.updateVisibilityFor(x, y, z);
 			chunk.updateVisibilityForNeigborsOf(x, y, z);
 
@@ -665,6 +683,7 @@ public class Chunk implements AABBObject
 
 	public boolean isBlockSpecialAbsolute(int x, int y, int z)
 	{
+		if (isInvalidHeight(y)) return false;
 		Chunk c = getChunkContaining(x, y, z, false, false, false);
 		if (c == null)
 		{
@@ -823,6 +842,13 @@ public class Chunk implements AABBObject
 			type = _blockManager.getBlockType(blockType);
 
 			special = ChunkData.dataIsSpecial(blockData);
+			if (type == null)
+			{
+				System.out.println(Integer.toHexString(blockData));
+				System.out.println(blockIndex + " = " + ChunkData.indexToPosition(blockIndex, new Vec3i()));
+				System.out.println(blockType);
+				System.out.println(special);
+			}
 
 			if ((meshType == MeshType.SOLID && !type.isTranslucent() && type.hasNormalAABB()) || (meshType == MeshType.TRANSLUCENT && (type.isTranslucent() || !type.hasNormalAABB())))
 			{
@@ -1331,36 +1357,75 @@ public class Chunk implements AABBObject
 
 	public void notifyNeighborsOf(int x, int y, int z)
 	{
+		Chunk chunk = getChunkContaining(x, y, z, false, false, false);
 		for (int i = 0; i < 6; ++i)
 		{
 			Side side = Side.getSide(i);
 			Vec3i normal = side.getNormal();
 
-			byte type = getBlockTypeAbsolute(x + normal.x(), y + normal.y(), z + normal.z(), false, false, false);
+			byte type = chunk.getBlockTypeAbsolute(x + normal.x(), y + normal.y(), z + normal.z(), false, false, false);
 
 			if (type > 0)
 			{
 				BlockType btype = _blockManager.getBlockType(type);
-				if (side == Side.BOTTOM && btype.isFixed())
+				if (side == Side.TOP && !btype.isFixed())
 				{
 					// TODO: make non-fixed blocks fall
+					if (!_loading)
+					{
+						chunk.specializeBlock(x, y + 1, z);
+					}
 				} else if (side == Side.TOP && btype.isSupportNeeded())
 				{
 
-					if (getBlockTypeAbsolute(x, y, z, false, false, false) <= 0)
+					if (chunk.getBlockTypeAbsolute(x, y, z, false, false, false) <= 0)
 					{
-						removeBlockAbsolute(x, y + 1, z);
+						chunk.removeBlockAbsolute(x, y + 1, z);
 					}
 				}
 
-				boolean isSpecial = isBlockSpecialAbsolute(x + normal.x(), y + normal.y(), z + normal.z());
+				boolean isSpecial = chunk.isBlockSpecialAbsolute(x + normal.x(), y + normal.y(), z + normal.z());
 				if (isSpecial)
 				{
-					Block b = getSpecialBlockAbsolute(x + normal.x(), y + normal.y(), z + normal.z());
+					Block b = chunk.getSpecialBlockAbsolute(x + normal.x(), y + normal.y(), z + normal.z());
 					b.neighborChanged(Side.getOppositeSide(side));
 				}
 			}
 		}
+	}
+
+	private void specializeBlock(int x, int y, int z)
+	{
+		Chunk chunk = getChunkContaining(x, y, z, false, false, false);
+
+		byte type = chunk.getBlockTypeAbsolute(x, y, z, false, false, false);
+		int index = ChunkData.positionToIndex(x - chunk.getAbsoluteX(), y, z - chunk.getAbsoluteZ());
+
+		System.out.println("Specialize Block: " + x + ", " + y + ", " + z + " (" + index + ")");
+
+		if (chunk._chunkData.isSpecial(index))
+		{
+			return;
+		}
+
+		/* Make sure the previous block was removed out of the lists */
+		if (chunk._chunkData.getFaceMask(index) != 0)
+		{
+			chunk._visibleBlocks.bufferRemove(index);
+		}
+
+		/*
+		 * AFTER removing the block out of the visiblity list, create the new
+		 * one
+		 */
+		DefaultBlock db = (DefaultBlock) BlockConstructor.construct(x, y, z, chunk, type, (byte) 0);
+		chunk._chunkData.setSpecialBlock(index, db);
+
+		db.addToVisibilityList();
+		db.addToUpdateList();
+		db.addToManualRenderList();
+
+		chunk.needsNewVBO();
 	}
 
 	public World getWorld()
@@ -1410,6 +1475,23 @@ public class Chunk implements AABBObject
 			return false;
 
 		return true;
+
+	}
+
+	public void checkDoubles()
+	{
+		for (int i = 0; i < _visibleBlocks.size(); ++i)
+		{
+			int v1 = _visibleBlocks.get(i);
+			for (int j = i + 1; j < _visibleBlocks.size(); ++j)
+			{
+				int v2 = _visibleBlocks.get(j);
+				if (v1 == v2)
+				{
+					System.out.println("Double at (" + i + ", " + j + "): " + v1);
+				}
+			}
+		}
 
 	}
 

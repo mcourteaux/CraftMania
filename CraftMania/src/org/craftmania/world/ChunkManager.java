@@ -188,8 +188,7 @@ public class ChunkManager
 
 	public Chunk getChunkContaining(int x, int y, int z, boolean createIfNecessary, boolean loadIfNeccessary, boolean generateIfNecessary)
 	{
-		return getChunk(MathHelper.floorDivision(x, Chunk.CHUNK_SIZE_HORIZONTAL), MathHelper.floorDivision(z, Chunk.CHUNK_SIZE_HORIZONTAL), createIfNecessary, loadIfNeccessary,
-				generateIfNecessary);
+		return getChunk(MathHelper.floorDivision(x, Chunk.CHUNK_SIZE_HORIZONTAL), MathHelper.floorDivision(z, Chunk.CHUNK_SIZE_HORIZONTAL), createIfNecessary, loadIfNeccessary, generateIfNecessary);
 	}
 
 	/**
@@ -213,15 +212,34 @@ public class ChunkManager
 		if (special)
 		{
 			Block block = oldChunk.getChunkData().getSpecialBlock(oldIndex);
+
+			/* Remember in which lists the block was present */
+			boolean updating = block.isUpdating();
+			boolean visible = block.isVisible();
+			boolean renderMan = block.isRenderingManually();
+
 			oldChunk.removeBlockAbsolute(srcX, srcY, srcZ);
 			newChunk.setSpecialBlockAbsolute(dstX, dstY, dstZ, block, false, false, false);
+
+			/* Put it again in the lists it was before the movement */
+			if (updating)
+				block.addToUpdateList();
+			if (visible)
+				block.addToVisibilityList();
+			if (renderMan)
+				block.addToManualRenderList();
+			
+			/* Check the visibility of neighbors again */
+			newChunk.updateVisibilityForNeigborsOf(dstX, dstY, dstZ);
+
 		} else
 		{
 			byte metadata = ChunkData.dataGetMetadata(blockData);
 			BlockType type = _blockManager.getBlockType(oldChunk.getChunkData().getBlockType(oldIndex));
-			oldChunk.setDefaultBlockAbsolute(srcX, srcY, srcZ, null, (byte) 0, true, true, false);
+			oldChunk.removeBlockAbsolute(srcX, srcY, srcZ);
 			newChunk.setDefaultBlockAbsolute(dstX, dstY, dstZ, type, metadata, true, true, false);
 		}
+
 	}
 
 	public void rememberBlockMovement(int srcX, int srcY, int srcZ, int dstX, int dstY, int dstZ)

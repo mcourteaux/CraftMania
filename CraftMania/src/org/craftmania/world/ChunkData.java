@@ -305,11 +305,12 @@ public class ChunkData
 		return x * Chunk.CHUNK_SIZE_VERTICAL * Chunk.CHUNK_SIZE_HORIZONTAL + y * Chunk.CHUNK_SIZE_HORIZONTAL + z;
 	}
 
-	public static void indexToPosition(int index, Vec3i output)
+	public static Vec3i indexToPosition(int index, Vec3i output)
 	{
 		output.setX(index / (Chunk.CHUNK_SIZE_HORIZONTAL * Chunk.CHUNK_SIZE_VERTICAL));
 		output.setY((index / Chunk.CHUNK_SIZE_HORIZONTAL) % Chunk.CHUNK_SIZE_VERTICAL);
 		output.setZ(index % Chunk.CHUNK_SIZE_HORIZONTAL);
+		return output;
 	}
 
 	public static boolean dataIsSpecial(int data)

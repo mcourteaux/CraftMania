@@ -262,6 +262,20 @@ public class Vec3f
 		return len;
 	}
 
+	public void sub(float x, float y, float z)
+	{
+		this.x -= x;
+		this.y -= y;
+		this.z -= z;
+	}
+
+	public void add(float x, float y, float z)
+	{
+		this.x += x;
+		this.y += y;
+		this.z += z;
+	}
+
 
 
 
