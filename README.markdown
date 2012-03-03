@@ -46,6 +46,6 @@ Credits
 Texture Pack
 ------------
 
-I'm using the awesome <strong><a href="http://www.carrotcakestudios.co.uk/gmcraft/">Good Morning Craft!</a></strong> texture pack by Louis Durrant.
+I'm using the awesome <strong><a href="http://www.carrotcakestudios.co.uk/gmcraft/">Good Morning Craft!</a></strong> texture pack by Louis Durrant (Carrot Cake Studios).
 Of course, this is a texture pack developed for Minecraft by Mojang. So, you might try his texture pack for Minecraft. Make sure you take a look at it!
 
