@@ -22,7 +22,6 @@ import org.craftmania.blocks.Block;
 import org.craftmania.blocks.BlockConstructor;
 import org.craftmania.blocks.BlockManager;
 import org.craftmania.blocks.BlockType;
-import org.craftmania.blocks.CrossedBlock;
 import org.craftmania.blocks.DefaultBlock;
 import org.craftmania.datastructures.AABB;
 import org.craftmania.datastructures.AABBObject;
@@ -498,9 +497,6 @@ public class Chunk implements AABBObject
 		Chunk chunk = getChunkContaining(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
 		if (chunk != null)
 		{
-			int absX = chunk.getAbsoluteX();
-			int absZ = chunk.getAbsoluteZ();
-
 			int index = ChunkData.positionToIndex(x - chunk.getAbsoluteX(), y, z - chunk.getAbsoluteZ());
 
 			byte blockType = chunk._chunkData.getBlockType(index);
@@ -521,8 +517,7 @@ public class Chunk implements AABBObject
 				}
 			}
 
-			byte blocklight = chunk._chunkData.getBlockLight(index);
-			byte sunlight = chunk._chunkData.getSunlight(index);
+
 			if (blockType != 0)
 			{
 				removeBlockAbsolute(x, y, z);
@@ -533,20 +528,6 @@ public class Chunk implements AABBObject
 				return;
 			}
 
-			/* Unspread the sunlight */
-			if (!type.isTranslucent())
-			{
-				chunk.unspreadSunlight(absX + x, absZ + z, y - 1);
-
-				// int lightIndex;
-				// for (int i = y; i > 0; --i)
-				// {
-				// lightIndex = ChunkData.positionToIndex(x - absX, y, z -
-				// absZ);
-				// chunk._chunkData.setSunlight(lightIndex, (byte) 0);
-				// }
-			}
-
 			/* Set it in the chunk data */
 			chunk._chunkData.setDefaultBlock(index, type.getID(), (byte) 0, metadata);
 
@@ -554,15 +535,19 @@ public class Chunk implements AABBObject
 			chunk.updateVisibilityFor(x, y, z);
 			chunk.updateVisibilityForNeigborsOf(x, y, z);
 
-			/* Clear the light at this position if solid */
+			/* Clear the light at this position if opaque */
 			if (!type.isTranslucent())
 			{
+				byte blocklight = chunk._chunkData.getBlockLight(index);
+				byte sunlight = chunk._chunkData.getSunlight(index);
+				
+				/* Unspread the sunlight */
+				chunk.unspreadSunlight(x, z, y + 1);
 				chunk._chunkData.clearLight(index);
 				/* Unspread light */
 				chunk.unspreadLight(x, y, z, blocklight, LightType.BLOCK);
 				chunk.unspreadLight(x, y, z, sunlight, LightType.SUN);
-				/* Respread sunlight */
-				// spreadSunlight(x, z);
+
 			}
 
 			/* Spread light for the blocktype */
@@ -588,13 +573,30 @@ public class Chunk implements AABBObject
 			{
 				chunk.removeBlockAbsolute(x, y, z);
 			}
+			
+			int index = block.getChunkDataIndex();
 
 			block.setChunk(chunk);
 			block.getPosition().set(x, y, z);
-			chunk._chunkData.setSpecialBlock(block.getChunkDataIndex(), block);
+			chunk._chunkData.setSpecialBlock(index, block);
 			chunk.updateVisibilityFor(x, y, z);
 			chunk.updateVisibilityForNeigborsOf(x, y, z);
 
+			/* Clear the light at this position if opaque */
+			if (!block.getBlockType().isTranslucent())
+			{
+				byte blocklight = chunk._chunkData.getBlockLight(index);
+				byte sunlight = chunk._chunkData.getSunlight(index);
+				
+				/* Unspread the sunlight */
+				chunk.unspreadSunlight(x, z, y + 1);
+				chunk._chunkData.clearLight(index);
+				/* Unspread light */
+				chunk.unspreadLight(x, y, z, blocklight, LightType.BLOCK);
+				chunk.unspreadLight(x, y, z, sunlight, LightType.SUN);
+
+			}
+			
 			/* Spread light produced by this block */
 			chunk.spreadLight(x, y, z, block.getBlockType().getLuminosity(), LightType.BLOCK);
 
@@ -1108,16 +1110,17 @@ public class Chunk implements AABBObject
 			if (type != 0)
 			{
 				BlockType btype = BlockManager.getInstance().getBlockType(type);
-				if (!btype.isTranslucent())
+				if (btype.isTranslucent())
 				{
 					continue;
 				}
 				covered = true;
-				continue;
 			}
 			if (covered)
 			{
-				chunk.unspreadLight(x, y, z, chunk._chunkData.getSunlight(ChunkData.positionToIndex(x - absX, y, z - absZ)), LightType.SUN);
+				byte light = chunk._chunkData.getSunlight(ChunkData.positionToIndex(x - absX, y, z - absZ));
+				if (light != 15) return;
+				chunk.unspreadLight(x, y, z, light, LightType.SUN);
 			}
 		}
 	}
