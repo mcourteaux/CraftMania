@@ -396,7 +396,7 @@ public class Game
 		TextureStorage.setTexturePack(_configuration.getTexturePack());
 		TextureStorage.loadTexture("terrain", "PNG", "terrain.png");
 		TextureStorage.loadTexture("particles", "PNG", "particles.png");
-		TextureStorage.loadTexture("items", "PNG", "gui/items_edit.png");
+		TextureStorage.loadTexture("items", "PNG", "gui/items.png");
 		TextureStorage.loadTexture("gui.gui", "PNG", "gui/gui.png");
 		TextureStorage.loadTexture("gui.container", "PNG", "gui/container.png");
 		TextureStorage.loadTexture("gui.inventory", "PNG", "gui/inventory.png");

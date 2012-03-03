@@ -71,7 +71,7 @@
     </block>
     
     <block id="7" name="leafs0">
-        <brush>
+        <brush alphaBlending="true">
             <allsides color="#809930">4,3</allsides>
         </brush>
         <resistance>1</resistance>
@@ -80,7 +80,7 @@
     </block>
     
     <block id="8" name="leafs1">
-        <brush>
+        <brush alphaBlending="true">
             <allsides color="#B4B450">4,3</allsides>
         </brush>
         <resistance>1</resistance>
@@ -168,8 +168,8 @@
     </block>
     
     <block id="17" name="needles">
-    	<brush>
-    		<allsides>5,8</allsides>
+    	<brush alphaBlending="true">
+    		<allsides>4,8</allsides>
     	</brush>
     	<resistance>2</resistance>
     	<mineResult>null</mineResult>

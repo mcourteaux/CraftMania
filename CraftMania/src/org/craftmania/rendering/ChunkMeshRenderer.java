@@ -46,7 +46,6 @@ public class ChunkMeshRenderer
 		if (meshType == MeshType.SOLID)
 		{
 			GL11.glDisable(GL11.GL_BLEND);
-
 		} else if (meshType == MeshType.TRANSLUCENT)
 		{
 			GL11.glDisable(GL11.GL_CULL_FACE);
