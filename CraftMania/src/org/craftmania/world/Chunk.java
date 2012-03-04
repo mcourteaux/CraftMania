@@ -520,7 +520,7 @@ public class Chunk implements AABBObject
 
 			if (blockType != 0)
 			{
-				removeBlockAbsolute(x, y, z);
+				chunk.removeBlockAbsolute(x, y, z);
 			}
 
 			if (type == null)
@@ -574,10 +574,14 @@ public class Chunk implements AABBObject
 				chunk.removeBlockAbsolute(x, y, z);
 			}
 			
-			int index = block.getChunkDataIndex();
 
+			/* First update the position of the block and then compute the index */
 			block.setChunk(chunk);
 			block.getPosition().set(x, y, z);
+			
+			/* Compute the index in the chunk data array */
+			int index = block.getChunkDataIndex();
+			
 			chunk._chunkData.setSpecialBlock(index, block);
 			chunk.updateVisibilityFor(x, y, z);
 			chunk.updateVisibilityForNeigborsOf(x, y, z);
@@ -633,6 +637,7 @@ public class Chunk implements AABBObject
 		Chunk chunk = getChunkContaining(x, y, z, false, false, false);
 		if (chunk != null)
 		{
+			chunk.checkDoubles();
 			int index = ChunkData.positionToIndex(x - chunk.getAbsoluteX(), y, z - chunk.getAbsoluteZ());
 
 			/* To start with, check if there is actually a block */
@@ -670,8 +675,8 @@ public class Chunk implements AABBObject
 			{
 				side = Side.getSide(i);
 				vec.set(x + side.getNormal().x(), y + side.getNormal().y(), z + side.getNormal().z());
-				blocklight = (byte) Math.max(blocklight, getLightAbsolute(vec.x(), vec.y(), vec.z(), LightType.BLOCK));
-				sunlight = (byte) Math.max(sunlight, getLightAbsolute(vec.x(), vec.y(), vec.z(), LightType.SUN));
+				blocklight = (byte) Math.max(blocklight, chunk.getLightAbsolute(vec.x(), vec.y(), vec.z(), LightType.BLOCK));
+				sunlight = (byte) Math.max(sunlight, chunk.getLightAbsolute(vec.x(), vec.y(), vec.z(), LightType.SUN));
 			}
 
 			chunk.spreadLight(x, y, z, (byte) (blocklight - 1), LightType.BLOCK);
@@ -680,6 +685,8 @@ public class Chunk implements AABBObject
 
 			/* Finally notify the neighbors */
 			chunk.notifyNeighborsOf(x, y, z);
+			
+			chunk.checkDoubles();
 		}
 	}
 
@@ -1399,6 +1406,9 @@ public class Chunk implements AABBObject
 
 	private void specializeBlock(int x, int y, int z)
 	{
+		new Exception("Specialze Block").printStackTrace(System.out);
+		
+		checkDoubles();
 		Chunk chunk = getChunkContaining(x, y, z, false, false, false);
 
 		byte type = chunk.getBlockTypeAbsolute(x, y, z, false, false, false);
@@ -1429,6 +1439,7 @@ public class Chunk implements AABBObject
 		db.addToManualRenderList();
 
 		chunk.needsNewVBO();
+		checkDoubles();
 	}
 
 	public World getWorld()
@@ -1483,9 +1494,15 @@ public class Chunk implements AABBObject
 
 	public void checkDoubles()
 	{
+		performListChanges();
 		for (int i = 0; i < _visibleBlocks.size(); ++i)
 		{
 			int v1 = _visibleBlocks.get(i);
+			if (_chunkData.getBlockData(v1) == 0)
+			{
+				System.out.println("Invalid visible entry at: " + v1 + " (" + ChunkData.indexToPosition(v1, new Vec3i()) + ")");
+				new Exception().printStackTrace(System.out);
+			}
 			for (int j = i + 1; j < _visibleBlocks.size(); ++j)
 			{
 				int v2 = _visibleBlocks.get(j);

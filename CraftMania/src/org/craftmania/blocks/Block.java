@@ -234,6 +234,11 @@ public abstract class Block implements AABBObject
 		return 0;
 	}
 
+	public boolean isRendering()
+	{
+		return _rendering;
+	}
+
 
 
 
