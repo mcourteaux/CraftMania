@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import org.craftmania.blocks.BlockManager;
 import org.craftmania.blocks.BlockXMLLoader;
+import org.craftmania.game.PerformanceMonitor.Operation;
 import org.craftmania.items.ItemXMLLoader;
 import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3f;
@@ -159,7 +160,7 @@ public class Game
 
 		System.out.println("LWJGL Version: " + Sys.getVersion());
 		System.out.println("GPU: " + Display.getAdapter());
-
+		
 		initOpenGL();
 		loadTextures();
 		loadFonts();
@@ -260,6 +261,13 @@ public class Game
 		infoFont.print(4, _configuration.getHeight() - 20 - 30, "Heap Size: " + MathHelper.bytesToMagaBytes(Runtime.getRuntime().totalMemory()) + " MB");
 		infoFont.print(4, _configuration.getHeight() - 20 - 45, "Heap Use:  " + MathHelper.bytesToMagaBytes(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) + " MB");
 		infoFont.print(4, _configuration.getHeight() - 20 - 60, "Buffers: " + BufferManager.getInstance().getAliveBuffers());
+		
+		Operation[] ops = Operation.values();
+		for (int i = 0; i < ops.length; ++i)
+		{
+			String name = ops[i].name();
+			infoFont.print(_configuration.getWidth() - 200, _configuration.getHeight() - 20 - 15 * i, String.format("%-20s %7.3f", name, PerformanceMonitor.getInstance().get(ops[i])));
+		}
 	}
 
 	public void initOverlayRendering()
@@ -324,9 +332,20 @@ public class Game
 			}
 			long startTiming = System.nanoTime();
 			_step = 1.0f / _fps;
+			
+			/* Update */
+			PerformanceMonitor.getInstance().start(Operation.UPDATE);
 			update();
+			PerformanceMonitor.getInstance().stop(Operation.UPDATE);
+			
+			/* Render */
+			PerformanceMonitor.getInstance().start(Operation.RENDER_ALL);
 			render();
 			Display.update();
+			PerformanceMonitor.getInstance().stop(Operation.RENDER_ALL);
+			
+			
+			
 			long stopTiming = System.nanoTime();
 
 			long frameTimeNanos = (stopTiming - startTiming);
@@ -396,7 +415,7 @@ public class Game
 		TextureStorage.setTexturePack(_configuration.getTexturePack());
 		TextureStorage.loadTexture("terrain", "PNG", "terrain.png");
 		TextureStorage.loadTexture("particles", "PNG", "particles.png");
-		TextureStorage.loadTexture("items", "PNG", "gui/items.png");
+		TextureStorage.loadStichedTexture("items", "gui/items.png", "gui/items_custom.png");
 		TextureStorage.loadTexture("gui.gui", "PNG", "gui/gui.png");
 		TextureStorage.loadTexture("gui.container", "PNG", "gui/container.png");
 		TextureStorage.loadTexture("gui.inventory", "PNG", "gui/inventory.png");

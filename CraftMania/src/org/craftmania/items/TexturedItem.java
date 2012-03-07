@@ -42,8 +42,8 @@ public abstract class TexturedItem extends InventoryItem
         this._texture = texture;
         this._texturePosition = texPos;
         
-        this._texPosUpLeft = new Vec2f((float) _texturePosition.x() / texture.getImageWidth() * 16.0f, (float) _texturePosition.y() / texture.getImageHeight() * 16.0f);
-        this._texPosDownRight = new Vec2f(_texPosUpLeft.x() + 0.0624f, _texPosUpLeft.y() + 0.0624f);
+        this._texPosUpLeft = new Vec2f((float) 16.0f * _texturePosition.x() / texture.getImageWidth(), (float) 16.0f * _texturePosition.y() / texture.getImageHeight());
+        this._texPosDownRight = new Vec2f(_texPosUpLeft.x() + 0.0624f, _texPosUpLeft.y() + (16.0f / texture.getImageHeight()));
         
         
     }

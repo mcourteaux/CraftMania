@@ -50,7 +50,7 @@ public class ChunkMeshBuilder
 
 	public static enum MeshType
 	{
-		SOLID, TRANSLUCENT
+		OPAQUE, TRANSLUCENT
 	}
 
 	private static BlockManager _blockManager = BlockManager.getInstance();
@@ -140,7 +140,7 @@ public class ChunkMeshBuilder
 			special = chunk.getChunkData().isSpecial(blockIndex);
 			type = _blockManager.getBlockType(blockType);
 
-			if ((meshType == MeshType.SOLID && !type.isTranslucent() && type.hasNormalAABB()) || (meshType == MeshType.TRANSLUCENT && (type.isTranslucent() || !type.hasNormalAABB())))
+			if ((meshType == MeshType.OPAQUE && !type.isTranslucent() && type.hasNormalAABB()) || (meshType == MeshType.TRANSLUCENT && (type.isTranslucent() || !type.hasNormalAABB())))
 			{
 
 				ChunkData.indexToPosition(blockIndex, vec);
@@ -389,7 +389,7 @@ public class ChunkMeshBuilder
 
 	public static void generateChunkMeshes(Chunk chunk)
 	{
-		generateChunkMesh(chunk, MeshType.SOLID);
+		generateChunkMesh(chunk, MeshType.OPAQUE);
 		generateChunkMesh(chunk, MeshType.TRANSLUCENT);
 	}
 }

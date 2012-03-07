@@ -1,11 +1,11 @@
 
 ### Graphics
 fullscreen=false
-width=900
+width=800
 height=500
 fovy=65
 fps=40
-viewing_distance=150
+viewing_distance=100
 vsync=false
 
 fire_viewing_distance=25

@@ -15,6 +15,7 @@
  ******************************************************************************/
 package org.craftmania.game;
 
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,6 +24,8 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import javax.imageio.ImageIO;
 
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
@@ -75,15 +78,21 @@ public class TextureStorage
 		map.put(id, t);
 		return t;
 	}
-
-	public static Texture loadTexture(String id, String format, String resource) throws IOException
+	
+	private static File getTextureFile(String resource)
 	{
 		File res = new File("res/textures/" + _texturePack + "/" + resource);
 		if (!res.exists())
 		{
 			res = new File("res/textures/" + _fallBackTexturePack + "/" + resource);
 		}
-		return loadTexture(id, format, new FileInputStream(res));
+		return res;
+	}
+
+	public static Texture loadTexture(String id, String format, String resource) throws IOException
+	{
+		
+		return loadTexture(id, format, new FileInputStream(getTextureFile(resource)));
 	}
 
 	public static Texture getTexture(String id)
@@ -92,4 +101,26 @@ public class TextureStorage
 		return text;
 	}
 
+	
+	public static Texture loadStichedTexture(String id, String resource0, String resource1) throws IOException
+	{
+		BufferedImage img0 = ImageIO.read(getTextureFile(resource0));
+		BufferedImage img1 = ImageIO.read(getTextureFile(resource1));
+		
+		if (img0.getWidth() != img1.getWidth())
+		{
+			throw new IOException("Images do not have the same width");
+		}
+		
+		BufferedImage img = new BufferedImage(img0.getWidth(), img0.getHeight() + img1.getHeight(), img0.getType());
+		Graphics2D g = img.createGraphics();
+		
+		g.drawImage(img0, 0, 0, null);
+		g.drawImage(img1, 0, img0.getHeight(), null);
+		
+		g.dispose();
+		
+		
+		return loadTexture(id, img);
+	}
 }

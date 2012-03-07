@@ -17,7 +17,9 @@ package org.craftmania.world;
 
 import org.craftmania.GameObject;
 import org.craftmania.game.Game;
+import org.craftmania.game.PerformanceMonitor;
 import org.craftmania.game.TextureStorage;
+import org.craftmania.game.PerformanceMonitor.Operation;
 import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3f;
 import org.lwjgl.opengl.GL11;
@@ -78,6 +80,9 @@ public class Sky extends GameObject
 	@Override
 	public void render()
 	{
+		PerformanceMonitor.getInstance().start(Operation.RENDER_SKY);
+
+		
 		Vec3f playerPos = Game.getInstance().getWorld().getActivePlayer().getPosition();
 
 		GL11.glDisable(GL11.GL_CULL_FACE);
@@ -106,6 +111,8 @@ public class Sky extends GameObject
 
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_BLEND);
+		
+		PerformanceMonitor.getInstance().stop(Operation.RENDER_SKY);
 	}
 
 	private void drawShpere(float x, float y, float z)

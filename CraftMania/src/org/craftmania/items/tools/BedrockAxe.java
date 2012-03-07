@@ -10,6 +10,6 @@ public class BedrockAxe extends Tool
 
 	public BedrockAxe()
 	{
-		 super("bedrock_axe", BlockClass.WOOD, Material.BEDROCK, new Vec2i(1, 13), 7.0f);		 
+		 super("bedrock_axe", BlockClass.WOOD, Material.BEDROCK, new Vec2i(1, 16), 7.0f);		 
 	}
 }

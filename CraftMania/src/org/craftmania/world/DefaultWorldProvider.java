@@ -39,11 +39,12 @@ public class DefaultWorldProvider extends WorldProvider
 
 	public static int SAMPLE_RATE_HORIZONTAL = 8;
 	public static int SAMPLE_RATE_VERTICAL = 8;
+	public static int SAMPLE_RATE_HEIGHTS = 4;
 	public static int SAMPLE_RATE_RAW_HEIGHS = 32;
 
 	public static int SAMPLE_RATE_TEMPERATURE = 32;
 
-	private static boolean DEBUG_WOLRD_PROVIDER = false;
+	private static boolean DEBUG_WOLRD_PROVIDER = true;
 
 	private World _world;
 	private WorldProviderGenerator _generator;
@@ -268,11 +269,11 @@ public class DefaultWorldProvider extends WorldProvider
 		int lowerX = x;
 		int lowerZ = z;
 
-		lowerX = MathHelper.floorDivision(x, SAMPLE_RATE_HORIZONTAL) * SAMPLE_RATE_HORIZONTAL;
-		lowerZ = MathHelper.floorDivision(z, SAMPLE_RATE_HORIZONTAL) * SAMPLE_RATE_HORIZONTAL;
+		lowerX = MathHelper.floorDivision(x, SAMPLE_RATE_HEIGHTS) * SAMPLE_RATE_HEIGHTS;
+		lowerZ = MathHelper.floorDivision(z, SAMPLE_RATE_HEIGHTS) * SAMPLE_RATE_HEIGHTS;
 
-		int upperX = lowerX + SAMPLE_RATE_HORIZONTAL;
-		int upperZ = lowerZ + SAMPLE_RATE_HORIZONTAL;
+		int upperX = lowerX + SAMPLE_RATE_HEIGHTS;
+		int upperZ = lowerZ + SAMPLE_RATE_HEIGHTS;
 
 		DataPoint2D q11, q12, q21, q22;
 		q11 = q12 = q21 = q22 = null;
@@ -352,7 +353,7 @@ public class DefaultWorldProvider extends WorldProvider
 
 		return biLerpDataPoints(x, z, q11, q12, q21, q22);
 	}
-	
+
 	public int getRawHeightAt(int x, int z)
 	{
 		int lowerX = x;
@@ -443,7 +444,6 @@ public class DefaultWorldProvider extends WorldProvider
 		return biLerpDataPoints(x, z, q11, q12, q21, q22);
 	}
 
-
 	@Override
 	public Biome getBiomeAt(int x, int y, int z)
 	{
@@ -455,6 +455,18 @@ public class DefaultWorldProvider extends WorldProvider
 			System.out.println();
 			System.out.println("Temp = " + temp + ", Humidity = " + humidity);
 			System.out.println();
+
+			float humidity2 = getHumidityAt(x - 1, y, z);
+			float temp2 = getTemperatureAt(x - 1, y, z);
+
+			if (Math.abs(humidity - humidity2) > 6.0f)
+			{
+				System.out.println("Humidity is the problem! " + (humidity - humidity2));
+			}
+			if (Math.abs(temp - temp2) > 6.0f)
+			{
+				System.out.println("Temperature is the problem! " + (temp - temp2));
+			}
 		}
 
 		if (temp > 25.0f && humidity < 30.0f)
@@ -493,7 +505,7 @@ public class DefaultWorldProvider extends WorldProvider
 
 			_spawnPoint = new Vec3f(x + 0.5f, y + 1.5f, z + 0.5f);
 			byte spawnPointBlock = 0;
-			while (spawnPointBlock == 0)
+			while (spawnPointBlock <= 0)
 			{
 				spawnPointBlock = _world.getChunkManager().getBlock(x, y, z, true, true, true);
 				try
@@ -589,11 +601,11 @@ public class DefaultWorldProvider extends WorldProvider
 		public DataPoint2D generateHeightAt(int x, int z)
 		{
 			/* Rasterize the coordinates */
-			x = MathHelper.floorDivision(x, DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL) * DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL;
-			z = MathHelper.floorDivision(z, DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL) * DefaultWorldProvider.SAMPLE_RATE_HORIZONTAL;
+			x = MathHelper.floorDivision(x, DefaultWorldProvider.SAMPLE_RATE_HEIGHTS) * DefaultWorldProvider.SAMPLE_RATE_HEIGHTS;
+			z = MathHelper.floorDivision(z, DefaultWorldProvider.SAMPLE_RATE_HEIGHTS) * DefaultWorldProvider.SAMPLE_RATE_HEIGHTS;
 
 			DataResults td = gatherDataAround(_heights, x, z, 20);
-			
+
 			int rawHeight = getRawHeightAt(x, z);
 
 			if (td.count == 0)
@@ -618,7 +630,7 @@ public class DefaultWorldProvider extends WorldProvider
 				return data;
 			}
 		}
-		
+
 		/**
 		 * Generates a new data point, stores it in the heights array. Returns
 		 * the newly generated terrain height
@@ -659,7 +671,6 @@ public class DefaultWorldProvider extends WorldProvider
 				return data;
 			}
 		}
-
 
 		private DataResults gatherDataAround(List<DataPoint2D> list, int x, int z, float radius)
 		{
@@ -761,7 +772,7 @@ public class DefaultWorldProvider extends WorldProvider
 		DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
 
 		dos.writeFloat(_world.getTime());
-		
+
 		IOUtilities.writeVec3f(dos, _spawnPoint);
 
 		writeDataPointList(dos, _rawHeights);
@@ -786,7 +797,6 @@ public class DefaultWorldProvider extends WorldProvider
 		dos.close();
 	}
 
-
 	@Override
 	public void load() throws Exception
 	{
@@ -801,7 +811,7 @@ public class DefaultWorldProvider extends WorldProvider
 		DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
 
 		_world.setTime(dis.readFloat());
-		
+
 		_spawnPoint = new Vec3f();
 		IOUtilities.readVec3f(dis, _spawnPoint);
 
@@ -826,7 +836,6 @@ public class DefaultWorldProvider extends WorldProvider
 		dis.close();
 
 	}
-
 
 	private void writeDataPointList(DataOutputStream dos, List<DataPoint2D> list) throws IOException
 	{

@@ -138,7 +138,7 @@ public class Chunk implements AABBObject
 		}
 
 		ChunkMeshBuilder.generateChunkMeshes(this);
-		if (_mesh.getVBO(MeshType.SOLID) <= 0)
+		if (_mesh.getVBO(MeshType.OPAQUE) <= 0)
 		{
 			_newVboNeeded = false;
 		} else
@@ -637,7 +637,6 @@ public class Chunk implements AABBObject
 		Chunk chunk = getChunkContaining(x, y, z, false, false, false);
 		if (chunk != null)
 		{
-			chunk.checkDoubles();
 			int index = ChunkData.positionToIndex(x - chunk.getAbsoluteX(), y, z - chunk.getAbsoluteZ());
 
 			/* To start with, check if there is actually a block */
@@ -686,7 +685,6 @@ public class Chunk implements AABBObject
 			/* Finally notify the neighbors */
 			chunk.notifyNeighborsOf(x, y, z);
 			
-			chunk.checkDoubles();
 		}
 	}
 
@@ -859,7 +857,7 @@ public class Chunk implements AABBObject
 				System.out.println(special);
 			}
 
-			if ((meshType == MeshType.SOLID && !type.isTranslucent() && type.hasNormalAABB()) || (meshType == MeshType.TRANSLUCENT && (type.isTranslucent() || !type.hasNormalAABB())))
+			if ((meshType == MeshType.OPAQUE && !type.isTranslucent() && type.hasNormalAABB()) || (meshType == MeshType.TRANSLUCENT && (type.isTranslucent() || !type.hasNormalAABB())))
 			{
 				if (!special)
 				{
@@ -1408,7 +1406,6 @@ public class Chunk implements AABBObject
 	{
 		new Exception("Specialze Block").printStackTrace(System.out);
 		
-		checkDoubles();
 		Chunk chunk = getChunkContaining(x, y, z, false, false, false);
 
 		byte type = chunk.getBlockTypeAbsolute(x, y, z, false, false, false);
@@ -1439,7 +1436,6 @@ public class Chunk implements AABBObject
 		db.addToManualRenderList();
 
 		chunk.needsNewVBO();
-		checkDoubles();
 	}
 
 	public World getWorld()

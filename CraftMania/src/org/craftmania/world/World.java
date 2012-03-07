@@ -28,7 +28,9 @@ import org.craftmania.game.Configuration;
 import org.craftmania.game.ControlSettings;
 import org.craftmania.game.FontStorage;
 import org.craftmania.game.Game;
+import org.craftmania.game.PerformanceMonitor;
 import org.craftmania.game.TextureStorage;
+import org.craftmania.game.PerformanceMonitor.Operation;
 import org.craftmania.inventory.Inventory;
 import org.craftmania.inventory.InventoryItem;
 import org.craftmania.inventory.Inventory.InventoryPlace;
@@ -129,6 +131,7 @@ public class World
 		/* Look through the camera with high viewing distance to render the sky */
 		_player.getFirstPersonCamera().lookThrough(512.0f);
 
+		
 		/* Set the fog color based on time */
 		_fogColor.set(Game.getInstance().getConfiguration().getFogColor());
 		_fogColor.scale(_sunlight - 0.05f);
@@ -154,15 +157,24 @@ public class World
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		TextureStorage.getTexture("terrain").bind();
 
+		PerformanceMonitor.getInstance().start(Operation.RENDER_OPAQUE);
 		for (int i = 0; i < _visibleChunks.size(); ++i)
 		{
-			_visibleChunks.get(i).render(MeshType.SOLID);
+			_visibleChunks.get(i).render(MeshType.OPAQUE);
 		}
+		PerformanceMonitor.getInstance().stop(Operation.RENDER_OPAQUE);
+		PerformanceMonitor.getInstance().start(Operation.RENDER_TRANSLUCENT);
 		for (int i = 0; i < _visibleChunks.size(); ++i)
 		{
 			_visibleChunks.get(i).render(MeshType.TRANSLUCENT);
+		}
+		PerformanceMonitor.getInstance().stop(Operation.RENDER_TRANSLUCENT);
+		PerformanceMonitor.getInstance().start(Operation.RENDER_MANUAL);
+		for (int i = 0; i < _visibleChunks.size(); ++i)
+		{			
 			_visibleChunks.get(i).renderManualBlocks();
 		}
+		PerformanceMonitor.getInstance().stop(Operation.RENDER_MANUAL);
 
 		if (_player.getPosition().y() + _player.getEyeHeight() > _sky.getCloudsHeight())
 		{

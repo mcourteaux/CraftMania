@@ -209,7 +209,6 @@ public class ChunkManager
 		int blockData = oldChunk.getChunkData().getBlockData(oldIndex);
 		boolean special = ChunkData.dataIsSpecial(blockData);
 		
-		oldChunk.checkDoubles();
 
 		if (special)
 		{
@@ -242,7 +241,6 @@ public class ChunkManager
 			newChunk.setDefaultBlockAbsolute(dstX, dstY, dstZ, type, metadata, true, true, false);
 		}
 
-		oldChunk.checkDoubles();
 	}
 
 	public void rememberBlockMovement(int srcX, int srcY, int srcZ, int dstX, int dstY, int dstZ)

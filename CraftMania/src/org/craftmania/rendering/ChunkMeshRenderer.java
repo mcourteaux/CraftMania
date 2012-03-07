@@ -43,7 +43,7 @@ public class ChunkMeshRenderer
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		TextureStorage.getTexture("terrain").bind();
 
-		if (meshType == MeshType.SOLID)
+		if (meshType == MeshType.OPAQUE)
 		{
 			GL11.glDisable(GL11.GL_BLEND);
 		} else if (meshType == MeshType.TRANSLUCENT)

@@ -9,7 +9,7 @@ public class BedrockShovel extends Tool
 {
 	public BedrockShovel()
 	{
-		super("bedrock_shovel", BlockClass.SAND, Material.BEDROCK, new Vec2i(2, 13), 7.0f);
+		super("bedrock_shovel", BlockClass.SAND, Material.BEDROCK, new Vec2i(2, 16), 7.0f);
 	}
 
 }

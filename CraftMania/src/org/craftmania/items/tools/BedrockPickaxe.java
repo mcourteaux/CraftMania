@@ -24,7 +24,7 @@ public class BedrockPickaxe extends Tool
 {
 	public BedrockPickaxe()
 	{
-		super("bedrock_pickaxe", BlockClass.STONE, Material.BEDROCK, new Vec2i(0, 13), 6.0f);
+		super("bedrock_pickaxe", BlockClass.STONE, Material.BEDROCK, new Vec2i(0, 16), 6.0f);
 	}
 	
 	@Override
