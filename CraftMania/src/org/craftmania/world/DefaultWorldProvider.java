@@ -170,7 +170,7 @@ public class DefaultWorldProvider extends WorldProvider
 
 		float temperature2D = biLerpDataPoints(x, z, q11, q12, q21, q22);
 
-		return temperature2D - y / 3.0f;
+		return temperature2D - y / 3.0f + 10;
 	}
 
 	@Override

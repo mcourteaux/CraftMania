@@ -228,6 +228,18 @@ public class ChunkGenerator extends Generator
 				}
 			}
 		}
+		
+		
+		/* Generate some floating islands */
+		if (random.randomInt(35) == 0)
+		{
+			FloatingIslandGenerator gen = new FloatingIslandGenerator(_worldProvider);
+			int x = chunk.getAbsoluteX() + random.randomInt(15);
+			int z = chunk.getAbsoluteZ() + random.randomInt(15);
+			
+			gen.generateFloatingIsland(chunk, x, _worldProvider.getHeightAt(x, z) + random.randomInt(40, 80), z);
+		}
+		
 
 		/* Make it accessible for the game */
 		chunk.setLoading(false);

@@ -27,6 +27,8 @@ import org.newdawn.slick.opengl.Texture;
 
 public class Sky extends GameObject
 {
+	
+	private Vec3f _playerPos;
 
 	/* Sphere */
 	private static Vec3f COLOR = new Vec3f(0.5f, 0.7f, 1.0f);
@@ -66,6 +68,10 @@ public class Sky extends GameObject
 	@Override
 	public void update()
 	{
+		
+		_playerPos = Game.getInstance().getWorld().getActivePlayer().getPosition();
+
+		
 		float step = Game.getInstance().getStep();
 		_cloudsX += step * 1.0f;
 		_cloudsZ += step * 0.6f;
@@ -76,28 +82,29 @@ public class Sky extends GameObject
 		_color.set(COLOR);
 		_color.scale(Game.getInstance().getWorld().getSunlight() - 0.15f);
 	}
-
-	@Override
-	public void render()
+	
+	public void renderSky()
 	{
 		PerformanceMonitor.getInstance().start(Operation.RENDER_SKY);
-
-		
-		Vec3f playerPos = Game.getInstance().getWorld().getActivePlayer().getPosition();
-
-		GL11.glDisable(GL11.GL_CULL_FACE);
-
 		/* Sphere */
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		drawShpere(playerPos.x(), Math.max(_cloudsHeight + _bend + 10.0f, playerPos.y() + _height), playerPos.z());
+		drawShpere(_playerPos.x(), Math.max(_cloudsHeight + _bend + 10.0f, _playerPos.y() + _height), _playerPos.z());
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
+
+		PerformanceMonitor.getInstance().stop(Operation.RENDER_SKY);
+	}
+
+	public void renderClouds()
+	{
+		PerformanceMonitor.getInstance().stop(Operation.RENDER_CLOUDS);
 
 		/* Clouds */
 		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glDisable(GL11.GL_CULL_FACE);
 		_clouds.bind();
 
-		int playerCloudGridX = MathHelper.round(playerPos.x() / (_cloudsTexWidth * _cloudsScale));
-		int playerCloudGridZ = MathHelper.round(playerPos.z() / (_cloudsHeight * _cloudsScale));
+		int playerCloudGridX = MathHelper.round(_playerPos.x() / (_cloudsTexWidth * _cloudsScale));
+		int playerCloudGridZ = MathHelper.round(_playerPos.z() / (_cloudsHeight * _cloudsScale));
 
 		GL11.glColor4f(1.0f, 1.0f, 1.0f, _cloudsAlpha);
 
@@ -112,7 +119,14 @@ public class Sky extends GameObject
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_BLEND);
 		
-		PerformanceMonitor.getInstance().stop(Operation.RENDER_SKY);
+		PerformanceMonitor.getInstance().stop(Operation.RENDER_CLOUDS);
+	}
+	
+	@Override
+	public void render()
+	{
+		renderSky();
+		renderClouds();
 	}
 
 	private void drawShpere(float x, float y, float z)

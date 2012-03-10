@@ -15,8 +15,6 @@
  ******************************************************************************/
 package org.craftmania.world;
 
-import static org.lwjgl.opengl.GL11.*;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,10 +27,9 @@ import org.craftmania.game.ControlSettings;
 import org.craftmania.game.FontStorage;
 import org.craftmania.game.Game;
 import org.craftmania.game.PerformanceMonitor;
-import org.craftmania.game.TextureStorage;
 import org.craftmania.game.PerformanceMonitor.Operation;
+import org.craftmania.game.TextureStorage;
 import org.craftmania.inventory.Inventory;
-import org.craftmania.inventory.InventoryItem;
 import org.craftmania.inventory.Inventory.InventoryPlace;
 import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3f;
@@ -131,24 +128,20 @@ public class World
 		/* Look through the camera with high viewing distance to render the sky */
 		_player.getFirstPersonCamera().lookThrough(512.0f);
 
-		
 		/* Set the fog color based on time */
 		_fogColor.set(Game.getInstance().getConfiguration().getFogColor());
 		_fogColor.scale(_sunlight - 0.05f);
 		GL11.glFog(GL11.GL_FOG_COLOR, GLUtils.wrapDirect(_fogColor.x(), _fogColor.y(), _fogColor.z(), 1.0f));
 		GL11.glClearColor(_fogColor.x(), _fogColor.y(), _fogColor.z(), 1.0f);
 
-		if (_player.getPosition().y() + _player.getEyeHeight() < _sky.getCloudsHeight())
-		{
-			glFogf(GL_FOG_START, 200);
-			glFogf(GL_FOG_END, 400);
-
-			_sky.render();
-		}
+		/* Render the sky */
+		GL11.glFogf(GL11.GL_FOG_START, 200);
+		GL11.glFogf(GL11.GL_FOG_END, 400);
+		_sky.renderSky();
 
 		/* Restore the fog distance */
-		glFogf(GL_FOG_START, configuration.getViewingDistance() * 0.55f);
-		glFogf(GL_FOG_END, configuration.getViewingDistance());
+		GL11.glFogf(GL11.GL_FOG_START, configuration.getViewingDistance() * 0.55f);
+		GL11.glFogf(GL11.GL_FOG_END, configuration.getViewingDistance());
 
 		/* Select the visible blocks */
 		selectVisibleChunks(_player.getFirstPersonCamera().getViewFrustum());
@@ -171,18 +164,15 @@ public class World
 		PerformanceMonitor.getInstance().stop(Operation.RENDER_TRANSLUCENT);
 		PerformanceMonitor.getInstance().start(Operation.RENDER_MANUAL);
 		for (int i = 0; i < _visibleChunks.size(); ++i)
-		{			
+		{
 			_visibleChunks.get(i).renderManualBlocks();
 		}
 		PerformanceMonitor.getInstance().stop(Operation.RENDER_MANUAL);
 
-		if (_player.getPosition().y() + _player.getEyeHeight() > _sky.getCloudsHeight())
-		{
-			glFogf(GL_FOG_START, 200);
-			glFogf(GL_FOG_END, 400);
-
-			_sky.render();
-		}
+		/* Render the clouds */
+		GL11.glFogf(GL11.GL_FOG_START, 200);
+		GL11.glFogf(GL11.GL_FOG_END, 400);
+		_sky.renderClouds();
 
 		_player.render();
 
@@ -195,7 +185,7 @@ public class World
 
 		Game.getInstance().initOverlayRendering();
 
-		glColor3f(1, 1, 1);
+		GL11.glColor3f(1, 1, 1);
 
 		if (Game.RENDER_INFORMATION_OVERLAY)
 		{
@@ -223,7 +213,7 @@ public class World
 			int width = conf.getWidth();
 			int height = conf.getHeight();
 			// Center Cross
-			glDisable(GL_TEXTURE_2D);
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			if (CENTER_CROSS_CALL_LIST == 0)
 			{
 				CENTER_CROSS_CALL_LIST = GL11.glGenLists(1);
@@ -232,29 +222,29 @@ public class World
 				int crossSize = 10;
 				int crossHole = 5;
 
-				glLineWidth(2.5f);
+				GL11.glLineWidth(2.5f);
 
-				glColor3f(0, 0, 0);
-				glBegin(GL_LINES);
-				glVertex3f(width / 2 - crossSize - crossHole, height / 2, 0);
-				glVertex3f(width / 2 - crossHole, height / 2, 0);
+				GL11.glColor3f(0, 0, 0);
+				GL11.glBegin(GL11.GL_LINES);
+				GL11.glVertex3f(width / 2 - crossSize - crossHole, height / 2, 0);
+				GL11.glVertex3f(width / 2 - crossHole, height / 2, 0);
 
-				glVertex3f(width / 2 + crossSize + crossHole, height / 2, 0);
-				glVertex3f(width / 2 + crossHole, height / 2, 0);
+				GL11.glVertex3f(width / 2 + crossSize + crossHole, height / 2, 0);
+				GL11.glVertex3f(width / 2 + crossHole, height / 2, 0);
 
-				glVertex3f(width / 2, height / 2 - crossSize - crossHole, 0);
-				glVertex3f(width / 2, height / 2 - crossHole, 0);
+				GL11.glVertex3f(width / 2, height / 2 - crossSize - crossHole, 0);
+				GL11.glVertex3f(width / 2, height / 2 - crossHole, 0);
 
-				glVertex3f(width / 2, height / 2 + crossSize + crossHole, 0);
-				glVertex3f(width / 2, height / 2 + crossHole, 0);
+				GL11.glVertex3f(width / 2, height / 2 + crossSize + crossHole, 0);
+				GL11.glVertex3f(width / 2, height / 2 + crossHole, 0);
 
-				glEnd();
+				GL11.glEnd();
 				GL11.glEndList();
 			} else
 			{
 				GL11.glCallList(CENTER_CROSS_CALL_LIST);
 			}
-			glEnable(GL_TEXTURE_2D);
+			GL11.glEnable(GL11.GL_TEXTURE_2D);
 
 			// Inventory bar
 			GL11.glPushMatrix();
@@ -634,7 +624,10 @@ public class World
 				_player.scrollInventoryItem();
 			} else
 			{
-				/* Make sure the inventory doesn't handle the event that made the inventory become active */
+				/*
+				 * Make sure the inventory doesn't handle the event that made
+				 * the inventory become active
+				 */
 				if (invActive)
 				{
 					_activatedInventory.mouseEvent();

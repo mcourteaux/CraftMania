@@ -1189,7 +1189,8 @@ public class Chunk implements AABBObject
 	public void unspreadLight(int x, int y, int z, byte light, LightType type)
 	{
 		Chunk chunk = getChunkContaining(x, y, z, false, false, false);
-		if (chunk._loading)
+		
+		if (chunk == null || chunk._loading)
 			return;
 		List<Vec3i> brightSpots = new FastArrayList<Vec3i>();
 		chunk.unspreadLight(x, y, z, light, type, brightSpots);
