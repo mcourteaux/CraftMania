@@ -16,25 +16,27 @@
 package org.craftmania.utilities;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ThreadPool
 {
 	private int _maximumThreads;
 	private volatile int _runningThreads;
-	private List<Runnable> _waitingRunnables;
+	private List<WaitingRunnable> _waitingRunnables;
 
 	public ThreadPool(int maximumThreads)
 	{
 		_maximumThreads = maximumThreads;
-		_waitingRunnables = new ArrayList<Runnable>();
+		_waitingRunnables = new ArrayList<WaitingRunnable>();
 	}
 
-	public void addThread(Runnable runnable)
+	public void addThread(Runnable runnable, int priority)
 	{
 		synchronized (this)
 		{
-			_waitingRunnables.add(runnable);
+			_waitingRunnables.add(new WaitingRunnable(runnable, priority));
+			Collections.sort(_waitingRunnables);
 		}
 		manage();
 	}
@@ -43,7 +45,7 @@ public class ThreadPool
 	{
 		if (_runningThreads < _maximumThreads && !_waitingRunnables.isEmpty())
 		{
-			final Runnable logic = _waitingRunnables.remove(0);
+			final WaitingRunnable logic = _waitingRunnables.remove(_waitingRunnables.size() - 1);
 			Thread t = new Thread(new Runnable()
 			{
 
@@ -51,7 +53,7 @@ public class ThreadPool
 				public void run()
 				{
 					++_runningThreads;
-					logic.run();
+					logic._runnable.run();
 					--_runningThreads;
 					manage();
 				}
@@ -59,5 +61,25 @@ public class ThreadPool
 			t.setPriority(Thread.MIN_PRIORITY);
 			t.start();
 		}
+	}
+	
+	private static class WaitingRunnable implements Comparable<WaitingRunnable>
+	{
+		private Runnable _runnable;
+		private int _priority;
+		
+		public WaitingRunnable(Runnable runnable, int priority)
+		{
+			_runnable = runnable;
+			_priority = priority;
+		}
+		
+		@Override
+		public int compareTo(WaitingRunnable o)
+		{
+			return o._priority - _priority;
+		}
+		
+		
 	}
 }

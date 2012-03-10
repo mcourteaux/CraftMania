@@ -15,12 +15,8 @@
  ******************************************************************************/
 package org.craftmania.world.characters;
 
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glRotated;
-import static org.lwjgl.opengl.GL11.glRotatef;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-
 import org.craftmania.game.Game;
+import org.lwjgl.opengl.GL11;
 
 /**
  * 
@@ -103,13 +99,13 @@ public class CharacterBody
 	public void transformToRightHand()
 	{
 		/* Transform the matix */
-		glLoadIdentity();
+		GL11.glLoadIdentity();
 
-		glTranslatef(0.2f - _progressRightHand / 10.0f, -0.05f, -0.2f - _progressRightHand / 20.0f * +(_progressRightHand * _blockDistance * 1.2f));
-		glRotatef(-65, 0, 1, 0);
-		glRotated(_progressRightHand * 50 - 10.0d, 0, 0, 1);
-		glRotated(_progressRightHand * 20, 1, 1, 0);
-		glRotatef(90, 0, 0, 1);
-		glRotatef(20, 0, 1, 0);
+		GL11.glTranslatef(0.2f - _progressRightHand / 10.0f, -0.05f, -0.2f - _progressRightHand / 20.0f * +(_progressRightHand * _blockDistance * 1.2f));
+		GL11.glRotatef(-65, 0, 1, 0);
+		GL11.glRotated(_progressRightHand * 50 - 10.0d, 0, 0, 1);
+		GL11.glRotated(_progressRightHand * 20, 1, 1, 0);
+		GL11.glRotatef(90, 0, 0, 1);
+		GL11.glRotatef(20, 0, 1, 0);
 	}
 }

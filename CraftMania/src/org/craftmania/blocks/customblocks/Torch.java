@@ -143,6 +143,7 @@ public class Torch extends CrossedBlock
 			GL11.glEnable(GL11.GL_BLEND);
 			GL11.glEnable(GL11.GL_ALPHA_TEST);
 			GL11.glAlphaFunc(GL11.GL_GREATER, 0.0f);
+			GL11.glColor3f(1.0f, 1.0f, 1.0f);
 
 			PARTICLES_TEXTURE.bind();
 

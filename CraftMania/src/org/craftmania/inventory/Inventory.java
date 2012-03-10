@@ -276,7 +276,7 @@ public abstract class Inventory
 		{
 			if (count < 0)
 			{
-				subtractAmount(count);
+				subtractAmount(-count);
 			} else
 			{
 				_itemCount += count;
@@ -287,7 +287,7 @@ public abstract class Inventory
 		{
 			if (count < 0)
 			{
-				addAmount(count);
+				addAmount(-count);
 			} else
 			{
 				_itemCount -= count;

@@ -58,7 +58,7 @@ public class ChunkThreading
 				}
 				--_threads;
 			}
-		});
+		}, 0);
 	}
 	
 	public void deleteChunk(final Chunk chunk)
@@ -88,10 +88,10 @@ public class ChunkThreading
 				}
 				--_threads;
 			}
-		});
+		}, 0);
 	}
 	
-	public void loadChunk(final Chunk chunk)
+	public void loadChunk(final Chunk chunk, int priority)
 	{
 		chunk.setLoading(true);
 		_generatePool.addThread(new Runnable()
@@ -114,10 +114,10 @@ public class ChunkThreading
 				}
 				--_threads;
 			}
-		});
+		}, priority);
 	}
 
-	public void generateChunk(final Chunk chunk)
+	public void generateChunk(final Chunk chunk, int priority)
 	{
 		chunk.setLoading(true);
 		_generatePool.addThread(new Runnable()
@@ -140,7 +140,7 @@ public class ChunkThreading
 				}
 				--_threads;
 			}
-		});
+		}, priority);
 	}
 
 	public void saveAndUnloadChunk(final Chunk chunk)
@@ -170,7 +170,7 @@ public class ChunkThreading
 				}
 				--_threads;
 			}
-		});
+		}, 0);
 	}
 
 	public boolean isTreadingBusy()
@@ -178,7 +178,7 @@ public class ChunkThreading
 		return _threads > 0;
 	}
 
-	public void loadAndGenerateChunk(final Chunk chunk)
+	public void loadAndGenerateChunk(final Chunk chunk, int priority)
 	{
 		chunk.setLoading(true);
 		_generatePool.addThread(new Runnable()
@@ -202,6 +202,6 @@ public class ChunkThreading
 				}
 				--_threads;
 			}
-		});
+		}, priority);
 	}
 }

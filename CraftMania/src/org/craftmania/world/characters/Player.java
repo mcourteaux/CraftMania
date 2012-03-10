@@ -15,8 +15,6 @@
  ******************************************************************************/
 package org.craftmania.world.characters;
 
-import static org.lwjgl.opengl.GL11.*;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -49,6 +47,7 @@ import org.craftmania.world.Chunk;
 import org.craftmania.world.Chunk.LightType;
 import org.craftmania.world.ChunkManager;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
 
 /**
  * 
@@ -166,43 +165,43 @@ public class Player extends GameObject
 	public void render()
 	{
 
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LEQUAL);
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glDepthFunc(GL11.GL_LEQUAL);
 
-		glEnable(GL_BLEND);
-		glClear(GL_DEPTH_BUFFER_BIT);
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
 
 		if (_aimedBlockPosition.y() != -1)
 		{
-			glClear(GL_DEPTH_BUFFER_BIT);
-			glDisable(GL_TEXTURE_2D);
+			GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
 
 			_aimedBlockAABB.render(0.0f, 0.0f, 0.0f, 0.1f);
-			glEnable(GL_TEXTURE_2D);
+			GL11.glEnable(GL11.GL_TEXTURE_2D);
 		}
 
 		if (_selectedItem != null)
 		{
-			glPushMatrix();
-			glEnable(GL_TEXTURE_2D);
-			glDisable(GL_CULL_FACE);
+			GL11.glPushMatrix();
+			GL11.glEnable(GL11.GL_TEXTURE_2D);
+			GL11.glDisable(GL11.GL_CULL_FACE);
 
 			_body.transformToRightHand();
 
 			/* Prepare the light buffer */
-			Chunk c = Game.getInstance().getWorld().getChunkManager().getChunkContaining((int) _position.x(), (int) _position.y(), (int) _position.z(), false, false, false);
+			Chunk c = Game.getInstance().getWorld().getChunkManager().getChunkContaining(MathHelper.floor(_position.x()), MathHelper.floor(_position.y()) + 1, MathHelper.floor(_position.z()), false, false, false);
 			if (c != null)
 			{
-				c.fillLightBuffer(c.getLightBuffer(), (int) _position.x(), (int) _position.y(), (int) _position.z());
+				c.fillLightBuffer(c.getLightBuffer(), MathHelper.floor(_position.x()), MathHelper.floor(_position.y()) + 1, MathHelper.floor(_position.z()));
 
 				/* Render the object, with the lightbuffer */
 				_selectedItem.renderHoldableObject(c.getLightBuffer());
 			}
 
-			glEnable(GL_CULL_FACE);
-			glPopMatrix();
+			GL11.glEnable(GL11.GL_CULL_FACE);
+			GL11.glPopMatrix();
 		}
-		glDisable(GL_DEPTH_TEST);
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
 	}
 
 	@Override

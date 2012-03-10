@@ -26,6 +26,7 @@ import static org.lwjgl.opengl.GL11.glTexCoord2f;
 import static org.lwjgl.opengl.GL11.glVertex2f;
 
 import org.craftmania.inventory.InventoryItem;
+import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3f;
 import org.newdawn.slick.opengl.Texture;
 
@@ -147,6 +148,32 @@ public final class BlockType extends InventoryItem
 	@Override
 	public void renderHoldableObject(byte[][][] lightBuffer)
 	{
+
+		/* Smoothen the light buffer */
+
+		int avg = 0;
+		for (int i0 = 0; i0 < lightBuffer.length; ++i0)
+		{
+			for (int i1 = 0; i1 < lightBuffer[i0].length; ++i1)
+			{
+				for (int i2 = 0; i2 < lightBuffer[i0][i1].length; ++i2)
+				{
+					avg += lightBuffer[i0][i1][i2];
+				}
+			}
+		}
+		avg /= 27.0f;
+		for (int i0 = 0; i0 < lightBuffer.length; ++i0)
+		{
+			for (int i1 = 0; i1 < lightBuffer[i0].length; ++i1)
+			{
+				for (int i2 = 0; i2 < lightBuffer[i0][i1].length; ++i2)
+				{
+					lightBuffer[i0][i1][i2] = (byte) avg;
+				}
+			}
+		}
+
 		float scale = 0.1f;
 		glScalef(scale, scale, scale);
 		glRotatef(-40, 0, 0, 1);
@@ -235,7 +262,7 @@ public final class BlockType extends InventoryItem
 	{
 		return hasSpecialAction;
 	}
-	
+
 	public boolean hasSpecialSaveData()
 	{
 		return hasSpecialSaveData;
@@ -250,7 +277,7 @@ public final class BlockType extends InventoryItem
 	{
 		return (DefaultBlockBrush) brush;
 	}
-	
+
 	public CrossedBlockBrush getCrossedBlockBrush()
 	{
 		return (CrossedBlockBrush) brush;
@@ -260,7 +287,7 @@ public final class BlockType extends InventoryItem
 	{
 		return crossed;
 	}
-	
+
 	public boolean isSupportNeeded()
 	{
 		return supportNeeded;

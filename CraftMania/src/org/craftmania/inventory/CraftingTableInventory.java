@@ -216,7 +216,7 @@ public class CraftingTableInventory extends Inventory
 				{
 					int index = CraftingTableInventoryRaster.CRAFTING_OFFSET + (y * 3) + x;
 					InventoryPlace place = getInventoryPlace(index);
-					System.out.println(x + ", " + y + (place == null ? "null" : " = --" + place.getItemCount() + ", stack = " + place.isStack()));
+					System.out.println(x + ", " + y + (place == null ? " null" : " = --" + place.getItemCount() + ", stack = " + place.isStack()));
 					if (place != null)
 					{
 						if (place.isStack())

@@ -73,7 +73,7 @@ public class FloatingIslandGenerator extends Generator
 				
 					if (!treeBuilt && x * x + z * z < size * size - 5)
 					{
-						if (_random.randomInt(10) == 0)
+						if (_random.randomInt(80) == 0)
 						{
 							treeBuilt = true;
 							TreeGenerator gen = new TreeGenerator(_random.randomLong());

@@ -28,10 +28,10 @@ import org.craftmania.blocks.BlockManager;
 import org.craftmania.blocks.BlockType;
 import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3f;
+import org.craftmania.world.characters.Player;
 
 public class ChunkManager
 {
-	@SuppressWarnings("unused")
 	private World _world;
 	private BlockManager _blockManager;
 	private Map<Integer, AbstractChunk<Chunk>> _superChunks;
@@ -208,7 +208,6 @@ public class ChunkManager
 
 		int blockData = oldChunk.getChunkData().getBlockData(oldIndex);
 		boolean special = ChunkData.dataIsSpecial(blockData);
-		
 
 		if (special)
 		{
@@ -229,7 +228,7 @@ public class ChunkManager
 				block.addToVisibilityList();
 			if (renderMan)
 				block.addToManualRenderList();
-			
+
 			/* Check the visibility of neighbors again */
 			newChunk.updateVisibilityForNeigborsOf(dstX, dstY, dstZ);
 
@@ -317,7 +316,11 @@ public class ChunkManager
 	{
 		if (seperateThread)
 		{
-			_blockChunkThreading.generateChunk(chunk);
+			Player p = _world.getActivePlayer();
+			float xDiff =  chunk.getAbsoluteX() - p.getPosition().x();
+			float zDiff =  chunk.getAbsoluteZ() - p.getPosition().z();
+			
+			_blockChunkThreading.generateChunk(chunk, (int) (xDiff * xDiff + zDiff * zDiff));
 		} else
 		{
 			chunk.generate();
@@ -338,7 +341,11 @@ public class ChunkManager
 	{
 		if (separateThread)
 		{
-			_blockChunkThreading.loadAndGenerateChunk(chunk);
+			Player p = _world.getActivePlayer();
+			float xDiff =  chunk.getAbsoluteX() - p.getPosition().x();
+			float zDiff =  chunk.getAbsoluteZ() - p.getPosition().z();
+			
+			_blockChunkThreading.loadAndGenerateChunk(chunk, (int) (xDiff * xDiff + zDiff * zDiff));
 		} else
 		{
 			try
