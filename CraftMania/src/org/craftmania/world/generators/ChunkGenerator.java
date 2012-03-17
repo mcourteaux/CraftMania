@@ -96,7 +96,7 @@ public class ChunkGenerator extends Generator
 			{
 				for (int y = 0; y < Chunk.CHUNK_SIZE_VERTICAL + 1; y += SAMPLE_RATE_VERTICAL_DENSITY)
 				{
-					densityMap[x][y][z] = generateDensity(random, x + chunk.getAbsoluteX(), y, z + chunk.getAbsoluteZ());
+					densityMap[x][y][z] = generateDensity(random, x, y, z);
 				}
 			}
 		}
@@ -166,8 +166,8 @@ public class ChunkGenerator extends Generator
 			TreeGenerator gen = new TreeGenerator(random.randomLong());
 			trees: for (int i = 0; i < treeCount; ++i)
 			{
-				int x = chunk.getAbsoluteX() + random.randomInt(0, Chunk.CHUNK_SIZE_HORIZONTAL);
-				int z = chunk.getAbsoluteZ() + random.randomInt(0, Chunk.CHUNK_SIZE_HORIZONTAL);
+				int x = chunk.getAbsoluteX() + random.randomInt(Chunk.CHUNK_SIZE_HORIZONTAL);
+				int z = chunk.getAbsoluteZ() + random.randomInt(Chunk.CHUNK_SIZE_HORIZONTAL);
 
 				/* Check for enough distance from the other trees */
 				for (TreeDefinition treeDef : _worldProvider.getTrees())
@@ -268,7 +268,7 @@ public class ChunkGenerator extends Generator
 		}
 
 		/* Generate some floating islands */
-		if (random.randomInt(35) == 0)
+		if (random.randomInt(35) == -1)
 		{
 			FloatingIslandGenerator gen = new FloatingIslandGenerator(_worldProvider);
 			int x = chunk.getAbsoluteX() + random.randomInt(Chunk.CHUNK_SIZE_HORIZONTAL);
@@ -276,6 +276,21 @@ public class ChunkGenerator extends Generator
 			int y = _heightMap[x - chunk.getAbsoluteX()][z - chunk.getAbsoluteZ()];
 
 			gen.generateFloatingIsland(chunk, x, y + random.randomInt(40, 80), z);
+		}
+
+		/* Generate a structure */
+		if (random.randomInt(10) == 0)
+		{
+			BuildingGenerator gen = new BuildingGenerator();
+			int x = chunk.getAbsoluteX() + random.randomInt(Chunk.CHUNK_SIZE_HORIZONTAL / 2);
+			int z = chunk.getAbsoluteZ() + random.randomInt(Chunk.CHUNK_SIZE_HORIZONTAL / 2);
+			int y = _heightMap[x - chunk.getAbsoluteX()][z - chunk.getAbsoluteZ()] + 1;
+
+			if (_worldProvider.getBiomeAt(x, y, z) == Biome.FIELDS)
+			{
+				System.out.println("Generate building at (" + x + ", " + y + ", " + z + ")");
+				gen.generateHouseAt(chunk, x, y, z);
+			}
 		}
 
 		/* Make it accessible for the game */
@@ -318,7 +333,14 @@ public class ChunkGenerator extends Generator
 
 	private float generateDensity(SmartRandom random, int x, int y, int z)
 	{
-		int baseLevel = _worldProvider.getHeightAt(x, z);
+		int baseLevel;
+		if (x >= Chunk.CHUNK_SIZE_HORIZONTAL || z >= Chunk.CHUNK_SIZE_HORIZONTAL)
+		{
+			baseLevel = _heightMap[Chunk.CHUNK_SIZE_HORIZONTAL - 1][Chunk.CHUNK_SIZE_HORIZONTAL - 1];
+		} else
+		{
+			baseLevel = _heightMap[x][z];
+		}
 		float depth = baseLevel - y;
 		if (depth < 0)
 		{

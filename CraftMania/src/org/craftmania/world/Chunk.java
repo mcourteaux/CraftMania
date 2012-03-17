@@ -154,8 +154,15 @@ public class Chunk implements AABBObject
 		if (!_generated)
 		{
 			_generated = true;
-			ChunkGenerator gen = new ChunkGenerator(Game.getInstance().getWorld(), getX(), getZ());
-			gen.generateChunk();
+			try
+			{
+				ChunkGenerator gen = new ChunkGenerator(Game.getInstance().getWorld(), getX(), getZ());
+				gen.generateChunk();
+			} catch (Exception e)
+			{
+				System.err.println("Generation of " + this + " failed!");
+				e.printStackTrace(System.err);
+			}
 
 			markNeighborsLightPointsDirty();
 		}
@@ -1367,6 +1374,12 @@ public class Chunk implements AABBObject
 	public void notifyNeighborsOf(int x, int y, int z)
 	{
 		Chunk chunk = getChunkContaining(x, y, z, false, false, false);
+		if (chunk == null)
+		{
+			System.err.println(this + " is null!");
+			new NullPointerException().printStackTrace(System.err);
+			return;
+		}
 		for (int i = 0; i < 6; ++i)
 		{
 			Side side = Side.getSide(i);

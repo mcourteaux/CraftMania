@@ -32,6 +32,7 @@
         </brush>
         <resistance>3</resistance>
         <blockClass>SAND</blockClass>
+        <mineResult>1</mineResult>
     </block>
 
     <block id="3" name="stone">
@@ -81,7 +82,7 @@
     
     <block id="8" name="leafs1">
         <brush alphaBlending="true">
-            <allsides color="#B4B450">4,3</allsides>
+            <allsides color="#A45415">4,3</allsides>
         </brush>
         <resistance>1</resistance>
         <mineResult>null</mineResult>

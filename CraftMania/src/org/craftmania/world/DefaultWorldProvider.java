@@ -641,7 +641,7 @@ public class DefaultWorldProvider extends WorldProvider
 				return data;
 			} else
 			{
-				float diff = _random.exponentialRandom(35.0f, 6);
+				float diff = _random.exponentialRandom(5.0f, 3);
 
 				float height = rawHeight * 0.6f + td.avg * 0.4f + diff;
 
