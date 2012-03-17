@@ -66,6 +66,7 @@ public class DefaultWorldProvider extends WorldProvider
 		_temperatures = new ArrayList<DefaultWorldProvider.DataPoint2D>();
 	}
 
+	
 	public List<TreeDefinition> getTrees()
 	{
 		return _trees;
@@ -80,9 +81,9 @@ public class DefaultWorldProvider extends WorldProvider
 	{
 		return point._x == x && point._z == z;
 	}
-
+	
 	@Override
-	public float getTemperatureAt(int x, int y, int z)
+	public int getTemperatureAt(int x, int z)
 	{
 		int lowerX = x;
 		int lowerZ = z;
@@ -168,13 +169,30 @@ public class DefaultWorldProvider extends WorldProvider
 			}
 		}
 
-		float temperature2D = biLerpDataPoints(x, z, q11, q12, q21, q22);
-
-		return temperature2D - y / 3.0f + 10;
+		return (int) biLerpDataPoints(x, z, q11, q12, q21, q22);
 	}
 
 	@Override
-	public float getHumidityAt(int x, int y, int z)
+	public int getTemperatureAt(int x, int y, int z)
+	{
+		int temperature2D = getTemperatureAt(x, z);
+		return calculateTemperature(temperature2D, y);
+	}
+	
+	public int calculateTemperature(int temperature, int y)
+	{
+		return (int) MathHelper.clamp(temperature - y / 3.0f + 10.0f, 2, 40);
+	}
+	
+	public int getHumidityAt(int x, int y, int z)
+	{
+		int humidity = getHumidityAt(x, z);
+		return (int) MathHelper.clamp(humidity * 10 / getTemperatureAt(x, y, z), 0, 100);
+	}
+
+
+	@Override
+	public int getHumidityAt(int x, int z)
 	{
 		int lowerX = x;
 		int lowerZ = z;
@@ -260,7 +278,7 @@ public class DefaultWorldProvider extends WorldProvider
 		}
 		float humidity2D = biLerpDataPoints(x, z, q11, q12, q21, q22);
 
-		return MathHelper.clamp(humidity2D * 10 / getTemperatureAt(x, y, z), 10, 95);
+		return MathHelper.clamp((int) humidity2D, 10, 95);
 	}
 
 	@Override
@@ -469,11 +487,17 @@ public class DefaultWorldProvider extends WorldProvider
 			}
 		}
 
-		if (temp > 25.0f && humidity < 30.0f)
+		return calculateBiome((int) temp, (int) humidity);
+	}
+	
+	@Override
+	public Biome calculateBiome(int temperature, int humidity)
+	{
+		if (temperature > 25.0f && humidity < 30.0f)
 		{
 			return Biome.DESERT;
 		}
-		if (temp < 5.0f)
+		if (temperature < 5.0f)
 		{
 			return Biome.SNOW;
 		}

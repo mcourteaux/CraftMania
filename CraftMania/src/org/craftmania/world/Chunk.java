@@ -154,8 +154,8 @@ public class Chunk implements AABBObject
 		if (!_generated)
 		{
 			_generated = true;
-			ChunkGenerator gen = new ChunkGenerator(Game.getInstance().getWorld());
-			gen.generateChunk(getX(), getZ());
+			ChunkGenerator gen = new ChunkGenerator(Game.getInstance().getWorld(), getX(), getZ());
+			gen.generateChunk();
 
 			markNeighborsLightPointsDirty();
 		}

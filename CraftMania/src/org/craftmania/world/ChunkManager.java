@@ -48,6 +48,11 @@ public class ChunkManager
 		_blockChunkThreading = new ChunkThreading(this);
 		_blockManager = BlockManager.getInstance();
 	}
+	
+	public World getWorld()
+	{
+		return _world;
+	}
 
 	public Collection<AbstractChunk<Chunk>> getAllSuperChunks()
 	{
@@ -175,7 +180,7 @@ public class ChunkManager
 				if (distSq <= distanceSq)
 				{
 					Chunk chunk = getChunk(centerX + x, centerZ + z, false, false, false);
-					if (chunk != null && !chunk.isDestroying() && !chunk.isLoading() && chunk.isLoaded())
+					if (chunk != null && !chunk.isDestroying())
 					{
 						chunks.add(chunk);
 					}
@@ -358,6 +363,11 @@ public class ChunkManager
 			}
 			chunk.generate();
 		}
+	}
+
+	public boolean isLoadingThreadPoolFull()
+	{
+		return _blockChunkThreading.isLoadingThreadPoolFull();
 	}
 
 }

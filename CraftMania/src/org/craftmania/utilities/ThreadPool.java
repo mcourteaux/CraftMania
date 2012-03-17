@@ -82,4 +82,9 @@ public class ThreadPool
 		
 		
 	}
+
+	public boolean isFull()
+	{
+		return _maximumThreads == _runningThreads;
+	}
 }

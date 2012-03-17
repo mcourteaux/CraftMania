@@ -22,10 +22,22 @@ import org.craftmania.math.Vec3f;
 
 public abstract class WorldProvider
 {
+	/* 2D Map */
 	public abstract int getHeightAt(int x, int z);
-	public abstract float getTemperatureAt(int x, int y, int z);
-	public abstract float getHumidityAt(int x, int y, int z);
+	public abstract int getTemperatureAt(int x, int z);
+	public abstract int getHumidityAt(int x, int z);
+	
+	/* 3D Calculated */
+	public abstract int getTemperatureAt(int x, int y, int z);
+	public abstract int getHumidityAt(int x, int y, int z);
+	
 	public abstract Biome getBiomeAt(int x, int y, int z);
+	
+	/* Calculate methods */
+	public abstract Biome calculateBiome(int temperature, int humidity);
+	public abstract int calculateTemperature(int temperature, int y);
+	
+	
 	public abstract Vec3f getSpawnPoint();
 	public abstract List<TreeDefinition> getTrees();
 	

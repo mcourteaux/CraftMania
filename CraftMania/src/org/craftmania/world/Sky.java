@@ -54,7 +54,7 @@ public class Sky extends GameObject
 	{
 		_color = new Vec3f(COLOR);
 		_height = 128.0f;
-		_radius = Game.getInstance().getConfiguration().getViewingDistance() * 4.0f;
+		_radius = 500.0f;
 		_bend = 15.0f;
 		_vertices = 32;
 		_clouds = TextureStorage.getTexture("environment.clouds");
@@ -96,7 +96,7 @@ public class Sky extends GameObject
 
 	public void renderClouds()
 	{
-		PerformanceMonitor.getInstance().stop(Operation.RENDER_CLOUDS);
+		PerformanceMonitor.getInstance().start(Operation.RENDER_CLOUDS);
 
 		/* Clouds */
 		GL11.glEnable(GL11.GL_BLEND);

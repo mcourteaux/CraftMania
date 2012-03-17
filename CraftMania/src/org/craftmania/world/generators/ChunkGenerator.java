@@ -33,13 +33,20 @@ public class ChunkGenerator extends Generator
 	private WorldProvider _worldProvider;
 	private static int SAMPLE_RATE_HORIZONTAL_DENSITY = 2;
 	private static int SAMPLE_RATE_VERTICAL_DENSITY = 2;
+	private int _x;
+	private int _z;
+	private int[][] _heightMap;
+	private int[][] _temperatureMap;
+	private int[][] _humidityMap;
 
-	public ChunkGenerator(World world)
+	public ChunkGenerator(World world, int x, int z)
 	{
 		_worldProvider = world.getWorldProvider();
+		_x = x;
+		_z = z;
 	}
 
-	public Chunk generateChunk(int _x, int _z)
+	public Chunk generateChunk()
 	{
 		System.out.println("---------- Generate chunk: " + _x + ", " + _z);
 
@@ -49,6 +56,36 @@ public class ChunkGenerator extends Generator
 		Chunk chunk = _chunkManager.getChunk(_x, _z, true, false, false);
 		chunk.setGenerated(true);
 		chunk.setLoading(true);
+
+		/* Build the height map */
+		_heightMap = new int[Chunk.CHUNK_SIZE_HORIZONTAL][Chunk.CHUNK_SIZE_HORIZONTAL];
+		for (int x = 0; x < Chunk.CHUNK_SIZE_HORIZONTAL; ++x)
+		{
+			for (int z = 0; z < Chunk.CHUNK_SIZE_HORIZONTAL; ++z)
+			{
+				_heightMap[x][z] = _worldProvider.getHeightAt(x + chunk.getAbsoluteX(), z + chunk.getAbsoluteZ());
+			}
+		}
+
+		/* Build the temperature map */
+		_temperatureMap = new int[Chunk.CHUNK_SIZE_HORIZONTAL][Chunk.CHUNK_SIZE_HORIZONTAL];
+		for (int x = 0; x < Chunk.CHUNK_SIZE_HORIZONTAL; ++x)
+		{
+			for (int z = 0; z < Chunk.CHUNK_SIZE_HORIZONTAL; ++z)
+			{
+				_temperatureMap[x][z] = _worldProvider.getTemperatureAt(x + chunk.getAbsoluteX(), z + chunk.getAbsoluteZ());
+			}
+		}
+
+		/* Build the humidity map */
+		_humidityMap = new int[Chunk.CHUNK_SIZE_HORIZONTAL][Chunk.CHUNK_SIZE_HORIZONTAL];
+		for (int x = 0; x < Chunk.CHUNK_SIZE_HORIZONTAL; ++x)
+		{
+			for (int z = 0; z < Chunk.CHUNK_SIZE_HORIZONTAL; ++z)
+			{
+				_humidityMap[x][z] = _worldProvider.getHumidityAt(x + chunk.getAbsoluteX(), z + chunk.getAbsoluteZ());
+			}
+		}
 
 		/* Build a density map */
 		float densityMap[][][] = new float[Chunk.CHUNK_SIZE_HORIZONTAL + 1][Chunk.CHUNK_SIZE_VERTICAL + 1][Chunk.CHUNK_SIZE_HORIZONTAL + 1];
@@ -72,9 +109,9 @@ public class ChunkGenerator extends Generator
 		{
 			for (int z = 0; z < Chunk.CHUNK_SIZE_HORIZONTAL; z++)
 			{
-				int baseLevel = _worldProvider.getHeightAt(x + chunk.getAbsoluteX(), z + chunk.getAbsoluteZ());
+				int baseLevel = _heightMap[x][z];
 
-				Biome topBiome = _worldProvider.getBiomeAt(x + chunk.getAbsoluteX(), baseLevel, z + chunk.getAbsoluteZ());
+				Biome topBiome = _worldProvider.calculateBiome(_worldProvider.calculateTemperature(_temperatureMap[x][z], baseLevel), _worldProvider.getHumidityAt(x + chunk.getAbsoluteX(), baseLevel, z + chunk.getAbsoluteZ()));
 
 				for (int y = 0; y < Chunk.CHUNK_SIZE_VERTICAL && y <= baseLevel; y++)
 				{
@@ -145,7 +182,7 @@ public class ChunkGenerator extends Generator
 					}
 				}
 				int type = -1;
-				int y = _worldProvider.getHeightAt(x, z);
+				int y = _heightMap[x - chunk.getAbsoluteX()][z - chunk.getAbsoluteZ()];
 
 				/*
 				 * Check if the root of the tree is INSIDE THIS blockchunk, to
@@ -161,6 +198,7 @@ public class ChunkGenerator extends Generator
 					if (biome == Biome.FOREST)
 					{
 						gen.generateNiceBroadLeavedTree(chunk, x, y, z);
+						// gen.generateBroadLeavedTree(chunk, x, y, z, true);
 						type = 0;
 					} else if (biome == Biome.DESERT)
 					{
@@ -191,7 +229,7 @@ public class ChunkGenerator extends Generator
 			{
 				int x = chunk.getAbsoluteX() + random.randomInt(0, Chunk.CHUNK_SIZE_HORIZONTAL);
 				int z = chunk.getAbsoluteZ() + random.randomInt(0, Chunk.CHUNK_SIZE_HORIZONTAL);
-				int y = _worldProvider.getHeightAt(x, z);
+				int y = _heightMap[x - chunk.getAbsoluteX()][z - chunk.getAbsoluteZ()];
 
 				Biome biome = _worldProvider.getBiomeAt(x, y, z);
 				if (biome == Biome.FIELDS || biome == Biome.FOREST)
@@ -208,9 +246,9 @@ public class ChunkGenerator extends Generator
 
 			for (int i = 0; i < flowerCount; ++i)
 			{
-				int x = chunk.getAbsoluteX() + random.randomInt(0, Chunk.CHUNK_SIZE_HORIZONTAL);
-				int z = chunk.getAbsoluteZ() + random.randomInt(0, Chunk.CHUNK_SIZE_HORIZONTAL);
-				int y = _worldProvider.getHeightAt(x, z);
+				int x = chunk.getAbsoluteX() + random.randomInt(Chunk.CHUNK_SIZE_HORIZONTAL);
+				int z = chunk.getAbsoluteZ() + random.randomInt(Chunk.CHUNK_SIZE_HORIZONTAL);
+				int y = _heightMap[x - chunk.getAbsoluteX()][z - chunk.getAbsoluteZ()];
 
 				Biome biome = _worldProvider.getBiomeAt(x, y, z);
 				if (biome == Biome.FIELDS || biome == Biome.FOREST)
@@ -228,18 +266,17 @@ public class ChunkGenerator extends Generator
 				}
 			}
 		}
-		
-		
+
 		/* Generate some floating islands */
 		if (random.randomInt(35) == 0)
 		{
 			FloatingIslandGenerator gen = new FloatingIslandGenerator(_worldProvider);
-			int x = chunk.getAbsoluteX() + random.randomInt(15);
-			int z = chunk.getAbsoluteZ() + random.randomInt(15);
-			
-			gen.generateFloatingIsland(chunk, x, _worldProvider.getHeightAt(x, z) + random.randomInt(40, 80), z);
+			int x = chunk.getAbsoluteX() + random.randomInt(Chunk.CHUNK_SIZE_HORIZONTAL);
+			int z = chunk.getAbsoluteZ() + random.randomInt(Chunk.CHUNK_SIZE_HORIZONTAL);
+			int y = _heightMap[x - chunk.getAbsoluteX()][z - chunk.getAbsoluteZ()];
+
+			gen.generateFloatingIsland(chunk, x, y + random.randomInt(40, 80), z);
 		}
-		
 
 		/* Make it accessible for the game */
 		chunk.setLoading(false);
@@ -259,16 +296,16 @@ public class ChunkGenerator extends Generator
 	{
 		for (int x = 0; x < Chunk.CHUNK_SIZE_HORIZONTAL; x++)
 		{
-			for (int y = 0; y < Chunk.CHUNK_SIZE_VERTICAL; y++)
+			for (int z = 0; z < Chunk.CHUNK_SIZE_HORIZONTAL; z++)
 			{
-				for (int z = 0; z < Chunk.CHUNK_SIZE_HORIZONTAL; z++)
+				for (int y = 0; y < _heightMap[x][z]; y++)
 				{
 					if (!(x % SAMPLE_RATE_HORIZONTAL_DENSITY == 0 && y % SAMPLE_RATE_VERTICAL_DENSITY == 0 && z % SAMPLE_RATE_HORIZONTAL_DENSITY == 0))
 					{
 						int offsetX = (x / SAMPLE_RATE_HORIZONTAL_DENSITY) * SAMPLE_RATE_HORIZONTAL_DENSITY;
 						int offsetY = (y / SAMPLE_RATE_VERTICAL_DENSITY) * SAMPLE_RATE_VERTICAL_DENSITY;
 						int offsetZ = (z / SAMPLE_RATE_HORIZONTAL_DENSITY) * SAMPLE_RATE_HORIZONTAL_DENSITY;
-						densityMap[x][y][z] = (float) MathHelper.triLerp(x, y, z, densityMap[offsetX][offsetY][offsetZ], densityMap[offsetX][SAMPLE_RATE_VERTICAL_DENSITY + offsetY][offsetZ], densityMap[offsetX][offsetY][offsetZ + SAMPLE_RATE_HORIZONTAL_DENSITY],
+						densityMap[x][y][z] = MathHelper.triLerp(x, y, z, densityMap[offsetX][offsetY][offsetZ], densityMap[offsetX][SAMPLE_RATE_VERTICAL_DENSITY + offsetY][offsetZ], densityMap[offsetX][offsetY][offsetZ + SAMPLE_RATE_HORIZONTAL_DENSITY],
 								densityMap[offsetX][offsetY + SAMPLE_RATE_VERTICAL_DENSITY][offsetZ + SAMPLE_RATE_HORIZONTAL_DENSITY], densityMap[SAMPLE_RATE_HORIZONTAL_DENSITY + offsetX][offsetY][offsetZ], densityMap[SAMPLE_RATE_HORIZONTAL_DENSITY + offsetX][offsetY
 										+ SAMPLE_RATE_VERTICAL_DENSITY][offsetZ], densityMap[SAMPLE_RATE_HORIZONTAL_DENSITY + offsetX][offsetY][offsetZ + SAMPLE_RATE_HORIZONTAL_DENSITY],
 								densityMap[SAMPLE_RATE_HORIZONTAL_DENSITY + offsetX][offsetY + SAMPLE_RATE_VERTICAL_DENSITY][offsetZ + SAMPLE_RATE_HORIZONTAL_DENSITY], offsetX, SAMPLE_RATE_HORIZONTAL_DENSITY + offsetX, offsetY, SAMPLE_RATE_VERTICAL_DENSITY + offsetY, offsetZ,

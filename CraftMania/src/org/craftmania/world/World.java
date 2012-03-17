@@ -393,6 +393,10 @@ public class World
 
 	public void checkForNewVisibleChunks()
 	{
+		/* Don't add chunks to the queue if all cores are busy */
+		if (_chunkManager.isLoadingThreadPoolFull()) return;
+		_checkForNewChunks = false;
+
 		float viewingDistance = Game.getInstance().getConfiguration().getViewingDistance();
 		viewingDistance /= Chunk.CHUNK_SIZE_HORIZONTAL;
 		viewingDistance += 1.0f;
@@ -440,12 +444,7 @@ public class World
 			System.out.println("New chunk in sight: " + (centerX + xToGenerate) + ", " + (centerZ + zToGenerate));
 			Chunk ch = _chunkManager.getChunk(centerX + xToGenerate, centerZ + zToGenerate, true, false, false);
 			_chunkManager.loadAndGenerateChunk(ch, true);
-			_checkForNewChunks = true;
-		} else
-		{
-			_checkForNewChunks = false;
 		}
-
 	}
 
 	public void setActivatedInventory(Inventory inv)
@@ -667,6 +666,11 @@ public class World
 			setTime(SECONDS_IN_DAY * 0.4f);
 		}
 
+	}
+
+	public void requestCheckForNewVisibleChunks()
+	{
+		_checkForNewChunks = true;
 	}
 
 }
