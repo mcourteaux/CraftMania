@@ -36,7 +36,7 @@ public class ChunkManager
 	private BlockManager _blockManager;
 	private Map<Integer, AbstractChunk<Chunk>> _superChunks;
 	private List<BlockMovement> _blocksToMove;
-	private ChunkLoader _chunkLoader;
+	private ChunkIO _chunkLoader;
 	private ChunkThreading _blockChunkThreading;
 
 	public ChunkManager(World world)
@@ -44,7 +44,7 @@ public class ChunkManager
 		_world = world;
 		_superChunks = new HashMap<Integer, AbstractChunk<Chunk>>();
 		_blocksToMove = new ArrayList<ChunkManager.BlockMovement>();
-		_chunkLoader = new ChunkLoader();
+		_chunkLoader = new ChunkIO();
 		_blockChunkThreading = new ChunkThreading(this);
 		_blockManager = BlockManager.getInstance();
 	}
@@ -332,7 +332,7 @@ public class ChunkManager
 		}
 	}
 
-	public ChunkLoader getBlockChunkLoader()
+	public ChunkIO getBlockChunkLoader()
 	{
 		return _chunkLoader;
 	}

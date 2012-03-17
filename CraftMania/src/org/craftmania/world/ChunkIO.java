@@ -32,7 +32,7 @@ import org.craftmania.game.Game;
 import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3i;
 
-public class ChunkLoader
+public class ChunkIO
 {
 	
 	private static final BlockManager _blockManager = BlockManager.getInstance();

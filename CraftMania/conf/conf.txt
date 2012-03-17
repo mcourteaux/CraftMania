@@ -3,9 +3,9 @@
 fullscreen=false
 width=800
 height=500
-fovy=65
-fps=40
-viewing_distance=100
+fovy=70
+fps=60
+viewing_distance=120
 vsync=false
 
 fire_viewing_distance=25
