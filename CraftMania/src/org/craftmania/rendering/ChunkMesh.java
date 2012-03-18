@@ -19,8 +19,8 @@ import org.craftmania.rendering.ChunkMeshBuilder.MeshType;
 
 public class ChunkMesh
 {
-	private volatile int _vertexCount[];
-	private volatile int[] _vbos;
+	private int _vertexCount[];
+	private int[] _vbos;
 
 	public ChunkMesh(int[] vertexCount, int[] vbos)
 	{

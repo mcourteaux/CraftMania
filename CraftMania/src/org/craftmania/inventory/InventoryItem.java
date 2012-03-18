@@ -16,6 +16,7 @@
 package org.craftmania.inventory;
 
 import org.craftmania.GameObject;
+import org.craftmania.world.LightBuffer;
 import org.lwjgl.opengl.GL11;
 
 /**
@@ -53,11 +54,11 @@ public abstract class InventoryItem extends GameObject
 		return _name;
 	}
 
-	public void renderHoldableObject(byte[][][] lightBuffer)
+	public void renderHoldableObject(LightBuffer lightBuffer)
 	{
 		GL11.glPushMatrix();
 		float scale = 0.1f / 16.0f;
-		float light = lightBuffer[1][1][1] / 30.001f;
+		float light = lightBuffer.get(1, 1, 1) / 30.001f;
 		GL11.glScalef(scale, scale, scale);
 		GL11.glColor3f(0.5f * light, 0.5f * light, 0.5f * light);
 		/* Render the texture */

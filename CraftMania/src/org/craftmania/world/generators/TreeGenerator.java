@@ -259,7 +259,7 @@ public class TreeGenerator extends Generator
 		for (int h = 0; h <= needlesHeight; ++h)
 		{
 			int radius = (int) ((float) needlesRadius * (1.0f - ((float) h / (float) needlesHeight)));
-			if (h % 2 == 1)
+			if ((h & 1) == 1)
 			{
 				radius--;
 			}

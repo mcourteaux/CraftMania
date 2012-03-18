@@ -23,6 +23,7 @@ import org.craftmania.blocks.CrossedBlock;
 import org.craftmania.blocks.CrossedBlockBrush;
 import org.craftmania.math.Vec3i;
 import org.craftmania.world.Chunk;
+import org.craftmania.world.LightBuffer;
 
 public class TallGrass extends CrossedBlock
 {
@@ -61,7 +62,7 @@ public class TallGrass extends CrossedBlock
 	}
 
 	@Override
-	public void render(byte[][][] lightBuffer)
+	public void render(LightBuffer lightBuffer)
 	{
 		BLOCK_BRUSHES[_length].setPosition(getX() + 0.5f, getY() + 0.5f, getZ() + 0.5f);
 		BLOCK_BRUSHES[_length].render(lightBuffer);
@@ -87,7 +88,7 @@ public class TallGrass extends CrossedBlock
 
 	
 	@Override
-	public void storeInVBO(FloatBuffer vbo, byte[][][] lightBuffer)
+	public void storeInVBO(FloatBuffer vbo, LightBuffer lightBuffer)
 	{
 		BLOCK_BRUSHES[_length].storeInVBO(vbo, getX() + 0.5f, getY() + 0.5f, getZ() + 0.5f, lightBuffer);
 	}

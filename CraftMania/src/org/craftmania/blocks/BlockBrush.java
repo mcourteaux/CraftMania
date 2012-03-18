@@ -18,6 +18,7 @@ package org.craftmania.blocks;
 import java.nio.FloatBuffer;
 
 import org.craftmania.math.Vec3f;
+import org.craftmania.world.LightBuffer;
 
 public abstract class BlockBrush
 {
@@ -29,8 +30,8 @@ public abstract class BlockBrush
 		setPosition(v.x(), v.y(), v.z());
 	}
 
-	public abstract void render(byte[][][] lightBuffer);
-	public abstract void storeInVBO(FloatBuffer vbo, float x, float y, float z, byte[][][] lightBuffer);
+	public abstract void render(LightBuffer lightBuffer);
+	public abstract void storeInVBO(FloatBuffer vbo, float x, float y, float z, LightBuffer lightBuffer);
 	public abstract int getVertexCount();
 
 	public abstract void create();

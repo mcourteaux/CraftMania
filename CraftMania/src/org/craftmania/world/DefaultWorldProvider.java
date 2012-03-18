@@ -37,10 +37,10 @@ import org.craftmania.utilities.SmartRandom;
 public class DefaultWorldProvider extends WorldProvider
 {
 
-	public static int SAMPLE_RATE_HORIZONTAL = 8;
-	public static int SAMPLE_RATE_VERTICAL = 8;
-	public static int SAMPLE_RATE_HEIGHTS = 4;
-	public static int SAMPLE_RATE_RAW_HEIGHS = 32;
+	public static final int SAMPLE_RATE_HORIZONTAL = 8;
+	public static final int SAMPLE_RATE_VERTICAL = 8;
+	public static final int SAMPLE_RATE_HEIGHTS = 4;
+	public static final int SAMPLE_RATE_RAW_HEIGHS = 32;
 
 	public static int SAMPLE_RATE_TEMPERATURE = 32;
 

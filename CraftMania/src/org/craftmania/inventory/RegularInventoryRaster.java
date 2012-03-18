@@ -56,8 +56,8 @@ public class RegularInventoryRaster implements InventoryRaster
     @Override
     public ReadablePoint getCenterOfCell(int index)
     {
-        int x = getCenterOfCell(index).getX();
-        int y = getCenterOfCell(index).getY();
+        int x = index % _cellCountX;
+        int y = index / _cellCountX;
         return new Point((int) (_x + (x + 1) * _marginX + (x + 0.5f) * _cellW),
                 (int) (_y + (y + 1) * _marginY + (y + 0.5f) * _cellH));
     }

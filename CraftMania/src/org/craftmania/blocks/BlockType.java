@@ -15,19 +15,11 @@
  ******************************************************************************/
 package org.craftmania.blocks;
 
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glRotatef;
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTexCoord2f;
-import static org.lwjgl.opengl.GL11.glVertex2f;
+import static org.lwjgl.opengl.GL11.*;
 
 import org.craftmania.inventory.InventoryItem;
-import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3f;
+import org.craftmania.world.LightBuffer;
 import org.newdawn.slick.opengl.Texture;
 
 public final class BlockType extends InventoryItem
@@ -146,33 +138,33 @@ public final class BlockType extends InventoryItem
 	}
 
 	@Override
-	public void renderHoldableObject(byte[][][] lightBuffer)
+	public void renderHoldableObject(LightBuffer lightBuffer)
 	{
 
 		/* Smoothen the light buffer */
 
-		int avg = 0;
-		for (int i0 = 0; i0 < lightBuffer.length; ++i0)
-		{
-			for (int i1 = 0; i1 < lightBuffer[i0].length; ++i1)
-			{
-				for (int i2 = 0; i2 < lightBuffer[i0][i1].length; ++i2)
-				{
-					avg += lightBuffer[i0][i1][i2];
-				}
-			}
-		}
-		avg /= 27.0f;
-		for (int i0 = 0; i0 < lightBuffer.length; ++i0)
-		{
-			for (int i1 = 0; i1 < lightBuffer[i0].length; ++i1)
-			{
-				for (int i2 = 0; i2 < lightBuffer[i0][i1].length; ++i2)
-				{
-					lightBuffer[i0][i1][i2] = (byte) avg;
-				}
-			}
-		}
+//		int avg = 0;
+//		for (int i0 = 0; i0 < lightBuffer.length; ++i0)
+//		{
+//			for (int i1 = 0; i1 < lightBuffer[i0].length; ++i1)
+//			{
+//				for (int i2 = 0; i2 < lightBuffer[i0][i1].length; ++i2)
+//				{
+//					avg += lightBuffer[i0][i1][i2];
+//				}
+//			}
+//		}
+//		avg /= 27.0f;
+//		for (int i0 = 0; i0 < lightBuffer.length; ++i0)
+//		{
+//			for (int i1 = 0; i1 < lightBuffer[i0].length; ++i1)
+//			{
+//				for (int i2 = 0; i2 < lightBuffer[i0][i1].length; ++i2)
+//				{
+//					lightBuffer[i0][i1][i2] = (byte) avg;
+//				}
+//			}
+//		}
 
 		float scale = 0.1f;
 		glScalef(scale, scale, scale);

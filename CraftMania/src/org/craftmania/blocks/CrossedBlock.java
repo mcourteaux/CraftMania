@@ -23,6 +23,7 @@ import org.craftmania.inventory.InventoryItem;
 import org.craftmania.math.Vec3f;
 import org.craftmania.math.Vec3i;
 import org.craftmania.world.Chunk;
+import org.craftmania.world.LightBuffer;
 
 public class CrossedBlock extends Block
 {
@@ -39,14 +40,14 @@ public class CrossedBlock extends Block
 	}
 
 	@Override
-	public void render(byte[][][] lightBuffer)
+	public void render(LightBuffer lightBuffer)
 	{
 		_blockType.getCrossedBlockBrush().setPosition(_postion.x() + 0.5f, _postion.y() + 0.5f, _postion.z() + 0.5f);
 		_blockType.getCrossedBlockBrush().render(lightBuffer);
 	}
 	
 	@Override
-	public void storeInVBO(FloatBuffer vbo, byte[][][] lightBuffer)
+	public void storeInVBO(FloatBuffer vbo, LightBuffer lightBuffer)
 	{
 		_blockType.getCrossedBlockBrush().storeInVBO(vbo, _postion.x() + 0.5f, _postion.y() + 0.5f, _postion.z() + 0.5f, lightBuffer);
 	}

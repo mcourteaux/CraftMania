@@ -56,7 +56,7 @@ public class Smoke extends GameObject
 	private Vec3f _vector;
 	private Vec3f _playerPosition;
 
-	private class Particle
+	private static class Particle
 	{
 		public Vec3f _position;
 		public float _size;

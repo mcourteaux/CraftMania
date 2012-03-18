@@ -235,7 +235,7 @@ public class ChunkData
 	{
 		index *= BLOCK_DATA_SIZE;
 		++index;
-		return ((_data[index] & (~SPECIAL_BIT)) << 8) | (_data[index + 1]);
+		return ((_data[index] & (~SPECIAL_BIT)) << 8) | (_data[index + 1] & 0xFF);
 	}
 
 	public void clearBlock(int index)
@@ -266,7 +266,7 @@ public class ChunkData
 		setSpecialBlock(index, block.getBlockType().getID(), position);
 	}
 
-	public class SpecialBlockPool
+	public static class SpecialBlockPool
 	{
 		public static final int POOL_SIZE = 4024;
 

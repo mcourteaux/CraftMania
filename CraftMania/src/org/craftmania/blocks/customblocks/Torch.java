@@ -13,6 +13,7 @@ import org.craftmania.math.Vec3i;
 import org.craftmania.rendering.particles.Smoke;
 import org.craftmania.utilities.SmartRandom;
 import org.craftmania.world.Chunk;
+import org.craftmania.world.LightBuffer;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
 
@@ -136,7 +137,7 @@ public class Torch extends CrossedBlock
 	 * Renders the fire of the torch
 	 */
 	@Override
-	public void render(byte[][][] lightBuffer)
+	public void render(LightBuffer lightBuffer)
 	{
 		if (_active)
 		{

@@ -25,6 +25,7 @@ import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3f;
 import org.craftmania.math.Vec3i;
 import org.craftmania.world.Chunk;
+import org.craftmania.world.LightBuffer;
 
 public class DefaultBlock extends Block
 {
@@ -158,7 +159,7 @@ public class DefaultBlock extends Block
 	}
 
 	@Override
-	public void render(byte[][][] lightBuffer)
+	public void render(LightBuffer lightBuffer)
 	{
 		_renderManually = true;
 		_rendering = true;
@@ -309,7 +310,7 @@ public class DefaultBlock extends Block
 	}
 
 	@Override
-	public void storeInVBO(FloatBuffer vbo, byte[][][] lightBuffer)
+	public void storeInVBO(FloatBuffer vbo, LightBuffer lightBuffer)
 	{
 		if (!isRenderingManually())
 		{

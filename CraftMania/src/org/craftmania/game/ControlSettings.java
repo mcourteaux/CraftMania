@@ -34,23 +34,23 @@ public class ControlSettings
 	private static Map<Integer, Integer> MAP_SETTINGS = new HashMap<Integer, Integer>();
 
 	/* Walking */
-	public static int MOVE_FORWARD = 1;
-	public static int MOVE_BACK = 2;
-	public static int MOVE_LEFT = 3;
-	public static int MOVE_RIGHT = 4;
+	public static final int MOVE_FORWARD = 1;
+	public static final int MOVE_BACK = 2;
+	public static final int MOVE_LEFT = 3;
+	public static final int MOVE_RIGHT = 4;
 
 	/* Others */
-	public static int JUMP = 5;
-	public static int CROUCH = 6;
-	public static int INVENTORY = 7;
-	public static int SMASH = 8;
-	public static int BUILD_OR_ACTION = 9;
+	public static final int JUMP = 5;
+	public static final int CROUCH = 6;
+	public static final int INVENTORY = 7;
+	public static final int SMASH = 8;
+	public static final int BUILD_OR_ACTION = 9;
 
 	/* Debug */
-	public static int TOGGLE_GOD_MODE = 100;
-	public static int TOGGLE_LIGHT_POINT = 101;
-	public static int TOGGLE_OVERLAY = 102;
-	public static int SET_SUN_HIGHT = 103;
+	public static final int TOGGLE_GOD_MODE = 100;
+	public static final int TOGGLE_LIGHT_POINT = 101;
+	public static final int TOGGLE_OVERLAY = 102;
+	public static final int SET_SUN_HIGHT = 103;
 
 	public static void initialize(KeyboardPreset preset)
 	{

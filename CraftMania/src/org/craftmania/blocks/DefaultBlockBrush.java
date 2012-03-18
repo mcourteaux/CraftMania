@@ -25,6 +25,7 @@ import org.craftmania.game.TextureStorage;
 import org.craftmania.math.Vec2f;
 import org.craftmania.math.Vec3f;
 import org.craftmania.math.Vec3i;
+import org.craftmania.world.LightBuffer;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
 
@@ -216,19 +217,19 @@ public final class DefaultBlockBrush extends BlockBrush
 		alphaBlending = true;
 	}
 
-	public void renderAt(float x, float y, float z, byte[][][] lightBuffer)
+	public void renderAt(float x, float y, float z, LightBuffer lightBuffer)
 	{
 		setPosition(x, y, z);
 		render(lightBuffer);
 	}
 
-	public void renderAt(Vec3f pos, byte[][][] lightBuffer)
+	public void renderAt(Vec3f pos, LightBuffer lightBuffer)
 	{
 		setPosition(pos.x(), pos.y(), pos.z());
 		render(lightBuffer);
 	}
 
-	public void render(byte[][][] lightBuffer)
+	public void render(LightBuffer lightBuffer)
 	{
 		if (alphaBlending)
 		{
@@ -244,7 +245,7 @@ public final class DefaultBlockBrush extends BlockBrush
 		renderFaces((byte) 0x3F, lightBuffer);
 	}
 
-	public void renderFaces(byte faceMask, byte[][][] lightBuffer)
+	public void renderFaces(byte faceMask, LightBuffer lightBuffer)
 	{
 		if (alphaBlending)
 		{
@@ -268,7 +269,7 @@ public final class DefaultBlockBrush extends BlockBrush
 			{
 				side = Side.getSide(i);
 				normal = side.getNormal();
-				glSetColor(colors[i], lightBuffer[1 + normal.x()][1 + normal.y()][1 + normal.z()] / 30.0001f);
+				glSetColor(colors[i], lightBuffer.get(1 + normal.x(), 1 + normal.y(), 1 + normal.z()) / 30.0001f);
 				glCallList(displayListBase + i);
 			}
 		}
@@ -514,7 +515,7 @@ public final class DefaultBlockBrush extends BlockBrush
 	}
 	
 	@Override
-	public void storeInVBO(FloatBuffer vertexBuffer, float x, float y, float z, byte[][][] lightBuffer)
+	public void storeInVBO(FloatBuffer vertexBuffer, float x, float y, float z, LightBuffer lightBuffer)
 	{
 		float tileSize = 0.0624f;
 		for (int i = 0, bit = 1; i < 6; ++i, bit <<= 1)
@@ -529,104 +530,104 @@ public final class DefaultBlockBrush extends BlockBrush
 				if (side == Side.TOP)
 				{
 					put3f(vertexBuffer, x - 0.5f, y + 0.5f - inset, z + 0.5f);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[1][2][1], lightBuffer[0][2][1], lightBuffer[0][2][2], lightBuffer[1][2][2]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(1, 2, 1), lightBuffer.get(0, 2, 1), lightBuffer.get(0, 2, 2), lightBuffer.get(1, 2, 2));
 					put2f(vertexBuffer, uv.x(), uv.y());
 
 					put3f(vertexBuffer, x + 0.5f, y + 0.5f - inset, z + 0.5f);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[1][2][1], lightBuffer[2][2][1], lightBuffer[1][2][2], lightBuffer[2][2][2]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(1, 2, 1), lightBuffer.get(2, 2, 1), lightBuffer.get(1, 2, 2), lightBuffer.get(2, 2, 2));
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y());
 
 					put3f(vertexBuffer, x + 0.5f, y + 0.5f - inset, z - 0.5f);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[1][2][1], lightBuffer[1][2][0], lightBuffer[2][2][0], lightBuffer[2][2][1]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(1, 2, 1), lightBuffer.get(1, 2, 0), lightBuffer.get(2, 2, 0), lightBuffer.get(2, 2, 1));
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y() + tileSize);
 
 					put3f(vertexBuffer, x - 0.5f, y + 0.5f - inset, z - 0.5f);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[1][2][1], lightBuffer[0][2][1], lightBuffer[1][2][0], lightBuffer[0][2][0]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(1, 2, 1), lightBuffer.get(0, 2, 1), lightBuffer.get(1, 2, 0), lightBuffer.get(0, 2, 0));
 					put2f(vertexBuffer, uv.x(), uv.y() + tileSize);
 				} else if (side == Side.LEFT)
 				{
 					put3f(vertexBuffer, x - 0.5f + inset, y - 0.5f, z - 0.5f);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[0][1][1], lightBuffer[0][0][1], lightBuffer[0][1][0], lightBuffer[0][0][0]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(0, 1, 1), lightBuffer.get(0, 0, 1), lightBuffer.get(0, 1, 0), lightBuffer.get(0, 0, 0));
 					put2f(vertexBuffer, uv.x(), uv.y() + tileSize);
 
 					put3f(vertexBuffer, x - 0.5f + inset, y - 0.5f, z + 0.5f);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[0][1][1], lightBuffer[0][0][1], lightBuffer[0][1][2], lightBuffer[0][0][2]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(0, 1, 1), lightBuffer.get(0, 0, 1), lightBuffer.get(0, 1, 2), lightBuffer.get(0, 0, 2));
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y() + tileSize);
 
 					put3f(vertexBuffer, x - 0.5f + inset, y + 0.5f, z + 0.5f);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[0][1][1], lightBuffer[0][1][2], lightBuffer[0][2][1], lightBuffer[0][2][2]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(0, 1, 1), lightBuffer.get(0, 1, 2), lightBuffer.get(0, 2, 1), lightBuffer.get(0, 2, 2));
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y());
 
 					put3f(vertexBuffer, x - 0.5f + inset, y + 0.5f, z - 0.5f);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[0][1][1], lightBuffer[0][1][0], lightBuffer[0][2][0], lightBuffer[0][2][1]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(0, 1, 1), lightBuffer.get(0, 1, 0), lightBuffer.get(0, 2, 0), lightBuffer.get(0, 2, 1));
 					put2f(vertexBuffer, uv.x(), uv.y());
 				} else if (side == Side.FRONT)
 				{
 					put3f(vertexBuffer, x - 0.5f, y - 0.5f, z + 0.5f - inset);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[1][1][2], lightBuffer[0][0][2], lightBuffer[0][1][2], lightBuffer[1][0][2]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(1, 1, 2), lightBuffer.get(0, 0, 2), lightBuffer.get(0, 1, 2), lightBuffer.get(1, 0, 2));
 					put2f(vertexBuffer, uv.x(), uv.y() + tileSize);
 
 					put3f(vertexBuffer, x + 0.5f, y - 0.5f, z + 0.5f - inset);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[1][1][2], lightBuffer[1][0][2], lightBuffer[2][1][2], lightBuffer[2][0][2]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(1, 1, 2), lightBuffer.get(1, 0, 2), lightBuffer.get(2, 1, 2), lightBuffer.get(2, 0, 2));
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y() + tileSize);
 
 					put3f(vertexBuffer, x + 0.5f, y + 0.5f, z + 0.5f - inset);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[1][1][2], lightBuffer[1][2][2], lightBuffer[2][2][2], lightBuffer[2][1][2]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(1, 1, 2), lightBuffer.get(1, 2, 2), lightBuffer.get(2, 2, 2), lightBuffer.get(2, 1, 2));
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y());
 
 					put3f(vertexBuffer, x - 0.5f, y + 0.5f, z + 0.5f - inset);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[1][1][2], lightBuffer[1][2][2], lightBuffer[0][1][2], lightBuffer[0][2][2]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(1, 1, 2), lightBuffer.get(1, 2, 2), lightBuffer.get(0, 1, 2), lightBuffer.get(0, 2, 2));
 					put2f(vertexBuffer, uv.x(), uv.y());
 				} else if (side == Side.RIGHT)
 				{
 					put3f(vertexBuffer, x + 0.5f - inset, y + 0.5f, z - 0.5f);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[2][1][1], lightBuffer[2][2][1], lightBuffer[2][1][0], lightBuffer[2][2][0]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(2, 1, 1), lightBuffer.get(2, 2, 1), lightBuffer.get(2, 1, 0), lightBuffer.get(2, 2, 0));
 					put2f(vertexBuffer, uv.x(), uv.y());
 
 					put3f(vertexBuffer, x + 0.5f - inset, y + 0.5f, z + 0.5f);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[2][1][1], lightBuffer[2][2][2], lightBuffer[2][2][1], lightBuffer[2][1][2]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(2, 1, 1), lightBuffer.get(2, 2, 2), lightBuffer.get(2, 2, 1), lightBuffer.get(2, 1, 2));
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y());
 
 					put3f(vertexBuffer, x + 0.5f - inset, y - 0.5f, z + 0.5f);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[2][1][1], lightBuffer[2][0][2], lightBuffer[2][0][1], lightBuffer[2][1][2]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(2, 1, 1), lightBuffer.get(2, 0, 2), lightBuffer.get(2, 0, 1), lightBuffer.get(2, 1, 2));
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y() + tileSize);
 
 					put3f(vertexBuffer, x + 0.5f - inset, y - 0.5f, z - 0.5f);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[2][1][1], lightBuffer[2][0][0], lightBuffer[2][0][1], lightBuffer[2][1][0]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(2, 1, 1), lightBuffer.get(2, 0, 0), lightBuffer.get(2, 0, 1), lightBuffer.get(2, 1, 0));
 					put2f(vertexBuffer, uv.x(), uv.y() + tileSize);
 				} else if (side == Side.BACK)
 				{
 					put3f(vertexBuffer, x - 0.5f, y + 0.5f, z - 0.5f + inset);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[1][1][0], lightBuffer[1][2][0], lightBuffer[0][2][0], lightBuffer[0][1][0]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(1, 1, 0), lightBuffer.get(1, 2, 0), lightBuffer.get(0, 2, 0), lightBuffer.get(0, 1, 0));
 					put2f(vertexBuffer, uv.x(), uv.y());
 
 					put3f(vertexBuffer, x + 0.5f, y + 0.5f, z - 0.5f + inset);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[1][1][0], lightBuffer[1][2][0], lightBuffer[2][2][0], lightBuffer[2][1][0]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(1, 1, 0), lightBuffer.get(1, 2, 0), lightBuffer.get(2, 2, 0), lightBuffer.get(2, 1, 0));
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y());
 
 					put3f(vertexBuffer, x + 0.5f, y - 0.5f, z - 0.5f + inset);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[1][1][0], lightBuffer[1][0][0], lightBuffer[2][0][0], lightBuffer[2][1][0]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(1, 1, 0), lightBuffer.get(1, 0, 0), lightBuffer.get(2, 0, 0), lightBuffer.get(2, 1, 0));
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y() + tileSize);
 
 					put3f(vertexBuffer, x - 0.5f, y - 0.5f, z - 0.5f + inset);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[1][1][0], lightBuffer[1][0][0], lightBuffer[0][0][0], lightBuffer[0][1][0]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(1, 1, 0), lightBuffer.get(1, 0, 0), lightBuffer.get(0, 0, 0), lightBuffer.get(0, 1, 0));
 					put2f(vertexBuffer, uv.x(), uv.y() + tileSize);
 				} else if (side == Side.BOTTOM)
 				{
 					put3f(vertexBuffer, x - 0.5f, y - 0.5f + inset, z - 0.5f);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[1][0][1], lightBuffer[1][0][0], lightBuffer[0][0][0], lightBuffer[0][0][1]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(1, 0, 1), lightBuffer.get(1, 0, 0), lightBuffer.get(0, 0, 0), lightBuffer.get(0, 0, 1));
 					put2f(vertexBuffer, uv.x(), uv.y());
 
 					put3f(vertexBuffer, x + 0.5f, y - 0.5f + inset, z - 0.5f);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[1][0][1], lightBuffer[1][0][0], lightBuffer[2][0][0], lightBuffer[2][0][1]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(1, 0, 1), lightBuffer.get(1, 0, 0), lightBuffer.get(2, 0, 0), lightBuffer.get(2, 0, 1));
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y());
 
 					put3f(vertexBuffer, x + 0.5f, y - 0.5f + inset, z + 0.5f);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[1][0][1], lightBuffer[1][0][2], lightBuffer[2][0][2], lightBuffer[2][0][1]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(1, 0, 1), lightBuffer.get(1, 0, 2), lightBuffer.get(2, 0, 2), lightBuffer.get(2, 0, 1));
 					put2f(vertexBuffer, uv.x() + tileSize, uv.y() + tileSize);
 
 					put3f(vertexBuffer, x - 0.5f, y - 0.5f + inset, z + 0.5f);
-					putColorWithLight4(vertexBuffer, color, lightBuffer[1][0][1], lightBuffer[1][0][2], lightBuffer[0][0][2], lightBuffer[0][0][1]);
+					putColorWithLight4(vertexBuffer, color, lightBuffer.get(1, 0, 1), lightBuffer.get(1, 0, 2), lightBuffer.get(0, 0, 2), lightBuffer.get(0, 0, 1));
 					put2f(vertexBuffer, uv.x(), uv.y() + tileSize);
 				}
 			}

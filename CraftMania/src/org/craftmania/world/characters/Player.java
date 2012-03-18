@@ -192,7 +192,7 @@ public class Player extends GameObject
 			Chunk c = Game.getInstance().getWorld().getChunkManager().getChunkContaining(MathHelper.floor(_position.x()), MathHelper.floor(_position.y()) + 1, MathHelper.floor(_position.z()), false, false, false);
 			if (c != null)
 			{
-				c.fillLightBuffer(c.getLightBuffer(), MathHelper.floor(_position.x()), MathHelper.floor(_position.y()) + 1, MathHelper.floor(_position.z()));
+				c.getLightBuffer().fill(MathHelper.floor(_position.x()), MathHelper.floor(_position.y()) + 1, MathHelper.floor(_position.z()));
 
 				/* Render the object, with the lightbuffer */
 				_selectedItem.renderHoldableObject(c.getLightBuffer());

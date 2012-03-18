@@ -20,8 +20,8 @@ import org.craftmania.game.Game;
 public class MathHelper
 {
 
-	public static float f_PI = (float) Math.PI;
-	public static float f_2PI = (float) (2.0d * Math.PI);
+	public static final float f_PI = (float) Math.PI;
+	public static final float f_2PI = (float) (2.0d * Math.PI);
 
 	private static float SIN_TABLE[];
 

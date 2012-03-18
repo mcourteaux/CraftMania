@@ -28,6 +28,7 @@ import org.craftmania.inventory.InventoryItem;
 import org.craftmania.math.Vec3i;
 import org.craftmania.world.Chunk;
 import org.craftmania.world.ChunkData;
+import org.craftmania.world.LightBuffer;
 
 public abstract class Block implements AABBObject
 {
@@ -123,7 +124,7 @@ public abstract class Block implements AABBObject
 		_chunk.needsNewVBO();
 	}
 	
-	public void removeFromVisibilityList()
+	public synchronized void removeFromVisibilityList()
 	{
 		if (_rendering)
 		{
@@ -179,8 +180,8 @@ public abstract class Block implements AABBObject
 	}
 
 	public abstract void update();
-	public abstract void render(byte[][][] lightBuffer);
-	public abstract void storeInVBO(FloatBuffer vbo, byte[][][] lightBuffer);
+	public abstract void render(LightBuffer lightBuffer);
+	public abstract void storeInVBO(FloatBuffer vbo, LightBuffer lightBuffer);
 	public abstract boolean isVisible();
 	public abstract AABB getAABB();
 	public abstract void smash(InventoryItem item);
@@ -219,12 +220,12 @@ public abstract class Block implements AABBObject
 		_chunk = chunk;	
 	}
 
-	public boolean isRenderingManually()
+	public synchronized boolean isRenderingManually()
 	{
 		return _renderManually;
 	}
 	
-	public boolean isUpdating()
+	public synchronized boolean isUpdating()
 	{
 		return _updating;
 	}
@@ -234,7 +235,7 @@ public abstract class Block implements AABBObject
 		return 0;
 	}
 
-	public boolean isRendering()
+	public synchronized boolean isRendering()
 	{
 		return _rendering;
 	}

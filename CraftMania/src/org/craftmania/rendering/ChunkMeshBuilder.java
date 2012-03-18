@@ -30,6 +30,7 @@ import org.craftmania.math.Vec3i;
 import org.craftmania.utilities.IntList;
 import org.craftmania.world.Chunk;
 import org.craftmania.world.ChunkData;
+import org.craftmania.world.LightBuffer;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 
@@ -39,14 +40,14 @@ public class ChunkMeshBuilder
 	
 	public static final Vec3f COLOR_WHITE = new Vec3f(1, 1, 1);
 
-	public static int STRIDE = 8;
-	public static int POSITION_SIZE = 3;
-	public static int POSITION_OFFSET = 0;
-	public static int COLOR_SIZE = 3;
-	public static int COLOR_OFFSET = POSITION_OFFSET + POSITION_SIZE;
-	public static int TEX_COORD_SIZE = 2;
-	public static int TEX_COORD_OFFSET = COLOR_OFFSET + COLOR_SIZE;
-	public static int FLOAT_SIZE = 4;
+	public static final int STRIDE = 8;
+	public static final int POSITION_SIZE = 3;
+	public static final int POSITION_OFFSET = 0;
+	public static final int COLOR_SIZE = 3;
+	public static final int COLOR_OFFSET = POSITION_OFFSET + POSITION_SIZE;
+	public static final int TEX_COORD_SIZE = 2;
+	public static final int TEX_COORD_OFFSET = COLOR_OFFSET + COLOR_SIZE;
+	public static final int FLOAT_SIZE = 4;
 
 	public static enum MeshType
 	{
@@ -127,7 +128,7 @@ public class ChunkMeshBuilder
 		Vec3i vec = new Vec3i();
 		BlockType type;
 		Block block = null;
-		byte[][][] lightBuffer = new byte[3][3][3];
+		LightBuffer lightBuffer = new LightBuffer(chunk);
 		byte faceMask = 0;
 
 		/* Iterate over the blocks */
@@ -150,7 +151,7 @@ public class ChunkMeshBuilder
 				vec.setX(vec.x() + chunk.getAbsoluteX());
 				vec.setZ(vec.z() + chunk.getAbsoluteZ());
 
-				chunk.fillLightBuffer(lightBuffer, vec.x(), vec.y(), vec.z());
+				lightBuffer.fill(vec.x(), vec.y(), vec.z());
 
 				if (special)
 				{

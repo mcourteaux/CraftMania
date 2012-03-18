@@ -226,17 +226,17 @@ public class World
 
 				GL11.glColor3f(0, 0, 0);
 				GL11.glBegin(GL11.GL_LINES);
-				GL11.glVertex3f(width / 2 - crossSize - crossHole, height / 2, 0);
-				GL11.glVertex3f(width / 2 - crossHole, height / 2, 0);
+				GL11.glVertex3f(width / 2f - crossSize - crossHole, height / 2f, 0);
+				GL11.glVertex3f(width / 2f - crossHole, height / 2f, 0);
 
-				GL11.glVertex3f(width / 2 + crossSize + crossHole, height / 2, 0);
-				GL11.glVertex3f(width / 2 + crossHole, height / 2, 0);
+				GL11.glVertex3f(width / 2f + crossSize + crossHole, height / 2f, 0);
+				GL11.glVertex3f(width / 2f + crossHole, height / 2f, 0);
 
-				GL11.glVertex3f(width / 2, height / 2 - crossSize - crossHole, 0);
-				GL11.glVertex3f(width / 2, height / 2 - crossHole, 0);
+				GL11.glVertex3f(width / 2f, height / 2f - crossSize - crossHole, 0);
+				GL11.glVertex3f(width / 2f, height / 2f - crossHole, 0);
 
-				GL11.glVertex3f(width / 2, height / 2 + crossSize + crossHole, 0);
-				GL11.glVertex3f(width / 2, height / 2 + crossHole, 0);
+				GL11.glVertex3f(width / 2f, height / 2f + crossSize + crossHole, 0);
+				GL11.glVertex3f(width / 2f, height / 2f + crossHole, 0);
 
 				GL11.glEnd();
 				GL11.glEndList();

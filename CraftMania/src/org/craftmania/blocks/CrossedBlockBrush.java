@@ -22,6 +22,7 @@ import java.nio.FloatBuffer;
 import org.craftmania.game.TextureStorage;
 import org.craftmania.math.Vec2f;
 import org.craftmania.math.Vec3f;
+import org.craftmania.world.LightBuffer;
 import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
 
@@ -54,13 +55,13 @@ public class CrossedBlockBrush extends BlockBrush
 	}
 
 	@Override
-	public void render(byte[][][] lightBuffer)
+	public void render(LightBuffer lightBuffer)
 	{
 		if (_callList != 0)
 		{
 			_terrain.bind();
 
-			float light = lightBuffer[1][1][1] / 29.99f;
+			float light = lightBuffer.get(1, 1, 1) / 30.001f;
 
 			/* Texture 11,10 -> 11,15 */
 			GL11.glDisable(GL11.GL_CULL_FACE);
@@ -120,9 +121,9 @@ public class CrossedBlockBrush extends BlockBrush
 	}
 
 	@Override
-	public void storeInVBO(FloatBuffer vbo, float x, float y, float z, byte[][][] lightBuffer)
+	public void storeInVBO(FloatBuffer vbo, float x, float y, float z, LightBuffer lightBuffer)
 	{
-		byte light = lightBuffer[1][1][1];
+		byte light = lightBuffer.get(1, 1, 1);
 
 		/* Blade 0 */
 		put3f(vbo, x - 0.5f, y + 0.5f, z - 0.5f);

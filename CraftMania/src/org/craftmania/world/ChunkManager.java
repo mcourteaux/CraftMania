@@ -48,7 +48,7 @@ public class ChunkManager
 		_blockChunkThreading = new ChunkThreading(this);
 		_blockManager = BlockManager.getInstance();
 	}
-	
+
 	public World getWorld()
 	{
 		return _world;
@@ -262,7 +262,7 @@ public class ChunkManager
 		_blocksToMove.clear();
 	}
 
-	private class BlockMovement
+	private static class BlockMovement
 	{
 
 		public int srcX, srcY, srcZ;
@@ -310,10 +310,17 @@ public class ChunkManager
 				_chunkLoader.saveChunk(chunk);
 			} catch (Exception e)
 			{
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			chunk.destroy();
+			while (!chunk.destroy())
+			{
+				try
+				{
+					Thread.sleep(10);
+				} catch (Exception e)
+				{
+				}
+			}
 		}
 	}
 
@@ -322,9 +329,9 @@ public class ChunkManager
 		if (seperateThread)
 		{
 			Player p = _world.getActivePlayer();
-			float xDiff =  chunk.getAbsoluteX() - p.getPosition().x();
-			float zDiff =  chunk.getAbsoluteZ() - p.getPosition().z();
-			
+			float xDiff = chunk.getAbsoluteX() - p.getPosition().x();
+			float zDiff = chunk.getAbsoluteZ() - p.getPosition().z();
+
 			_blockChunkThreading.generateChunk(chunk, (int) (xDiff * xDiff + zDiff * zDiff));
 		} else
 		{
@@ -347,9 +354,9 @@ public class ChunkManager
 		if (separateThread)
 		{
 			Player p = _world.getActivePlayer();
-			float xDiff =  chunk.getAbsoluteX() - p.getPosition().x();
-			float zDiff =  chunk.getAbsoluteZ() - p.getPosition().z();
-			
+			float xDiff = chunk.getAbsoluteX() - p.getPosition().x();
+			float zDiff = chunk.getAbsoluteZ() - p.getPosition().z();
+
 			_blockChunkThreading.loadAndGenerateChunk(chunk, (int) (xDiff * xDiff + zDiff * zDiff));
 		} else
 		{

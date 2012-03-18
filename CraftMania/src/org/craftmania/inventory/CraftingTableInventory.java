@@ -270,7 +270,7 @@ public class CraftingTableInventory extends Inventory
 		_sharedContent = sharedInventoryContent;
 	}
 
-	public final class CraftingTableInventoryRaster implements InventoryRaster
+	public static final class CraftingTableInventoryRaster implements InventoryRaster
 	{
 
 		private Rectangle[] _cellAABBs;

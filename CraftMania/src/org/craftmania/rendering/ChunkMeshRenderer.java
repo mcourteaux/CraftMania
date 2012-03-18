@@ -23,14 +23,14 @@ import org.lwjgl.opengl.GL11;
 
 public class ChunkMeshRenderer
 {
-	public static int STRIDE = 8;
-	public static int POSITION_SIZE = 3;
-	public static int POSITION_OFFSET = 0;
-	public static int COLOR_SIZE = 3;
-	public static int COLOR_OFFSET = POSITION_OFFSET + POSITION_SIZE;
-	public static int TEX_COORD_SIZE = 2;
-	public static int TEX_COORD_OFFSET = COLOR_OFFSET + COLOR_SIZE;
-	public static int FLOAT_SIZE = 4;
+	public static final int STRIDE = 8;
+	public static final int POSITION_SIZE = 3;
+	public static final int POSITION_OFFSET = 0;
+	public static final int COLOR_SIZE = 3;
+	public static final int COLOR_OFFSET = POSITION_OFFSET + POSITION_SIZE;
+	public static final int TEX_COORD_SIZE = 2;
+	public static final int TEX_COORD_OFFSET = COLOR_OFFSET + COLOR_SIZE;
+	public static final int FLOAT_SIZE = 4;
 
 	public static void renderChunkMesh(Chunk chunk, MeshType meshType)
 	{

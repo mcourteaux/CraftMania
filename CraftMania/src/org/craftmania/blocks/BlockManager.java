@@ -19,6 +19,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,9 +41,9 @@ public class BlockManager
 
 	public static BlockManager getInstance()
 	{
-		if (__instance == null)
+		synchronized (__lock)
 		{
-			synchronized (__lock)
+			if (__instance == null)
 			{
 				try
 				{
@@ -69,19 +70,22 @@ public class BlockManager
 
 			if (bt != null)
 			{
-				/* Brush might be null like in case of Tall Grass, where there are six block brushes. Initialized by the class itself */
+				/*
+				 * Brush might be null like in case of Tall Grass, where there
+				 * are six block brushes. Initialized by the class itself
+				 */
 				if (bt.getBrush() != null)
 				{
 					bt.getBrush().create();
 				}
-				
+
 				/* Make sure all static initializer bodies are called */
 				if (bt.getCustomClass() != null)
 				{
 					try
 					{
 						System.out.println("Loading static content for " + bt.getCustomClass());
-						Class.forName(bt.getCustomClass());						
+						Class.forName(bt.getCustomClass());
 					} catch (Exception e)
 					{
 						System.err.println("Custom Block class is not found!");
@@ -99,7 +103,7 @@ public class BlockManager
 		}
 
 		System.out.println(_typeStrings);
-		System.out.println(_blockTypes);
+		System.out.println(Arrays.toString(_blockTypes));
 	}
 
 	public void release()
@@ -110,20 +114,23 @@ public class BlockManager
 
 			if (bt != null)
 			{
-				/* Brush might be null like in case of Tall Grass, where there are six block brushes. Initialized by the class itself */
+				/*
+				 * Brush might be null like in case of Tall Grass, where there
+				 * are six block brushes. Initialized by the class itself
+				 */
 				if (bt.getBrush() != null)
 				{
 					bt.getBrush().create();
 				}
-				
+
 				/* Make sure all static initializer bodies are called */
 				if (bt.getCustomClass() != null)
 				{
 					try
 					{
-						Class<?> clazz = Class.forName(bt.getCustomClass());			
+						Class<?> clazz = Class.forName(bt.getCustomClass());
 						Method[] methods = clazz.getDeclaredMethods();
-						
+
 						for (int m = 0; m < methods.length; ++m)
 						{
 							Method method = methods[m];
@@ -142,7 +149,7 @@ public class BlockManager
 			}
 		}
 	}
-	
+
 	public byte blockID(String id)
 	{
 		Byte bt = _typeStrings.get(id);

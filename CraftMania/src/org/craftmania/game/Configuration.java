@@ -17,8 +17,9 @@ package org.craftmania.game;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 import org.craftmania.game.ControlSettings.KeyboardPreset;
 import org.craftmania.math.Vec3f;
@@ -138,7 +139,7 @@ public class Configuration
 	{
 		File f = new File(string);
 
-		BufferedReader br = new BufferedReader(new FileReader(f));
+		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"));
 
 		String line;
 		while ((line = br.readLine()) != null)
@@ -188,6 +189,8 @@ public class Configuration
 			}
 
 		}
+		
+		br.close();
 
 	}
 

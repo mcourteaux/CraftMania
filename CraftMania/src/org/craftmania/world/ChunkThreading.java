@@ -79,10 +79,17 @@ public class ChunkThreading
 				{
 					try
 					{
-						chunk.destroy();
+						while (!chunk.destroy())
+						{
+							try
+							{
+								Thread.sleep(10);
+							} catch (Exception e)
+							{
+							}
+						}
 					} catch (Exception e)
 					{
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -165,7 +172,15 @@ public class ChunkThreading
 					try
 					{
 						_chunkManager.getBlockChunkLoader().saveChunk(chunk);
-						chunk.destroy();
+						while (!chunk.destroy())
+						{
+							try
+							{
+								Thread.sleep(10);
+							} catch (Exception e)
+							{
+							}
+						}
 					} catch (Exception e)
 					{
 						// TODO Auto-generated catch block

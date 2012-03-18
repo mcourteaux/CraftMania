@@ -26,7 +26,7 @@ public class FloatingIslandGenerator extends Generator
 
 	public void generateFloatingIsland(Chunk chunk, int ix, int iy, int iz)
 	{
-		_random = new SmartRandom(new Random(_worldSeed + ix * 1024 + iy * 512 + iz));
+		_random = new SmartRandom(new Random(_worldSeed + ix * 1024L + iy * 512L + iz));
 
 		Polygon polygon = new Polygon();
 

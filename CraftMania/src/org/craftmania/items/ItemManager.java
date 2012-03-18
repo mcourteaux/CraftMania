@@ -26,7 +26,7 @@ public class ItemManager
 {
 
 	private static ItemManager __instance;
-	public static int ITEM_OFFSET = 128;
+	public static final int ITEM_OFFSET = 128;
 
 	public static ItemManager getInstance()
 	{

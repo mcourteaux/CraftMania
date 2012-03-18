@@ -322,7 +322,7 @@ public class DefaultPlayerInventory extends Inventory
         _sharedContent = sharedInventoryContent;
     }
 
-    private final class DefaultPlayerInventoryRaster implements InventoryRaster
+    private static final class DefaultPlayerInventoryRaster implements InventoryRaster
     {
 
         public static final int AMOR_OFFSET = 9 * 4;

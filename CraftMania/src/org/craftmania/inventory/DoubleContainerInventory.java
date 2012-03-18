@@ -149,7 +149,7 @@ public class DoubleContainerInventory extends Inventory
 		_sharedContent = sharedInventoryContent;
 	}
 
-	public final class DoubleContainerInventoryRaster implements InventoryRaster
+	public static final class DoubleContainerInventoryRaster implements InventoryRaster
 	{
 
 		public static final int CONTENT_OFFSET = 36;

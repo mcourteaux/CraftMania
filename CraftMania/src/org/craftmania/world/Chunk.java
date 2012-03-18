@@ -60,7 +60,7 @@ public class Chunk implements AABBObject
 
 	private ChunkMesh _mesh;
 	private boolean _newVboNeeded;
-	byte[][][] _lightBuffer = new byte[3][3][3];
+	private LightBuffer _lightBuffer;
 
 	/* Blocks */
 	private ChunkData _chunkData;
@@ -82,6 +82,7 @@ public class Chunk implements AABBObject
 		_position = new Vec2i(x, z);
 		_aabb = createAABBForBlockChunkAt(x, z, null);
 		_neighbors = new Chunk[4];
+		_lightBuffer = new LightBuffer(this);
 
 		_chunkData = new ChunkData();
 
@@ -136,16 +137,10 @@ public class Chunk implements AABBObject
 		{
 			_mesh = new ChunkMesh();
 		}
+		_lightBuffer.setDirty();
 
 		ChunkMeshBuilder.generateChunkMeshes(this);
-		if (_mesh.getVBO(MeshType.OPAQUE) <= 0)
-		{
-			_newVboNeeded = false;
-		} else
-		{
-			_newVboNeeded = false;
-		}
-
+		_newVboNeeded = false;
 	}
 
 	public void generate()
@@ -308,20 +303,34 @@ public class Chunk implements AABBObject
 
 	public Chunk getChunkContaining(int x, int y, int z, boolean createIfNecessary, boolean loadIfNecessary, boolean generateIfNecessary)
 	{
-		int relativeX = x - getAbsoluteX();
-		int relativeZ = z - getAbsoluteZ();
+		/* For optimization, we store the relative coordinates in x and z */
+		x = x - getAbsoluteX();
+		z = z - getAbsoluteZ();
+		
+		/* Weak try to speed this method up */
+		if (((x | z) & 0xFFFFFFF0) == 0)
+		{
+			if (!isDestroying())
+			{
+				return this;
+			} else
+			{
+				return null;
+			}
+		}
+		
 		/* Find out the neighboring chunk that contains our block */
 		Side side = null;
-		if (relativeX < 0)
+		if (x < 0)
 		{
 			side = Side.LEFT;
-		} else if (relativeX >= CHUNK_SIZE_HORIZONTAL)
+		} else if (x >= CHUNK_SIZE_HORIZONTAL)
 		{
 			side = Side.RIGHT;
-		} else if (relativeZ < 0)
+		} else if (z < 0)
 		{
 			side = Side.BACK;
-		} else if (relativeZ >= CHUNK_SIZE_HORIZONTAL)
+		} else if (z >= CHUNK_SIZE_HORIZONTAL)
 		{
 			side = Side.FRONT;
 		}
@@ -340,10 +349,10 @@ public class Chunk implements AABBObject
 			if (neighbor == null)
 			{
 				// return null;
-				return Game.getInstance().getWorld().getChunkManager().getChunkContaining(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
+				return Game.getInstance().getWorld().getChunkManager().getChunkContaining(x + getAbsoluteX(), y, z + getAbsoluteZ(), createIfNecessary, loadIfNecessary, generateIfNecessary);
 			} else
 			{
-				return getNeighborChunk(side).getChunkContaining(x, y, z, createIfNecessary, loadIfNecessary, generateIfNecessary);
+				return getNeighborChunk(side).getChunkContaining(x + getAbsoluteX(), y, z + getAbsoluteZ(), createIfNecessary, loadIfNecessary, generateIfNecessary);
 			}
 		}
 	}
@@ -524,7 +533,6 @@ public class Chunk implements AABBObject
 				}
 			}
 
-
 			if (blockType != 0)
 			{
 				chunk.removeBlockAbsolute(x, y, z);
@@ -547,7 +555,7 @@ public class Chunk implements AABBObject
 			{
 				byte blocklight = chunk._chunkData.getBlockLight(index);
 				byte sunlight = chunk._chunkData.getSunlight(index);
-				
+
 				/* Unspread the sunlight */
 				chunk.unspreadSunlight(x, z, y + 1);
 				chunk._chunkData.clearLight(index);
@@ -580,15 +588,14 @@ public class Chunk implements AABBObject
 			{
 				chunk.removeBlockAbsolute(x, y, z);
 			}
-			
 
 			/* First update the position of the block and then compute the index */
 			block.setChunk(chunk);
 			block.getPosition().set(x, y, z);
-			
+
 			/* Compute the index in the chunk data array */
 			int index = block.getChunkDataIndex();
-			
+
 			chunk._chunkData.setSpecialBlock(index, block);
 			chunk.updateVisibilityFor(x, y, z);
 			chunk.updateVisibilityForNeigborsOf(x, y, z);
@@ -598,7 +605,7 @@ public class Chunk implements AABBObject
 			{
 				byte blocklight = chunk._chunkData.getBlockLight(index);
 				byte sunlight = chunk._chunkData.getSunlight(index);
-				
+
 				/* Unspread the sunlight */
 				chunk.unspreadSunlight(x, z, y + 1);
 				chunk._chunkData.clearLight(index);
@@ -607,7 +614,7 @@ public class Chunk implements AABBObject
 				chunk.unspreadLight(x, y, z, sunlight, LightType.SUN);
 
 			}
-			
+
 			/* Spread light produced by this block */
 			chunk.spreadLight(x, y, z, block.getBlockType().getLuminosity(), LightType.BLOCK);
 
@@ -691,13 +698,14 @@ public class Chunk implements AABBObject
 
 			/* Finally notify the neighbors */
 			chunk.notifyNeighborsOf(x, y, z);
-			
+
 		}
 	}
 
 	public boolean isBlockSpecialAbsolute(int x, int y, int z)
 	{
-		if (isInvalidHeight(y)) return false;
+		if (isInvalidHeight(y))
+			return false;
 		Chunk c = getChunkContaining(x, y, z, false, false, false);
 		if (c == null)
 		{
@@ -717,11 +725,18 @@ public class Chunk implements AABBObject
 		_generated = b;
 	}
 
-	public synchronized void destroy()
+	/**
+	 * @return true if the chunk is destroying or is destroyed, false otherwise.
+	 */
+	public synchronized boolean destroy()
 	{
 		if (isDestroying())
 		{
-			return;
+			return true;
+		}
+		if (isLoading())
+		{
+			return false;
 		}
 		_destroying = true;
 
@@ -762,7 +777,7 @@ public class Chunk implements AABBObject
 		superChunk.set(xInChunk, zInChunk, null);
 
 		setGenerated(false);
-
+		return true;
 	}
 
 	public void setLoading(boolean b)
@@ -811,29 +826,8 @@ public class Chunk implements AABBObject
 				{
 					Block b = _chunkData.getSpecialBlock(index);
 					ChunkData.indexToPosition(index, v);
-					fillLightBuffer(_lightBuffer, v.x() + getAbsoluteX(), v.y(), v.z() + getAbsoluteZ());
+					_lightBuffer.fill(v.x() + getAbsoluteX(), v.y(), v.z() + getAbsoluteZ());
 					b.render(_lightBuffer);
-				}
-			}
-		}
-	}
-
-	public void fillLightBuffer(byte[][][] lightBuffer, int x, int y, int z)
-	{
-		byte rawlight, blockLight, sunlight;
-		for (int xx = -1; xx <= 1; ++xx)
-		{
-			for (int yy = -1; yy <= 1; ++yy)
-			{
-				for (int zz = -1; zz <= 1; ++zz)
-				{
-					rawlight = getLightAbsolute(xx + x, yy + y, zz + z, LightType.RAW);
-					blockLight = (byte) (rawlight & 0xF);
-					sunlight = (byte) ((rawlight & 0xF0) >>> 4);
-
-					sunlight *= getWorld().getSunlight() * 2.0f;
-
-					lightBuffer[xx + 1][yy + 1][zz + 1] = (byte) Math.max(blockLight * 2, sunlight);
 				}
 			}
 		}
@@ -1131,7 +1125,8 @@ public class Chunk implements AABBObject
 			if (covered)
 			{
 				byte light = chunk._chunkData.getSunlight(ChunkData.positionToIndex(x - absX, y, z - absZ));
-				if (light != 15) return;
+				if (light != 15)
+					return;
 				chunk.unspreadLight(x, y, z, light, LightType.SUN);
 			}
 		}
@@ -1196,7 +1191,7 @@ public class Chunk implements AABBObject
 	public void unspreadLight(int x, int y, int z, byte light, LightType type)
 	{
 		Chunk chunk = getChunkContaining(x, y, z, false, false, false);
-		
+
 		if (chunk == null || chunk._loading)
 			return;
 		List<Vec3i> brightSpots = new FastArrayList<Vec3i>();
@@ -1419,7 +1414,7 @@ public class Chunk implements AABBObject
 	private void specializeBlock(int x, int y, int z)
 	{
 		new Exception("Specialze Block").printStackTrace(System.out);
-		
+
 		Chunk chunk = getChunkContaining(x, y, z, false, false, false);
 
 		byte type = chunk.getBlockTypeAbsolute(x, y, z, false, false, false);
@@ -1457,7 +1452,7 @@ public class Chunk implements AABBObject
 		return _world;
 	}
 
-	public byte[][][] getLightBuffer()
+	public LightBuffer getLightBuffer()
 	{
 		return _lightBuffer;
 	}
