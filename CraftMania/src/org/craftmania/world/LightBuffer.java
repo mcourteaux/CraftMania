@@ -1,221 +1,65 @@
 package org.craftmania.world;
 
+import org.craftmania.datastructures.Fast3DByteArray;
+import org.craftmania.math.MathHelper;
 import org.craftmania.world.Chunk.LightType;
 
 public class LightBuffer
 {
 
-	private int _x, _y, _z;
-	private byte[] _buffer;
-	private boolean _buffered;
-	private Chunk _owner;
+	private int _x, _z;
+	private int _refX, _refY, _refZ;
+	private Fast3DByteArray _buffer;
 
-	public LightBuffer(Chunk owner)
+	public LightBuffer()
 	{
-		_buffer = new byte[27];
-		_owner = owner;
-	}
-	
-	public void setDirty()
-	{
-		_buffered = false;
+		_buffer = new Fast3DByteArray(Chunk.CHUNK_SIZE_HORIZONTAL + 2, Chunk.CHUNK_SIZE_VERTICAL, Chunk.CHUNK_SIZE_HORIZONTAL + 2);
 	}
 
-	public void fill(int x, int y, int z)
+	public void buffer(Chunk chunk)
 	{
-		manualFill(x, y, z);
-//		if (_buffered)
-//		{
-//			if (x == _x + 1)
-//			{
-//				moveRight();
-//			} else if (x == _x - 1)
-//			{
-//				moveLeft();
-//			}
-//			if (y == _y + 1)
-//			{
-//				moveUp();
-//			} else if (y == _y - 1)
-//			{
-//				moveDown();
-//			}
-//			if (z == _z + 1)
-//			{
-//				moveForward();
-//			} else if (z == _z - 1)
-//			{
-//				moveBackward();
-//			} else
-//			{
-//				manualFill(x, y, z);
-//			}
-//		} else
-//		{
-//			/* Fill manually */
-//			manualFill(x, y, z);
-//		}
-//		_buffered = true;
-	}
+		_x = chunk.getAbsoluteX();
+		_z = chunk.getAbsoluteZ();
 
-	private void manualFill(int x, int y, int z)
-	{
+		ChunkData data = chunk.getChunkData();
 		byte rawlight, blockLight, sunlight;
-		for (int xx = -1; xx <= 1; ++xx)
+		float sun = chunk.getWorld().getSunlight();
+
+		int minY = MathHelper.clamp(MathHelper.floor(chunk.getVisibleContentAABB().minY() - 2), 0, Chunk.CHUNK_SIZE_VERTICAL);
+		int maxY = MathHelper.clamp(MathHelper.ceil(chunk.getVisibleContentAABB().maxY() + 2), 0, Chunk.CHUNK_SIZE_VERTICAL);
+
+		int i = 0;
+		for (int x = -1; x <= Chunk.CHUNK_SIZE_HORIZONTAL; ++x)
 		{
-			for (int yy = -1; yy <= 1; ++yy)
+			for (int y = minY; y <= maxY; ++y)
 			{
-				for (int zz = -1; zz <= 1; ++zz)
+				for (int z = -1; z <= Chunk.CHUNK_SIZE_HORIZONTAL; ++z)
 				{
-					rawlight = _owner.getLightAbsolute(xx + x, yy + y, zz + z, LightType.RAW);
-					blockLight = (byte) (rawlight & 0xF);
-					sunlight = (byte) ((rawlight & 0xF0) >>> 4);
+					if (x != -1 && x != Chunk.CHUNK_SIZE_HORIZONTAL && x != -1 && x != Chunk.CHUNK_SIZE_HORIZONTAL)
+					{
+						i = ChunkData.positionToIndex(x, y, z);
+						rawlight = data.getLight(i, LightType.RAW);
+						blockLight = (byte) (rawlight & 0xF);
+						sunlight = (byte) ((rawlight & 0xF0) >>> 4);
 
-					sunlight *= _owner.getWorld().getSunlight() * 2.0f;
+						sunlight *= sun * 2.0f;
 
-					set(xx + 1, yy + 1, zz + 1, (byte) Math.max(blockLight * 2, sunlight));
+						_buffer.set(x + 1, y, z + 1, (byte) Math.max(blockLight * 2, sunlight));
+					}
 				}
 			}
 		}
-
-		_x = x;
-		_y = y;
-		_z = z;
 	}
 
-	private void moveLeft()
+	public void setReferencePoint(int x, int y, int z)
 	{
-		System.out.println("ml");
-		_x--;
-		for (int i = 0; i < 3; ++i)
-		{
-			set(2, 0, i, get(1, 0, i));
-			set(2, 1, i, get(1, 1, i));
-			set(2, 2, i, get(1, 2, i));
-			set(1, 0, i, get(0, 0, i));
-			set(1, 1, i, get(0, 1, i));
-			set(1, 2, i, get(0, 2, i));
-
-			set(0, 0, i, calculateLightAt(_x - 1, _y - 1, _z + i - 1));
-			set(0, 1, i, calculateLightAt(_x - 1, _y + 0, _z + i - 1));
-			set(0, 2, i, calculateLightAt(_x - 1, _y + 1, _z + i - 1));
-		}
-	}
-
-	private void moveRight()
-	{
-		System.out.println("mr");
-		_x++;
-		for (int i = 0; i < 3; ++i)
-		{
-			set(0, 0, i, get(1, 0, i));
-			set(0, 1, i, get(1, 1, i));
-			set(0, 2, i, get(1, 2, i));
-			set(1, 0, i, get(2, 0, i));
-			set(1, 1, i, get(2, 1, i));
-			set(1, 2, i, get(2, 2, i));
-
-			set(2, 0, i, calculateLightAt(_x + 1, _y - 1, _z + i - 1));
-			set(2, 1, i, calculateLightAt(_x + 1, _y + 0, _z + i - 1));
-			set(2, 2, i, calculateLightAt(_x + 1, _y + 1, _z + i - 1));
-		}
-	}
-
-	private void moveUp()
-	{
-		System.out.println("mu");
-		_y++;
-		for (int i = 0; i < 3; ++i)
-		{
-			set(0, 0, i, get(0, 1, i));
-			set(1, 0, i, get(1, 1, i));
-			set(2, 0, i, get(2, 1, i));
-			set(0, 1, i, get(0, 2, i));
-			set(1, 1, i, get(1, 2, i));
-			set(2, 1, i, get(2, 2, i));
-
-			set(0, 2, i, calculateLightAt(_x - 1, _y + 1, _z + i - 1));
-			set(1, 2, i, calculateLightAt(_x + 0, _y + 1, _z + i - 1));
-			set(2, 2, i, calculateLightAt(_x + 1, _y + 1, _z + i - 1));
-		}
-	}
-
-	private void moveDown()
-	{
-		System.out.println("md");
-		_y--;
-		for (int i = 0; i < 3; ++i)
-		{
-			set(0, 2, i, get(0, 1, i));
-			set(1, 2, i, get(1, 1, i));
-			set(2, 2, i, get(2, 1, i));
-			set(0, 1, i, get(0, 0, i));
-			set(1, 1, i, get(1, 0, i));
-			set(2, 1, i, get(2, 0, i));
-
-			set(0, 0, i, calculateLightAt(_x - 1, _y - 1, _z + i - 1));
-			set(1, 0, i, calculateLightAt(_x + 0, _y - 1, _z + i - 1));
-			set(2, 0, i, calculateLightAt(_x + 1, _y - 1, _z + i - 1));
-		}
-	}
-
-	private void moveBackward()
-	{
-		System.out.println("mb");
-		_z--;
-		for (int i = 0; i < 3; ++i)
-		{
-			set(0, i, 2, get(0, i, 1));
-			set(1, i, 2, get(1, i, 1));
-			set(2, i, 2, get(2, i, 1));
-			set(0, i, 1, get(0, i, 0));
-			set(1, i, 1, get(1, i, 0));
-			set(2, i, 1, get(2, i, 0));
-
-			set(0, i, 0, calculateLightAt(_x - 1, _y + i - 1, _z - 1));
-			set(1, i, 0, calculateLightAt(_x + 0, _y + i - 1, _z - 1));
-			set(2, i, 0, calculateLightAt(_x + 1, _y + i - 1, _z - 1));
-		}
-	}
-
-	private void moveForward()
-	{
-		_z++;
-		for (int i = 0; i < 3; ++i)
-		{
-			set(0, i, 0, get(0, i, 1));
-			set(1, i, 0, get(1, i, 1));
-			set(2, i, 0, get(2, i, 1));
-			set(0, i, 1, get(0, i, 2));
-			set(1, i, 1, get(1, i, 2));
-			set(2, i, 1, get(2, i, 2));
-		
-			set(0, i, 2, calculateLightAt(_x - 1, _y + i - 1, _z + 1));
-			set(1, i, 2, calculateLightAt(_x + 0, _y + i - 1, _z + 1));
-			set(2, i, 2, calculateLightAt(_x + 1, _y + i - 1, _z + 1));
-		}
-	}
-
-	private void set(int x, int y, int z, byte b)
-	{
-		_buffer[x * 9 + y * 3 + z] = b;
+		_refX = x - _x;
+		_refY = y;
+		_refZ = z - _z;
 	}
 
 	public byte get(int x, int y, int z)
 	{
-		return _buffer[x * 9 + y * 3 + z];
-	}
-
-	private byte calculateLightAt(int x, int y, int z)
-	{
-		byte rawlight = _owner.getLightAbsolute(x, y, z, LightType.RAW);
-		byte blockLight = (byte) (rawlight & 0xF);
-		byte sunlight = (byte) ((rawlight & 0xF0) >>> 4);
-
-		sunlight *= _owner.getWorld().getSunlight() * 2.0f;
-
-		rawlight = (byte) Math.max(blockLight * 2, sunlight);
-
-		return rawlight;
+		return _buffer.get(x + _refX, y + _refY, z + _refZ);
 	}
 }

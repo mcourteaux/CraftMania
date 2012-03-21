@@ -50,6 +50,9 @@ public class Chunk implements AABBObject
 
 	private Vec2i _position;
 	private AABB _aabb;
+	private AABB _contentAABB;
+	private AABB _visibleContentAABB;
+	private AABB _auxiliaryAABB;
 	private int _blockCount;
 	private boolean _loaded;
 	private boolean _generated;
@@ -81,8 +84,11 @@ public class Chunk implements AABBObject
 		/* General */
 		_position = new Vec2i(x, z);
 		_aabb = createAABBForBlockChunkAt(x, z, null);
+		_contentAABB = null;
+		_visibleContentAABB = null;
+		_auxiliaryAABB = new AABB(new Vec3f(), new Vec3f());
 		_neighbors = new Chunk[4];
-		_lightBuffer = new LightBuffer(this);
+		_lightBuffer = new LightBuffer();
 
 		_chunkData = new ChunkData();
 
@@ -137,7 +143,6 @@ public class Chunk implements AABBObject
 		{
 			_mesh = new ChunkMesh();
 		}
-		_lightBuffer.setDirty();
 
 		ChunkMeshBuilder.generateChunkMeshes(this);
 		_newVboNeeded = false;
@@ -165,6 +170,7 @@ public class Chunk implements AABBObject
 		/* Generate sunlight */
 		generateSunlight();
 		spreadLightFromLightPoints();
+		buildVisibileContentAABB();
 	}
 
 	public void spreadLightFromLightPoints()
@@ -306,7 +312,7 @@ public class Chunk implements AABBObject
 		/* For optimization, we store the relative coordinates in x and z */
 		x = x - getAbsoluteX();
 		z = z - getAbsoluteZ();
-		
+
 		/* Weak try to speed this method up */
 		if (((x | z) & 0xFFFFFFF0) == 0)
 		{
@@ -318,7 +324,7 @@ public class Chunk implements AABBObject
 				return null;
 			}
 		}
-		
+
 		/* Find out the neighboring chunk that contains our block */
 		Side side = null;
 		if (x < 0)
@@ -393,6 +399,21 @@ public class Chunk implements AABBObject
 			updateVisibilityFor(getAbsoluteX() + v.x(), v.y(), getAbsoluteZ() + v.z());
 		}
 		performListChanges();
+	}
+	
+	public void buildVisibileContentAABB()
+	{
+		_visibleContentAABB = null;
+		int index;
+		int absX = getAbsoluteX();
+		int absZ = getAbsoluteZ();
+		Vec3i v = new Vec3i();
+		for (int i = 0; i < _visibleBlocks.size(); ++i)
+		{
+			index = _visibleBlocks.get(i);
+			v = ChunkData.indexToPosition(index, v);
+			_visibleContentAABB = addBlockToAABB(_visibleContentAABB, v.x() + absX, v.y(), v.z() + absZ);
+		}
 	}
 
 	public void updateVisibilityForNeigborsOf(int x, int y, int z)
@@ -571,6 +592,9 @@ public class Chunk implements AABBObject
 			/* Finally notify the neighbors */
 			chunk.notifyNeighborsOf(x, y, z);
 
+			/* Include the block into the content AABB */
+			chunk._contentAABB = chunk.addBlockToAABB(chunk._contentAABB, x, y, z);
+
 		}
 	}
 
@@ -622,6 +646,9 @@ public class Chunk implements AABBObject
 			chunk.notifyNeighborsOf(x, y, z);
 
 			chunk.needsNewVBO();
+
+			/* Include the block into the content AABB */
+			chunk._contentAABB = chunk.addBlockToAABB(chunk._contentAABB, x, y, z);
 		}
 	}
 
@@ -826,7 +853,8 @@ public class Chunk implements AABBObject
 				{
 					Block b = _chunkData.getSpecialBlock(index);
 					ChunkData.indexToPosition(index, v);
-					_lightBuffer.fill(v.x() + getAbsoluteX(), v.y(), v.z() + getAbsoluteZ());
+					/* The lightbuffer should be still ok */
+					_lightBuffer.setReferencePoint(v.x(), v.y(), v.z());
 					b.render(_lightBuffer);
 				}
 			}
@@ -1497,27 +1525,42 @@ public class Chunk implements AABBObject
 
 	}
 
-	public void checkDoubles()
+	private AABB addBlockToAABB(AABB aabb, int x, int y, int z)
 	{
-		performListChanges();
-		for (int i = 0; i < _visibleBlocks.size(); ++i)
+		// System.out.println(_contentAABB);
+		if (aabb == null)
 		{
-			int v1 = _visibleBlocks.get(i);
-			if (_chunkData.getBlockData(v1) == 0)
-			{
-				System.out.println("Invalid visible entry at: " + v1 + " (" + ChunkData.indexToPosition(v1, new Vec3i()) + ")");
-				new Exception().printStackTrace(System.out);
-			}
-			for (int j = i + 1; j < _visibleBlocks.size(); ++j)
-			{
-				int v2 = _visibleBlocks.get(j);
-				if (v1 == v2)
-				{
-					System.out.println("Double at (" + i + ", " + j + "): " + v1);
-				}
-			}
-		}
+			aabb = new AABB(new Vec3f(x, y, z).add(DefaultBlock.HALF_BLOCK_SIZE), new Vec3f(DefaultBlock.HALF_BLOCK_SIZE));
+		} else
+		{
+			_auxiliaryAABB.getPosition().set(x, y, z).add(DefaultBlock.HALF_BLOCK_SIZE);
+			_auxiliaryAABB.getDimensions().set(DefaultBlock.HALF_BLOCK_SIZE);
 
+			aabb.include(_auxiliaryAABB);
+		}
+		return aabb;
+	}
+
+	private void removeBlockFromContentAABB(int x, int y, int z)
+	{
+		_auxiliaryAABB.getPosition().set(x, y, z).add(DefaultBlock.HALF_BLOCK_SIZE);
+		_auxiliaryAABB.getDimensions().set(DefaultBlock.HALF_BLOCK_SIZE);
+		/* Check if the block is at the edge of the content AABB */
+		if (_auxiliaryAABB.minX() == _contentAABB.minX() || _auxiliaryAABB.minY() == _contentAABB.minY() || _auxiliaryAABB.minZ() == _contentAABB.minZ() || _auxiliaryAABB.maxX() == _contentAABB.maxX() || _auxiliaryAABB.maxY() == _contentAABB.maxY()
+				|| _auxiliaryAABB.maxZ() == _contentAABB.maxZ())
+		{
+
+		}
+	}
+
+	public AABB getContentAABB()
+	{
+		return _contentAABB;
+	}
+
+	public AABB getVisibleContentAABB()
+	{
+		return _visibleContentAABB;
 	}
 
 }

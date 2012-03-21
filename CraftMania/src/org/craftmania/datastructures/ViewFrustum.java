@@ -134,6 +134,8 @@ public class ViewFrustum {
      */
     public boolean intersects(AABB aabb) {
 
+    	if (aabb == null) return false;
+    	
         Vec3f[] aabbVertices = aabb.getVertices();
         Vec3f rp = VEC3F_ZERO; // Reference Point for rendereing
 

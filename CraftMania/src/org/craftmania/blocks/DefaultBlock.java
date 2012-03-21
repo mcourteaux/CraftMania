@@ -251,7 +251,7 @@ public class DefaultBlock extends Block
 	{
 		if (_aabb == null)
 		{
-			_aabb = new AABB(new Vec3f(getPosition()).add(HALF_BLOCK_SIZE), HALF_BLOCK_SIZE);
+			_aabb = new AABB(new Vec3f(getPosition()).add(HALF_BLOCK_SIZE), new Vec3f(HALF_BLOCK_SIZE));
 		}
 		return _aabb;
 	}

@@ -63,7 +63,7 @@ public class CrossedBlock extends Block
 	{
 		if (_aabb == null)
 		{
-			_aabb = new AABB(new Vec3f(getPosition()).add(DefaultBlock.HALF_BLOCK_SIZE), DefaultBlock.HALF_BLOCK_SIZE);
+			_aabb = new AABB(new Vec3f(getPosition()).add(DefaultBlock.HALF_BLOCK_SIZE), new Vec3f(DefaultBlock.HALF_BLOCK_SIZE));
 		}
 		return _aabb;
 	}

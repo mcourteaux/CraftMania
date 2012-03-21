@@ -536,7 +536,7 @@ public class World
 				continue;
 			}
 
-			if (frustum.intersects(chunk.getAABB()))
+			if (frustum.intersects(chunk.getVisibleContentAABB()))
 			{
 				_visibleChunks.add(chunk);
 			}

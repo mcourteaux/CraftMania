@@ -109,6 +109,7 @@ public class ChunkIO
 		chunk.performListChanges();
 		chunk.markNeighborsLightPointsDirty();
 		chunk.setLoaded(true);
+		chunk.buildVisibileContentAABB();
 	}
 
 	protected void saveChunk(Chunk blockChunk) throws Exception
@@ -137,7 +138,7 @@ public class ChunkIO
 		for (int i = 0; i < blockCount; ++i)
 		{
 			byte b = data.getBlockType(i);
-			if (data.isSpecial(i))
+			if (data.isSpecial(i)) 
 			{
 				Block bl = data.getSpecialBlock(i);
 				BlockType type = _blockManager.getBlockType(b);
