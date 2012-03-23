@@ -18,13 +18,10 @@ package org.craftmania.rendering;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
-import org.craftmania.Side;
 import org.craftmania.blocks.Block;
 import org.craftmania.blocks.BlockManager;
 import org.craftmania.blocks.BlockType;
-import org.craftmania.blocks.DefaultBlock;
-import org.craftmania.blocks.DefaultBlockBrush;
-import org.craftmania.math.Vec2f;
+import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3f;
 import org.craftmania.math.Vec3i;
 import org.craftmania.utilities.IntList;
@@ -220,6 +217,8 @@ public class ChunkMeshBuilder
 		{
 			value = light / 30.001f;
 		}
+		
+		value = MathHelper.sin(value * MathHelper.f_PI_div_2);
 		vertexBuffer.put(vec.x() * value);
 		vertexBuffer.put(vec.y() * value);
 		vertexBuffer.put(vec.z() * value);

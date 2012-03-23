@@ -22,6 +22,7 @@ public class MathHelper
 
 	public static final float f_PI = (float) Math.PI;
 	public static final float f_2PI = (float) (2.0d * Math.PI);
+	public static float f_PI_div_2 = (float) (0.5d * Math.PI);
 
 	private static float SIN_TABLE[];
 
@@ -369,6 +370,21 @@ public class MathHelper
 	}
 
 	public static float simplify(float val, float interval)
+	{
+		while (val >= interval)
+		{
+			val -= interval;
+		}
+		
+		while (val < 0)
+		{
+			val += interval;
+		}
+		
+		return val;
+	}
+	
+	public static int simplify(int val, int interval)
 	{
 		while (val >= interval)
 		{

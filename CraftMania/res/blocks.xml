@@ -156,7 +156,8 @@
         <customClass>org.craftmania.blocks.customblocks.Torch</customClass>
         <solid>false</solid>
         <normalAABB>false</normalAABB>
-        <dimensions>0.2,0.4,0.2</dimensions>
+        <dimensions>0.2,0.3,0.2</dimensions>
+        <center>0.5,0.3,0.5</center>
         <translucent>true</translucent>
         <luminosity>15</luminosity>
     </block>
@@ -197,21 +198,24 @@
     	<solid>false</solid>
     	<translucent>true</translucent>
     	<mineResult>null</mineResult>
-        <dimensions>0.4305,0.5,0.4305</dimensions>
+        <dimensions>0.4305,0.45,0.4305</dimensions>
+        <center>0.5,0.45,0.5</center>
     </block>
     <block id="21" name="redflower">
     	<crossedbrush>12,0</crossedbrush>
     	<supportNeeded>true</supportNeeded>
     	<solid>false</solid>
     	<translucent>true</translucent>
-        <dimensions>0.4305,0.5,0.4305</dimensions>
+        <dimensions>0.2305,0.45,0.2305</dimensions>
+        <center>0.5,0.45,0.4305</center>
     </block>
     <block id="22" name="yellowflower">
     	<crossedbrush>13,0</crossedbrush>
     	<supportNeeded>true</supportNeeded>
     	<solid>false</solid>
     	<translucent>true</translucent>
-        <dimensions>0.4305,0.5,0.4305</dimensions>
+        <dimensions>0.2305,0.35,0.2305</dimensions>
+        <center>0.5,0.35,0.4305</center>
     </block>
     <block id="23" name="glass">
     	<brush alphaBlending="true">

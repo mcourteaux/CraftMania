@@ -15,14 +15,13 @@
  ******************************************************************************/
 package org.craftmania.rendering;
 
+import static org.lwjgl.opengl.GL11.*;
+
 import org.craftmania.datastructures.ViewFrustum;
-import org.craftmania.game.Game;
 import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3f;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.glu.GLU;
-
-import static org.lwjgl.opengl.GL11.*;
 
 /**
  * 

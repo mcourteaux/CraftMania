@@ -192,7 +192,7 @@ public class AABB
 	 * 
 	 * @return The vertices
 	 */
-	public Vec3f[] getVertices()
+	public synchronized Vec3f[] getVertices()
 	{
 		if (_vertices == null)
 		{
@@ -401,7 +401,7 @@ public class AABB
 		return maxZ() - minZ();
 	}
 
-	public void recalcVertices()
+	public synchronized void recalcVertices()
 	{
 		if (_vertices != null)
 		{

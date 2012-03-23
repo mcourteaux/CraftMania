@@ -553,8 +553,9 @@ public class Player extends GameObject
 				_aimedBlockHealth = _blockManager.getBlockType(closestBlock).getResistance();
 				_aimedBlockPosition.set(newAimedBlockPosition);
 				_aimedBlockType = closestBlock;
-				_aimedBlockAABB.getPosition().set(_aimedBlockPosition.x() + 0.5f, _aimedBlockPosition.y() + 0.5f, _aimedBlockPosition.z() + 0.5f);
-				_aimedBlockAABB.getDimensions().set(_blockManager.getBlockType(_aimedBlockType).getDimensions());
+				BlockType aimedBlockType = _blockManager.getBlockType(_aimedBlockType);
+				_aimedBlockAABB.getPosition().set(_aimedBlockPosition.x(), _aimedBlockPosition.y(), _aimedBlockPosition.z()).add(aimedBlockType.getCenter());
+				_aimedBlockAABB.getDimensions().set(aimedBlockType.getDimensions());
 				_aimedBlockAABB.recalcVertices();
 			}
 			_aimedAdjacentBlockPosition = closestIntersection.calcAdjacentBlockPos();

@@ -400,10 +400,15 @@ public class Chunk implements AABBObject
 		}
 		performListChanges();
 	}
-	
+
 	public void buildVisibileContentAABB()
 	{
 		_visibleContentAABB = null;
+		if (_loading)
+		{
+			return;
+		}
+		_visibleBlocks.executeModificationBuffer();
 		int index;
 		int absX = getAbsoluteX();
 		int absZ = getAbsoluteZ();
@@ -503,6 +508,7 @@ public class Chunk implements AABBObject
 					{
 						chunk.getVisibleBlocks().bufferRemove(index);
 					}
+					chunk.buildVisibileContentAABB();
 					chunk.needsNewVBO();
 				}
 				return faceMask;
@@ -595,6 +601,8 @@ public class Chunk implements AABBObject
 			/* Include the block into the content AABB */
 			chunk._contentAABB = chunk.addBlockToAABB(chunk._contentAABB, x, y, z);
 
+			chunk.buildVisibileContentAABB();
+
 		}
 	}
 
@@ -649,6 +657,7 @@ public class Chunk implements AABBObject
 
 			/* Include the block into the content AABB */
 			chunk._contentAABB = chunk.addBlockToAABB(chunk._contentAABB, x, y, z);
+			chunk.buildVisibileContentAABB();
 		}
 	}
 
@@ -725,7 +734,7 @@ public class Chunk implements AABBObject
 
 			/* Finally notify the neighbors */
 			chunk.notifyNeighborsOf(x, y, z);
-
+			chunk.buildVisibileContentAABB();
 		}
 	}
 

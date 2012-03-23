@@ -30,6 +30,7 @@ public final class BlockType extends InventoryItem
 	private BlockBrush brush;
 	private Texture inventoryTexture;
 	private Vec3f dimensions;
+	private Vec3f center;
 	private boolean solid;
 	private boolean fixed;
 	private boolean translucent;
@@ -60,6 +61,7 @@ public final class BlockType extends InventoryItem
 		this.id = (byte) id;
 		this.brush = BlockBrushStorage.get(name);
 		dimensions = new Vec3f(0.5f, 0.5f, 0.5f);
+		center = new Vec3f(0.5f, 0.5f, 0.5f);
 		solid = true;
 		fixed = true;
 		translucent = false;
@@ -198,6 +200,11 @@ public final class BlockType extends InventoryItem
 	public Vec3f getDimensions()
 	{
 		return dimensions;
+	}
+	
+	public Vec3f getCenter()
+	{
+		return center;
 	}
 
 	public boolean isFixed()
