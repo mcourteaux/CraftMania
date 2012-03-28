@@ -262,18 +262,20 @@ public class Vec3f
 		return len;
 	}
 
-	public void sub(float x, float y, float z)
+	public Vec3f sub(float x, float y, float z)
 	{
 		this.x -= x;
 		this.y -= y;
 		this.z -= z;
+		return this;
 	}
 
-	public void add(float x, float y, float z)
+	public Vec3f add(float x, float y, float z)
 	{
 		this.x += x;
 		this.y += y;
 		this.z += z;
+		return this;
 	}
 
 	@Override

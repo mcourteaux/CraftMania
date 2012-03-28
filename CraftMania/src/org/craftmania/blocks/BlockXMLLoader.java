@@ -221,6 +221,13 @@ public class BlockXMLLoader
 					}
 					continue;
 				}
+				
+				if (settingName.equals("customInventoryImage"))
+				{
+					bm.setBlockTypeSetting(blockType, settingName, parseVec2i(valueStr));
+					bm.setBlockTypeSetting(blockType, settingName + "Texture", settingsElement.getAttribute("texture"));
+					continue;
+				}
 
 				Class<?> settingsType = getSettingsType(blockType, settingName);
 				if (settingsType == null)

@@ -239,4 +239,21 @@
     	<hasSpecialAction>true</hasSpecialAction>
     	<hasSpecialSaveData>true</hasSpecialSaveData>
     </block>
+    <block id="25" name="redstone">
+    	<hasRedstoneLogic>true</hasRedstoneLogic>
+    	<customClass>org.craftmania.blocks.customblocks.Redstone</customClass>
+    	<customInventoryImage texture="items">8,3</customInventoryImage>
+    	<translucent>true</translucent>
+    	<solid>false</solid>
+    	<normalAABB>false</normalAABB>
+    </block>
+    <block id="26" name="redstone_ore">
+    	<brush>
+    		<allsides>3,3</allsides>
+    	</brush>
+    	<blockClass>STONE</blockClass>
+    	<resistance>15</resistance>
+    	<mineResult>redstone</mineResult>
+    	<mineResultCount>15</mineResultCount>
+    </block>
 </root>

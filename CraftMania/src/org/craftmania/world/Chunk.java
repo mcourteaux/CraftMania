@@ -515,7 +515,19 @@ public class Chunk implements AABBObject
 			} else
 			{
 				Block block = chunk._chunkData.getSpecialBlock(index);
+				boolean visibleOld = block.isVisible();
 				block.checkVisibility();
+				boolean visibleNew = block.isVisible();
+				if (visibleOld != visibleNew)
+				{
+					if (visibleNew)
+					{
+						block.addToVisibilityList();
+					} else
+					{
+						block.removeFromVisibilityList();
+					}
+				}
 				if (block instanceof DefaultBlock)
 				{
 					return ((DefaultBlock) block).getFaceMask();

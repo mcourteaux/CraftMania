@@ -199,6 +199,7 @@ public class ChunkMeshBuilder
 		{
 			value = light / 30.001f;
 		}
+		value = MathHelper.sin(value * MathHelper.f_PI_div_2);
 		vertexBuffer.put(vec.x() * value);
 		vertexBuffer.put(vec.y() * value);
 		vertexBuffer.put(vec.z() * value);

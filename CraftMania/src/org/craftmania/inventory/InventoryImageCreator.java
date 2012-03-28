@@ -56,26 +56,37 @@ public class InventoryImageCreator
 	{
 		this(32);
 	}
-	
+
 	public BufferedImage createInventoryImage(BlockType type)
 	{
 		if (type.getBrush() == null)
 		{
 			return NOT_AVAILABLE;
 		}
-		if (type.isCrossed())
+		if (type.getCustomInventoryImage() != null && type.getCustomInventoryImageTexture() != null)
 		{
-			return createInventoryImage(type.getCrossedBlockBrush());
+			Texture tex = TextureStorage.getTexture(type.getCustomInventoryImageTexture());
+			BufferedImage img = textureToBufferedImage(tex);
+			img = getTile16(img, type.getCustomInventoryImage().x(), type.getCustomInventoryImage().y());
+			return img;
 		} else
 		{
-			return createInventoryImage(type.getDefaultBlockBrush());
+			if (type.isCrossed())
+			{
+				return createInventoryImage(type.getCrossedBlockBrush());
+			} else
+			{
+				return createInventoryImage(type.getDefaultBlockBrush());
+			}
 		}
 	}
 
 	/**
 	 * Creates an inventory image of a crossed block brush
 	 * 
-	 * @param dbb The CrossedBlockBrush for which an inventory image will be created
+	 * @param dbb
+	 *            The CrossedBlockBrush for which an inventory image will be
+	 *            created
 	 * @return
 	 */
 	public BufferedImage createInventoryImage(CrossedBlockBrush cbb)
@@ -83,8 +94,8 @@ public class InventoryImageCreator
 		BufferedImage bi = new BufferedImage(_size, _size, BufferedImage.TYPE_INT_ARGB);
 
 		Vec2f texpos = cbb.getTexturePosition();
-		BufferedImage tile = getTile16(_terrainImage, MathHelper.round(texpos.x() / 16f * _terrainImage.getWidth()), MathHelper.round(texpos.y() /16f * _terrainImage.getHeight()));
-		
+		BufferedImage tile = getTile16(_terrainImage, MathHelper.round(texpos.x() / 16f * _terrainImage.getWidth()), MathHelper.round(texpos.y() / 16f * _terrainImage.getHeight()));
+
 		Graphics2D g = bi.createGraphics();
 		g.drawImage(tile, 0, 0, bi.getWidth(), bi.getHeight(), null);
 		g.dispose();
@@ -95,7 +106,9 @@ public class InventoryImageCreator
 	/**
 	 * Creates an inventory image of a default block brush
 	 * 
-	 * @param dbb The DefaultBlockBrush for which an inventory image will be created
+	 * @param dbb
+	 *            The DefaultBlockBrush for which an inventory image will be
+	 *            created
 	 * @return
 	 */
 	public BufferedImage createInventoryImage(DefaultBlockBrush dbb)

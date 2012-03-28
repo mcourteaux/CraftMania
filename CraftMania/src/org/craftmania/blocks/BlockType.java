@@ -18,6 +18,7 @@ package org.craftmania.blocks;
 import static org.lwjgl.opengl.GL11.*;
 
 import org.craftmania.inventory.InventoryItem;
+import org.craftmania.math.Vec2i;
 import org.craftmania.math.Vec3f;
 import org.craftmania.world.LightBuffer;
 import org.newdawn.slick.opengl.Texture;
@@ -43,6 +44,9 @@ public final class BlockType extends InventoryItem
 	private boolean crossed;
 	private byte luminosity;
 	private boolean supportNeeded;
+	private boolean hasRedstoneLogic;
+	private Vec2i customInventoryImage;
+	private String customInventoryImageTexture;
 
 	public enum BlockClass
 	{
@@ -145,34 +149,43 @@ public final class BlockType extends InventoryItem
 
 		/* Smoothen the light buffer */
 
-//		int avg = 0;
-//		for (int i0 = 0; i0 < lightBuffer.length; ++i0)
-//		{
-//			for (int i1 = 0; i1 < lightBuffer[i0].length; ++i1)
-//			{
-//				for (int i2 = 0; i2 < lightBuffer[i0][i1].length; ++i2)
-//				{
-//					avg += lightBuffer[i0][i1][i2];
-//				}
-//			}
-//		}
-//		avg /= 27.0f;
-//		for (int i0 = 0; i0 < lightBuffer.length; ++i0)
-//		{
-//			for (int i1 = 0; i1 < lightBuffer[i0].length; ++i1)
-//			{
-//				for (int i2 = 0; i2 < lightBuffer[i0][i1].length; ++i2)
-//				{
-//					lightBuffer[i0][i1][i2] = (byte) avg;
-//				}
-//			}
-//		}
+		// int avg = 0;
+		// for (int i0 = 0; i0 < lightBuffer.length; ++i0)
+		// {
+		// for (int i1 = 0; i1 < lightBuffer[i0].length; ++i1)
+		// {
+		// for (int i2 = 0; i2 < lightBuffer[i0][i1].length; ++i2)
+		// {
+		// avg += lightBuffer[i0][i1][i2];
+		// }
+		// }
+		// }
+		// avg /= 27.0f;
+		// for (int i0 = 0; i0 < lightBuffer.length; ++i0)
+		// {
+		// for (int i1 = 0; i1 < lightBuffer[i0].length; ++i1)
+		// {
+		// for (int i2 = 0; i2 < lightBuffer[i0][i1].length; ++i2)
+		// {
+		// lightBuffer[i0][i1][i2] = (byte) avg;
+		// }
+		// }
+		// }
 
-		float scale = 0.1f;
-		glScalef(scale, scale, scale);
-		glRotatef(-40, 0, 0, 1);
-		brush.setPosition(0, 0, 0);
-		brush.render(lightBuffer);
+		if (customInventoryImage != null)
+		{
+			renderInventoryItem();
+		} else
+		{
+			if (brush != null)
+			{
+				float scale = 0.1f;
+				glScalef(scale, scale, scale);
+				glRotatef(-40, 0, 0, 1);
+				brush.setPosition(0, 0, 0);
+				brush.render(lightBuffer);
+			}
+		}
 	}
 
 	@Override
@@ -201,7 +214,7 @@ public final class BlockType extends InventoryItem
 	{
 		return dimensions;
 	}
-	
+
 	public Vec3f getCenter()
 	{
 		return center;
@@ -292,4 +305,18 @@ public final class BlockType extends InventoryItem
 		return supportNeeded;
 	}
 
+	public boolean hasRedstoneLogic()
+	{
+		return hasRedstoneLogic;
+	}
+
+	public Vec2i getCustomInventoryImage()
+	{
+		return customInventoryImage;
+	}
+
+	public String getCustomInventoryImageTexture()
+	{
+		return customInventoryImageTexture;
+	}
 }

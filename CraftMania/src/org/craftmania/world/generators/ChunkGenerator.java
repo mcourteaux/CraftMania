@@ -149,10 +149,12 @@ public class ChunkGenerator extends Generator
 						} else if (density < 10.0f && depth > 10)
 						{
 							chunk.setDefaultBlockRelative(x, y, z, BlockManager.getInstance().getBlockType("iron_ore"), (byte) 0, true, false, false);
+						} else if (y < 16 && density < 13.0f)
+						{
+							chunk.setDefaultBlockRelative(x, y, z, BlockManager.getInstance().getBlockType("redstone_ore"), (byte) 0, true, false, false);
 						} else
 						{
 							chunk.setDefaultBlockRelative(x, y, z, BlockManager.getInstance().getBlockType("stone"), (byte) 0, true, false, false);
-
 						}
 					}
 				}

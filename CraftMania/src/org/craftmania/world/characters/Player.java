@@ -513,13 +513,15 @@ public class Player extends GameObject
 						continue;
 
 					special = chunk.isBlockSpecialAbsolute(x, y, z);
+					Block block = null;
 					if (special)
 					{
-						Block block = chunk.getSpecialBlockAbsolute(x, y, z);
+						block = chunk.getSpecialBlockAbsolute(x, y, z);
 						if (block.isMoving())
 						{
 							continue;
 						}
+						_intersectionTestingAABB.set(block.getAABB());
 					}
 
 					v.set(x + 0.5f, y + 0.5f, z + 0.5f);
@@ -528,9 +530,12 @@ public class Player extends GameObject
 					float lenSquared = v.lengthSquared();
 					if (lenSquared < rayLenSquared)
 					{
-						_intersectionTestingAABB.getPosition().set(x + 0.5f, y + 0.5f, z + 0.5f);
-						_intersectionTestingAABB.getDimensions().set(_blockManager.getBlockType(bl).getDimensions());
-						_intersectionTestingAABB.recalcVertices();
+						if (!special)
+						{
+							_intersectionTestingAABB.getPosition().set(x + 0.5f, y + 0.5f, z + 0.5f);
+							_intersectionTestingAABB.getDimensions().set(_blockManager.getBlockType(bl).getDimensions());
+							_intersectionTestingAABB.recalcVertices();
+						}
 						/* Perform the raycast */
 						List<RayBlockIntersection.Intersection> intersections = RayBlockIntersection.executeIntersection(x, y, z, _intersectionTestingAABB, rayOrigin, rayDirection);
 						if (!intersections.isEmpty())
@@ -540,6 +545,16 @@ public class Player extends GameObject
 								closestIntersection = intersections.get(0);
 								closestBlock = bl;
 								newAimedBlockPosition.set(x, y, z);
+
+								if (special)
+								{
+									_aimedBlockAABB.set(block.getAABB());
+								} else
+								{
+									BlockType aimedBlockType = _blockManager.getBlockType(bl);
+									_aimedBlockAABB.getPosition().set(_aimedBlockPosition.x(), _aimedBlockPosition.y(), _aimedBlockPosition.z()).add(aimedBlockType.getCenter());
+									_aimedBlockAABB.getDimensions().set(aimedBlockType.getDimensions());
+								}
 							}
 						}
 					}
@@ -553,9 +568,7 @@ public class Player extends GameObject
 				_aimedBlockHealth = _blockManager.getBlockType(closestBlock).getResistance();
 				_aimedBlockPosition.set(newAimedBlockPosition);
 				_aimedBlockType = closestBlock;
-				BlockType aimedBlockType = _blockManager.getBlockType(_aimedBlockType);
-				_aimedBlockAABB.getPosition().set(_aimedBlockPosition.x(), _aimedBlockPosition.y(), _aimedBlockPosition.z()).add(aimedBlockType.getCenter());
-				_aimedBlockAABB.getDimensions().set(aimedBlockType.getDimensions());
+
 				_aimedBlockAABB.recalcVertices();
 			}
 			_aimedAdjacentBlockPosition = closestIntersection.calcAdjacentBlockPos();
@@ -811,6 +824,7 @@ public class Player extends GameObject
 						} else
 						{
 							Block block = BlockConstructor.construct(bX, bY, bZ, bc, type.getID(), (byte) 0);
+							System.out.println("Build special block! " + block + " (" + block.getClass().getSimpleName() + ")");
 							bc.setSpecialBlockAbsolute(bX, bY, bZ, block, true, true, true);
 						}
 
