@@ -267,4 +267,11 @@
         <hasRedstoneLogic>true</hasRedstoneLogic>
         <luminosity>3</luminosity>
     </block>
+    <block id="28" name="redstone_lamp">
+    	<brush>
+    		<allsides>3,13</allsides>
+    	</brush>
+    	<customClass>org.craftmania.blocks.customblocks.RedstoneLamp</customClass>
+    	<hasRedstoneLogic>true</hasRedstoneLogic>
+    </block>
 </root>

@@ -4,6 +4,7 @@ planks,planks;planks,planks crafting_table 1
 planks;planks stick 4
 planks,planks,planks;planks,,planks;planks,planks,planks container 1
 redstone;stick redstone_torch 4
+redstone,redstone,redstone;redstone,cobblestone,redstone;redstone,redstone,redstone redstone_lamp 4
 
 coal;stick torch 4
 sand,sand;torch,torch glass 8

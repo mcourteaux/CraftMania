@@ -53,6 +53,7 @@ public class Redstone extends Block implements RedstoneLogic
 	@Override
 	public void feed(int power)
 	{
+		if (power <= 0) return;
 		if (!_powered || power > _power)
 		{
 			_chunk.needsNewVBO();
@@ -78,6 +79,7 @@ public class Redstone extends Block implements RedstoneLogic
 	@Override
 	public void unfeed(int power)
 	{
+		if (power <= 0) return;
 		if (_powered)
 		{
 			_chunk.needsNewVBO();
