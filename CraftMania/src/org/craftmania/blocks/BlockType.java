@@ -17,10 +17,13 @@ package org.craftmania.blocks;
 
 import static org.lwjgl.opengl.GL11.*;
 
+import org.craftmania.game.TextureStorage;
 import org.craftmania.inventory.InventoryItem;
+import org.craftmania.math.Vec2f;
 import org.craftmania.math.Vec2i;
 import org.craftmania.math.Vec3f;
 import org.craftmania.world.LightBuffer;
+import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.opengl.Texture;
 
 public final class BlockType extends InventoryItem
@@ -84,18 +87,37 @@ public final class BlockType extends InventoryItem
 		float hw = 15f;
 		float hh = 15f;
 
+		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		inventoryTexture.bind();
 
-		glBegin(GL_QUADS);
-		glTexCoord2f(0, 0);
-		glVertex2f(-hw, hh);
-		glTexCoord2f(1, 0);
-		glVertex2f(hw, hh);
-		glTexCoord2f(1, 1);
-		glVertex2f(hw, -hh);
-		glTexCoord2f(0, 1);
-		glVertex2f(-hw, -hh);
-		glEnd();
+		if (customInventoryImage != null)
+		{
+			Vec2f uv0 = new Vec2f(customInventoryImage.x() / (inventoryTexture.getImageWidth() / 16.0f), customInventoryImage.y() / (inventoryTexture.getImageHeight() / 16.0f));
+
+			glBegin(GL_QUADS);
+			glTexCoord2f(uv0.x(), uv0.y());
+			glVertex2f(-hw, hh);
+			glTexCoord2f(uv0.x() + (16.0f / inventoryTexture.getImageWidth()), uv0.y());
+			glVertex2f(hw, hh);
+			glTexCoord2f(uv0.x() + (16.0f / inventoryTexture.getImageWidth()), uv0.y() + (16.0f / inventoryTexture.getImageHeight()));
+			glVertex2f(hw, -hh);
+			glTexCoord2f(uv0.x(), uv0.y() + (16.0f / inventoryTexture.getImageHeight()));
+			glVertex2f(-hw, -hh);
+			glEnd();
+		} else
+		{
+
+			glBegin(GL_QUADS);
+			glTexCoord2f(0, 0);
+			glVertex2f(-hw, hh);
+			glTexCoord2f(1, 0);
+			glVertex2f(hw, hh);
+			glTexCoord2f(1, 1);
+			glVertex2f(hw, -hh);
+			glTexCoord2f(0, 1);
+			glVertex2f(-hw, -hh);
+			glEnd();
+		}
 	}
 
 	@Override
@@ -174,7 +196,22 @@ public final class BlockType extends InventoryItem
 
 		if (customInventoryImage != null)
 		{
-			renderInventoryItem();
+			GL11.glPushMatrix();
+			float scale = 0.1f / 16.0f;
+			float light = lightBuffer.get(1, 1, 1) / 30.001f;
+			GL11.glScalef(scale, scale, scale);
+			GL11.glColor3f(0.5f * light, 0.5f * light, 0.5f * light);
+			/* Render the texture */
+			for (float i = 0.0f; i < 0.02f; i += 0.002f)
+			{
+				if (i > 0.016f)
+				{
+					GL11.glColor3f(1.0f * light, 1.0f * light, 1.0f * light);
+				}
+				renderInventoryItem();
+				GL11.glTranslatef(0, 0, 0.002f / scale);
+			}
+			GL11.glPopMatrix();
 		} else
 		{
 			if (brush != null)

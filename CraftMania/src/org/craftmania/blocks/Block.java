@@ -111,18 +111,23 @@ public abstract class Block implements AABBObject
 		_health -= damage;
 		if (_health <= 0)
 		{
-			destory();
+			destroy();
 			return true;
 		}
 		return false;
 	}
 	
-	public void destory()
+	public final void destroy()
 	{
 		Game.getInstance().getWorld().getChunkManager().removeBlock(getX(), getY(), getZ());
-		
 		_chunk.needsNewVBO();
 	}
+	
+	public void destruct()
+	{
+		
+	}
+	
 	
 	public synchronized void removeFromVisibilityList()
 	{

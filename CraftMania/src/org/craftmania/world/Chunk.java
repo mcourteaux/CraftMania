@@ -712,6 +712,7 @@ public class Chunk implements AABBObject
 			if (oldSpecial)
 			{
 				Block block = chunk._chunkData.getSpecialBlock(index);
+				block.destruct();
 				block.removeFromVisibilityList();
 				block.removeFromManualRenderList();
 				block.removeFromUpdateList();
@@ -1560,18 +1561,6 @@ public class Chunk implements AABBObject
 			aabb.include(_auxiliaryAABB);
 		}
 		return aabb;
-	}
-
-	private void removeBlockFromContentAABB(int x, int y, int z)
-	{
-		_auxiliaryAABB.getPosition().set(x, y, z).add(DefaultBlock.HALF_BLOCK_SIZE);
-		_auxiliaryAABB.getDimensions().set(DefaultBlock.HALF_BLOCK_SIZE);
-		/* Check if the block is at the edge of the content AABB */
-		if (_auxiliaryAABB.minX() == _contentAABB.minX() || _auxiliaryAABB.minY() == _contentAABB.minY() || _auxiliaryAABB.minZ() == _contentAABB.minZ() || _auxiliaryAABB.maxX() == _contentAABB.maxX() || _auxiliaryAABB.maxY() == _contentAABB.maxY()
-				|| _auxiliaryAABB.maxZ() == _contentAABB.maxZ())
-		{
-
-		}
 	}
 
 	public AABB getContentAABB()

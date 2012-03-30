@@ -71,7 +71,7 @@ public class CrossedBlock extends Block
 	@Override
 	public void smash(InventoryItem item)
 	{
-		destory();
+		destroy();
 	}
 
 	@Override

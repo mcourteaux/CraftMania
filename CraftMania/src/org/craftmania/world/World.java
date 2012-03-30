@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.craftmania.blocks.Block;
+import org.craftmania.blocks.customblocks.Redstone;
 import org.craftmania.datastructures.AABB;
 import org.craftmania.datastructures.ViewFrustum;
 import org.craftmania.game.Configuration;
@@ -33,6 +34,7 @@ import org.craftmania.inventory.Inventory;
 import org.craftmania.inventory.Inventory.InventoryPlace;
 import org.craftmania.math.MathHelper;
 import org.craftmania.math.Vec3f;
+import org.craftmania.math.Vec3i;
 import org.craftmania.rendering.ChunkMeshBuilder.MeshType;
 import org.craftmania.rendering.GLFont;
 import org.craftmania.rendering.GLUtils;
@@ -55,6 +57,7 @@ public class World
 	private ChunkManager _chunkManager;
 	private Player _player;
 	private Sky _sky;
+	private List<Vec3i> _redstoneRefeedPoints;
 
 	private List<Chunk> _localChunks;
 	private List<Chunk> _oldChunkList;
@@ -87,6 +90,7 @@ public class World
 		_oldChunkList = new ArrayList<Chunk>();
 		_chunksThatNeedsNewVBO = new ArrayList<Chunk>();
 		_visibleChunks = new FastArrayList<Chunk>(30);
+		_redstoneRefeedPoints = new ArrayList<Vec3i>();
 		_chunkVisibilityTestingAABB = new AABB(new Vec3f(), new Vec3f());
 		_chunkDistanceComparator = new ChunkDistanceComparator();
 		_fogColor = new Vec3f();
@@ -387,6 +391,19 @@ public class World
 		updateLocalChunks();
 
 		_chunkManager.performRememberedBlockChanges();
+		
+		/* Perform the redstone power respreading */
+		for (int i = 0; i < _redstoneRefeedPoints.size(); ++i)
+		{
+			Vec3i v = _redstoneRefeedPoints.get(i);
+			Block bl = _chunkManager.getSpecialBlock(v.x(), v.y(), v.z());
+			if (bl instanceof Redstone)
+			{
+				Redstone r = (Redstone) bl;
+				r.refeedNeighbors();
+			}
+		}
+		_redstoneRefeedPoints.clear();
 
 		_tick++;
 	}
@@ -394,7 +411,8 @@ public class World
 	public void checkForNewVisibleChunks()
 	{
 		/* Don't add chunks to the queue if all cores are busy */
-		if (_chunkManager.isLoadingThreadPoolFull()) return;
+		if (_chunkManager.isLoadingThreadPoolFull())
+			return;
 		_checkForNewChunks = false;
 
 		float viewingDistance = Game.getInstance().getConfiguration().getViewingDistance();
@@ -604,7 +622,6 @@ public class World
 				c.needsNewVBO();
 			}
 		}
-
 	}
 
 	private void processInput()
@@ -671,6 +688,11 @@ public class World
 	public void requestCheckForNewVisibleChunks()
 	{
 		_checkForNewChunks = true;
+	}
+
+	public void respreadRedstone(int x, int y, int z)
+	{
+		_redstoneRefeedPoints.add(new Vec3i(x, y, z));
 	}
 
 }

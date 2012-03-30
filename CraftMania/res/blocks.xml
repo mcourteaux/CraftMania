@@ -256,4 +256,15 @@
     	<mineResult>redstone</mineResult>
     	<mineResultCount>15</mineResultCount>
     </block>
+    <block id="27" name="redstone_torch">
+    	<crossedbrush>3,6</crossedbrush>
+    	<customClass>org.craftmania.blocks.customblocks.RedstoneTorch</customClass>
+        <solid>false</solid>
+        <normalAABB>false</normalAABB>
+        <dimensions>0.2,0.3,0.2</dimensions>
+        <center>0.5,0.3,0.5</center>
+        <translucent>true</translucent>
+        <hasRedstoneLogic>true</hasRedstoneLogic>
+        <luminosity>3</luminosity>
+    </block>
 </root>

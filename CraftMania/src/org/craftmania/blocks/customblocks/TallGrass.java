@@ -81,7 +81,7 @@ public class TallGrass extends CrossedBlock
 		{
 			if (_chunk.getBlockTypeAbsolute(getX(), getY() - 1, getZ(), false, false, false) <= 0)
 			{
-				destory();
+				destroy();
 			}
 		}
 	}

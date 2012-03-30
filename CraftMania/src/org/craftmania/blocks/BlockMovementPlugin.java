@@ -75,7 +75,7 @@ public class BlockMovementPlugin
 		
 		if (_block.getY() < -40)
 		{
-			_block.destory();
+			_block.destroy();
 		}
 	}
 	

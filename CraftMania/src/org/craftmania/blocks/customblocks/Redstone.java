@@ -9,6 +9,7 @@ import org.craftmania.blocks.Block;
 import org.craftmania.blocks.BlockManager;
 import org.craftmania.blocks.BlockType;
 import org.craftmania.datastructures.AABB;
+import org.craftmania.game.Game;
 import org.craftmania.inventory.InventoryItem;
 import org.craftmania.math.Vec2f;
 import org.craftmania.math.Vec3f;
@@ -38,6 +39,7 @@ public class Redstone extends Block implements RedstoneLogic
 	private boolean _powered;
 	private boolean[] _connections;
 	private boolean _visible;
+	private int _power;
 
 	public Redstone(Chunk chunk, Vec3i pos)
 	{
@@ -49,42 +51,54 @@ public class Redstone extends Block implements RedstoneLogic
 	}
 
 	@Override
-	public void feed()
+	public void feed(int power)
 	{
-		if (!_powered)
+		if (!_powered || power > _power)
 		{
+			_chunk.needsNewVBO();
+			_power = Math.max(_power, power);
 			_powered = true;
-			/* Conduct the power */
-			Vec3i n;
-			for (int i = 0, j = 0; i < 6 && j < _connectionCount; ++i)
+			refeedNeighbors();
+		}
+	}
+	
+	public void refeedNeighbors()
+	{
+		/* Conduct the power */
+		for (int i = 0, j = 0; i < 6 && j < _connectionCount; ++i)
+		{
+			if (_connections[i])
 			{
-				if (_connections[i])
-				{
-					++j;
-					n = Side.getSide(i).getNormal();
-					RedstoneLogic rl = (RedstoneLogic) _chunk.getSpecialBlockAbsolute(getX() + n.x(), getY() + n.y(), getZ() + n.z());
-					rl.feed();
-				}
+				++j;
+				feedNeighbor(Side.getSide(i), _power - 1);
 			}
 		}
 	}
 
 	@Override
-	public void unfeed()
+	public void unfeed(int power)
 	{
 		if (_powered)
 		{
-			_powered = false;
-			/* Conduct the power */
-			Vec3i n;
-			for (int i = 0, j = 0; i < 6 && j < _connectionCount; ++i)
+			_chunk.needsNewVBO();
+
+			if (power == _power)
 			{
-				if (_connections[i])
+				_powered = false;
+				for (int i = 0, j = 0; i < 6 && j < _connectionCount; ++i)
 				{
-					++j;
-					n = Side.getSide(i).getNormal();
-					RedstoneLogic rl = (RedstoneLogic) _chunk.getSpecialBlockAbsolute(getX() + n.x(), getY() + n.y(), getZ() + n.z());
-					rl.unfeed();
+					if (_connections[i])
+					{
+						++j;
+						unfeedNeighbor(Side.getSide(i), _power - 1);
+					}
+				}
+				_power = 0;
+			} else
+			{
+				if (power < _power)
+				{
+					Game.getInstance().getWorld().respreadRedstone(getX(), getY(), getZ());
 				}
 			}
 		}
@@ -123,7 +137,10 @@ public class Redstone extends Block implements RedstoneLogic
 		Vec3f v = new Vec3f(1, 1, 1);
 		if (!_powered)
 		{
-			v.scale(0.5f);
+			v.scale(0.2f);
+		} else
+		{
+			v.scale(((float) _power) / ((float) MAXIMUM_REDSTONE_TRAVELING_DISTANCE));
 		}
 		System.out.printf("Store Redstone (%b, %b, %b, %b)%n", connectedL, connectedR, connectedF, connectedB);
 		if ((_connectionCount == 1 && (connectedL || connectedR)) || (_connectionCount == 2 && (connectedL && connectedR)))
@@ -332,7 +349,7 @@ public class Redstone extends Block implements RedstoneLogic
 	@Override
 	public void smash(InventoryItem item)
 	{
-		destory();
+		destroy();
 	}
 
 	@Override
@@ -359,6 +376,17 @@ public class Redstone extends Block implements RedstoneLogic
 	}
 
 	@Override
+	public void destruct()
+	{
+		disconnect(Side.BACK);
+		disconnect(Side.FRONT);
+		disconnect(Side.LEFT);
+		disconnect(Side.RIGHT);
+		disconnect(Side.TOP);
+		disconnect(Side.BOTTOM);
+	}
+
+	@Override
 	public void checkVisibility()
 	{
 		_visible = true;
@@ -376,11 +404,11 @@ public class Redstone extends Block implements RedstoneLogic
 		if (!_connections[side.ordinal()])
 		{
 			_connectionCount++;
-		}
-		_connections[side.ordinal()] = true;
-		if (isPowered())
-		{
-			feedNeighbor(side);
+			_connections[side.ordinal()] = true;
+			if (isPowered())
+			{
+				feedNeighbor(side, _power - 1);
+			}
 		}
 	}
 
@@ -390,14 +418,41 @@ public class Redstone extends Block implements RedstoneLogic
 		if (_connections[side.ordinal()])
 		{
 			_connectionCount--;
+			_connections[side.ordinal()] = false;
+			if (isPowered())
+			{
+				unfeedNeighbor(side, _power - 1);
+			}
 		}
-		_connections[side.ordinal()] = false;
 	}
 
-	private void feedNeighbor(Side side)
+	private void feedNeighbor(Side side, int power)
 	{
 		Vec3i n = side.getNormal();
-		RedstoneLogic rl = (RedstoneLogic) _chunk.getSpecialBlockAbsolute(getX() + n.x(), getY() + n.y(), getZ() + n.z());
-		rl.feed();
+		Block bl = _chunk.getSpecialBlockAbsolute(getX() + n.x(), getY() + n.y(), getZ() + n.z());
+		if (bl == null)
+		{
+			return;
+		}
+		if (bl instanceof RedstoneLogic)
+		{
+			RedstoneLogic rl = (RedstoneLogic) bl;
+			rl.feed(power);
+		}
+	}
+
+	private void unfeedNeighbor(Side side, int power)
+	{
+		Vec3i n = side.getNormal();
+		Block bl = _chunk.getSpecialBlockAbsolute(getX() + n.x(), getY() + n.y(), getZ() + n.z());
+		if (bl == null)
+		{
+			return;
+		}
+		if (bl instanceof RedstoneLogic)
+		{
+			RedstoneLogic rl = (RedstoneLogic) bl;
+			rl.unfeed(power);
+		}
 	}
 }

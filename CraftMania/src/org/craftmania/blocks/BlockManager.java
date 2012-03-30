@@ -94,11 +94,15 @@ public class BlockManager
 				}
 				_typeStrings.put(bt.getType(), Byte.valueOf((byte) i));
 
-				BufferedImage img = inventoryImageCreator.createInventoryImage(bt);
-
-				Texture inventoryTexture = TextureStorage.loadTexture(bt.getType(), img);
-
-				bt.setInventoryTexture(inventoryTexture);
+				if (bt.getCustomInventoryImage() != null)
+				{
+					bt.setInventoryTexture(TextureStorage.getTexture(bt.getCustomInventoryImageTexture()));
+				} else
+				{
+					BufferedImage img = inventoryImageCreator.createInventoryImage(bt);
+					Texture inventoryTexture = TextureStorage.loadTexture(bt.getType(), img);
+					bt.setInventoryTexture(inventoryTexture);
+				}
 			}
 		}
 
