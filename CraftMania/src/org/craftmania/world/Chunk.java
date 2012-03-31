@@ -23,6 +23,8 @@ import org.craftmania.blocks.BlockConstructor;
 import org.craftmania.blocks.BlockManager;
 import org.craftmania.blocks.BlockType;
 import org.craftmania.blocks.DefaultBlock;
+import org.craftmania.blocks.customblocks.Redstone;
+import org.craftmania.blocks.customblocks.RedstoneLamp;
 import org.craftmania.datastructures.AABB;
 import org.craftmania.datastructures.AABBObject;
 import org.craftmania.game.Game;
@@ -73,6 +75,7 @@ public class Chunk implements AABBObject
 
 	/* Neighbors */
 	private Chunk[] _neighbors;
+	private boolean _newVisibilityContentAABBNeeded;
 
 	public static enum LightType
 	{
@@ -178,6 +181,10 @@ public class Chunk implements AABBObject
 		performListChanges();
 		Vec3i v = new Vec3i();
 		int absX = getAbsoluteX(), absZ = getAbsoluteZ();
+
+		BlockType redstoneType = BlockManager.getInstance().getBlockType("redstone");
+		BlockType redstoneLampType = BlockManager.getInstance().getBlockType("redstone_lamp");
+
 		for (int i = 0; i < _visibleBlocks.size(); ++i)
 		{
 			int index = _visibleBlocks.get(i);
@@ -190,6 +197,27 @@ public class Chunk implements AABBObject
 				ChunkData.indexToPosition(index, v);
 				unspreadLight(v.x() + absX, v.y(), v.z() + absZ, type.getLuminosity(), LightType.BLOCK);
 				spreadLight(v.x() + absX, v.y(), v.z() + absZ, type.getLuminosity(), LightType.BLOCK);
+			}
+
+			if (type == redstoneType)
+			{
+				Redstone r = (Redstone) _chunkData.getSpecialBlock(index);
+				if (r.isPowered())
+				{
+					ChunkData.indexToPosition(index, v);
+					unspreadLight(v.x() + absX, v.y(), v.z() + absZ, Redstone.LUMINOSITY, LightType.BLOCK);
+					spreadLight(v.x() + absX, v.y(), v.z() + absZ, Redstone.LUMINOSITY, LightType.BLOCK);
+				}
+			}
+			if (type == redstoneLampType)
+			{
+				RedstoneLamp r = (RedstoneLamp) _chunkData.getSpecialBlock(index);
+				if (r.isPowered())
+				{
+					ChunkData.indexToPosition(index, v);
+					unspreadLight(v.x() + absX, v.y(), v.z() + absZ, RedstoneLamp.LUMINOSITY, LightType.BLOCK);
+					spreadLight(v.x() + absX, v.y(), v.z() + absZ, RedstoneLamp.LUMINOSITY, LightType.BLOCK);
+				}
 			}
 		}
 		_lightPointsDirty = false;
@@ -419,6 +447,7 @@ public class Chunk implements AABBObject
 			v = ChunkData.indexToPosition(index, v);
 			_visibleContentAABB = addBlockToAABB(_visibleContentAABB, v.x() + absX, v.y(), v.z() + absZ);
 		}
+		_newVisibilityContentAABBNeeded = false;
 	}
 
 	public void updateVisibilityForNeigborsOf(int x, int y, int z)
@@ -504,11 +533,12 @@ public class Chunk implements AABBObject
 					if (oldFaceMask == 0)
 					{
 						chunk.getVisibleBlocks().bufferAdd(index);
+						chunk._visibleContentAABB = chunk.addBlockToAABB(chunk.getVisibleContentAABB(), x, y, z);
 					} else if (faceMask == 0)
 					{
 						chunk.getVisibleBlocks().bufferRemove(index);
+						chunk.needsNewVisibleContentAABB();
 					}
-					chunk.buildVisibileContentAABB();
 					chunk.needsNewVBO();
 				}
 				return faceMask;
@@ -523,9 +553,11 @@ public class Chunk implements AABBObject
 					if (visibleNew)
 					{
 						block.addToVisibilityList();
+						chunk._visibleContentAABB = chunk.addBlockToAABB(chunk.getVisibleContentAABB(), x, y, z);
 					} else
 					{
 						block.removeFromVisibilityList();
+						chunk.needsNewVisibleContentAABB();
 					}
 				}
 				if (block instanceof DefaultBlock)
@@ -612,9 +644,6 @@ public class Chunk implements AABBObject
 
 			/* Include the block into the content AABB */
 			chunk._contentAABB = chunk.addBlockToAABB(chunk._contentAABB, x, y, z);
-
-			chunk.buildVisibileContentAABB();
-
 		}
 	}
 
@@ -669,7 +698,6 @@ public class Chunk implements AABBObject
 
 			/* Include the block into the content AABB */
 			chunk._contentAABB = chunk.addBlockToAABB(chunk._contentAABB, x, y, z);
-			chunk.buildVisibileContentAABB();
 		}
 	}
 
@@ -747,7 +775,7 @@ public class Chunk implements AABBObject
 
 			/* Finally notify the neighbors */
 			chunk.notifyNeighborsOf(x, y, z);
-			chunk.buildVisibileContentAABB();
+			chunk.needsNewVisibleContentAABB();
 		}
 	}
 
@@ -876,7 +904,7 @@ public class Chunk implements AABBObject
 					Block b = _chunkData.getSpecialBlock(index);
 					ChunkData.indexToPosition(index, v);
 					/* The lightbuffer should be still ok */
-					_lightBuffer.setReferencePoint(v.x(), v.y(), v.z());
+					_lightBuffer.setReferencePoint(v.x() + getAbsoluteX(), v.y(), v.z() + getAbsoluteZ());
 					b.render(_lightBuffer);
 				}
 			}
@@ -1563,6 +1591,11 @@ public class Chunk implements AABBObject
 		return aabb;
 	}
 
+	private void needsNewVisibleContentAABB()
+	{
+		_newVisibilityContentAABBNeeded = true;
+	}
+
 	public AABB getContentAABB()
 	{
 		return _contentAABB;
@@ -1570,6 +1603,10 @@ public class Chunk implements AABBObject
 
 	public AABB getVisibleContentAABB()
 	{
+		if (_newVisibilityContentAABBNeeded)
+		{
+			buildVisibileContentAABB();
+		}
 		return _visibleContentAABB;
 	}
 

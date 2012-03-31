@@ -18,6 +18,7 @@ public class RedstoneLamp extends DefaultBlock implements RedstoneLogic
 {
 
 	private final static DefaultBlockBrush BRUSH_POWERED;
+	public static final byte LUMINOSITY = 15;
 
 	static
 	{

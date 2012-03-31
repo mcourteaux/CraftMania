@@ -17,7 +17,6 @@ package org.craftmania.blocks;
 
 import static org.lwjgl.opengl.GL11.*;
 
-import org.craftmania.game.TextureStorage;
 import org.craftmania.inventory.InventoryItem;
 import org.craftmania.math.Vec2f;
 import org.craftmania.math.Vec2i;
@@ -87,7 +86,6 @@ public final class BlockType extends InventoryItem
 		float hw = 15f;
 		float hh = 15f;
 
-		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		inventoryTexture.bind();
 
 		if (customInventoryImage != null)

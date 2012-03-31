@@ -265,7 +265,7 @@
         <center>0.5,0.3,0.5</center>
         <translucent>true</translucent>
         <hasRedstoneLogic>true</hasRedstoneLogic>
-        <luminosity>3</luminosity>
+        <luminosity>5</luminosity>
     </block>
     <block id="28" name="redstone_lamp">
     	<brush>

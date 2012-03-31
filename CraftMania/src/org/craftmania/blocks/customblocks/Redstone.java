@@ -16,6 +16,7 @@ import org.craftmania.math.Vec3f;
 import org.craftmania.math.Vec3i;
 import org.craftmania.world.Chunk;
 import org.craftmania.world.LightBuffer;
+import org.craftmania.world.Chunk.LightType;
 
 public class Redstone extends Block implements RedstoneLogic
 {
@@ -25,6 +26,8 @@ public class Redstone extends Block implements RedstoneLogic
 	private static final float MINIMUM_TERRAIN_SIZE = 3.0f / 16.0f;
 	private static final Vec2f TEXTURE_CENTER_CROSS;
 	private static final Vec2f TEXTURE_CENTER_LINE;
+	private static final float COLOR_INTENSITY_LOOKUP_TABLE[];
+	public static final byte LUMINOSITY = 4;
 
 	static
 	{
@@ -33,6 +36,12 @@ public class Redstone extends Block implements RedstoneLogic
 
 		TEXTURE_CENTER_CROSS.scale(16.0f / 256.0f);
 		TEXTURE_CENTER_LINE.scale(16.0f / 256.0f);
+
+		COLOR_INTENSITY_LOOKUP_TABLE = new float[MAXIMUM_REDSTONE_TRAVELING_DISTANCE + 1];
+		for (int i = 0; i < COLOR_INTENSITY_LOOKUP_TABLE.length; ++i)
+		{
+			COLOR_INTENSITY_LOOKUP_TABLE[i] = (float) (1.0f - Math.pow(1.17f, -i - 3));
+		}
 	}
 
 	private int _connectionCount;
@@ -53,16 +62,19 @@ public class Redstone extends Block implements RedstoneLogic
 	@Override
 	public void feed(int power)
 	{
-		if (power <= 0) return;
+		if (power <= 0)
+			return;
 		if (!_powered || power > _power)
 		{
 			_chunk.needsNewVBO();
 			_power = Math.max(_power, power);
 			_powered = true;
 			refeedNeighbors();
+			/* Spread the light */
+			_chunk.spreadLight(getX(), getY(), getZ(), LUMINOSITY, LightType.BLOCK);
 		}
 	}
-	
+
 	public void refeedNeighbors()
 	{
 		/* Conduct the power */
@@ -79,7 +91,8 @@ public class Redstone extends Block implements RedstoneLogic
 	@Override
 	public void unfeed(int power)
 	{
-		if (power <= 0) return;
+		if (power <= 0)
+			return;
 		if (_powered)
 		{
 			_chunk.needsNewVBO();
@@ -95,6 +108,8 @@ public class Redstone extends Block implements RedstoneLogic
 						unfeedNeighbor(Side.getSide(i), _power - 1);
 					}
 				}
+				/* Unspread the light */
+				_chunk.unspreadLight(getX(), getY(), getZ(), LUMINOSITY, LightType.BLOCK);
 				_power = 0;
 			} else
 			{
@@ -142,7 +157,7 @@ public class Redstone extends Block implements RedstoneLogic
 			v.scale(0.2f);
 		} else
 		{
-			v.scale(((float) _power) / ((float) MAXIMUM_REDSTONE_TRAVELING_DISTANCE));
+			v.scale(COLOR_INTENSITY_LOOKUP_TABLE[_power]);
 		}
 		System.out.printf("Store Redstone (%b, %b, %b, %b)%n", connectedL, connectedR, connectedF, connectedB);
 		if ((_connectionCount == 1 && (connectedL || connectedR)) || (_connectionCount == 2 && (connectedL && connectedR)))
@@ -380,6 +395,11 @@ public class Redstone extends Block implements RedstoneLogic
 	@Override
 	public void destruct()
 	{
+		if (_powered)
+		{
+			/* Unspread the light */
+			_chunk.unspreadLight(getX(), getY(), getZ(), LUMINOSITY, LightType.BLOCK);
+		}
 		disconnect(Side.BACK);
 		disconnect(Side.FRONT);
 		disconnect(Side.LEFT);
