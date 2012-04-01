@@ -77,13 +77,16 @@ public class Redstone extends Block implements RedstoneLogic
 
 	public void refeedNeighbors()
 	{
-		/* Conduct the power */
-		for (int i = 0, j = 0; i < 6 && j < _connectionCount; ++i)
+		if (_power > 1)
 		{
-			if (_connections[i])
+			/* Conduct the power */
+			for (int i = 0, j = 0; i < 6 && j < _connectionCount; ++i)
 			{
-				++j;
-				feedNeighbor(Side.getSide(i), _power - 1);
+				if (_connections[i])
+				{
+					++j;
+					feedNeighbor(Side.getSide(i), _power - 1);
+				}
 			}
 		}
 	}
@@ -148,6 +151,16 @@ public class Redstone extends Block implements RedstoneLogic
 		boolean connectedF = _connections[Side.FRONT.ordinal()];
 		boolean connectedB = _connections[Side.BACK.ordinal()];
 
+		int cons = _connectionCount;
+		if (_connections[Side.TOP.ordinal()])
+		{
+			cons--;
+		}
+		if (_connections[Side.BOTTOM.ordinal()])
+		{
+			cons--;
+		}
+
 		float x = getX() + 0.5f;
 		float y = getY() + 0.02f;
 		float z = getZ() + 0.5f;
@@ -160,7 +173,7 @@ public class Redstone extends Block implements RedstoneLogic
 			v.scale(COLOR_INTENSITY_LOOKUP_TABLE[_power]);
 		}
 		System.out.printf("Store Redstone (%b, %b, %b, %b)%n", connectedL, connectedR, connectedF, connectedB);
-		if ((_connectionCount == 1 && (connectedL || connectedR)) || (_connectionCount == 2 && (connectedL && connectedR)))
+		if ((cons == 1 && (connectedL || connectedR)) || (cons == 2 && (connectedL && connectedR)))
 		{
 			put3f(vbo, x - 0.5f, y, z - 0.5f);
 			putColorWithLight4(vbo, v, lightBuffer.get(1, 1, 1), lightBuffer.get(0, 1, 0), lightBuffer.get(1, 1, 0), lightBuffer.get(0, 1, 1));
@@ -177,7 +190,7 @@ public class Redstone extends Block implements RedstoneLogic
 			put3f(vbo, x - 0.5f, y, z + 0.5f);
 			putColorWithLight4(vbo, v, lightBuffer.get(1, 1, 1), lightBuffer.get(0, 1, 2), lightBuffer.get(1, 1, 2), lightBuffer.get(0, 1, 1));
 			put2f(vbo, TEXTURE_CENTER_LINE.x() - MAXIMUM_TEXTURE_SIZE, TEXTURE_CENTER_LINE.y() + MAXIMUM_TEXTURE_SIZE);
-		} else if ((_connectionCount == 1 && (connectedF || connectedB)) || (_connectionCount == 2 && (connectedF && connectedB)))
+		} else if ((cons == 1 && (connectedF || connectedB)) || (cons == 2 && (connectedF && connectedB)))
 		{
 			put3f(vbo, x - 0.5f, y, z - 0.5f);
 			putColorWithLight4(vbo, v, lightBuffer.get(1, 1, 1), lightBuffer.get(0, 1, 0), lightBuffer.get(1, 1, 0), lightBuffer.get(0, 1, 1));
@@ -194,7 +207,7 @@ public class Redstone extends Block implements RedstoneLogic
 			put3f(vbo, x - 0.5f, y, z + 0.5f);
 			putColorWithLight4(vbo, v, lightBuffer.get(1, 1, 1), lightBuffer.get(0, 1, 2), lightBuffer.get(1, 1, 2), lightBuffer.get(0, 1, 1));
 			put2f(vbo, TEXTURE_CENTER_LINE.x() + MAXIMUM_TEXTURE_SIZE, TEXTURE_CENTER_LINE.y() + MAXIMUM_TEXTURE_SIZE);
-		} else if (_connectionCount == 2 && (connectedL && connectedB))
+		} else if (cons == 2 && (connectedL && connectedB))
 		{
 			put3f(vbo, x - 0.5f, y, z - 0.5f);
 			putColorWithLight4(vbo, v, lightBuffer.get(1, 1, 1), lightBuffer.get(0, 1, 0), lightBuffer.get(1, 1, 0), lightBuffer.get(0, 1, 1));
@@ -211,7 +224,7 @@ public class Redstone extends Block implements RedstoneLogic
 			put3f(vbo, x - 0.5f, y, z + MINIMUM_TERRAIN_SIZE);
 			putColorWithLight4(vbo, v, lightBuffer.get(1, 1, 1), lightBuffer.get(0, 1, 2), lightBuffer.get(1, 1, 2), lightBuffer.get(0, 1, 1));
 			put2f(vbo, TEXTURE_CENTER_CROSS.x() - MAXIMUM_TEXTURE_SIZE, TEXTURE_CENTER_CROSS.y() + MINIMUM_TEXTURE_SIZE);
-		} else if (_connectionCount == 2 && (connectedR && connectedB))
+		} else if (cons == 2 && (connectedR && connectedB))
 		{
 			put3f(vbo, x - MINIMUM_TERRAIN_SIZE, y, z - 0.5f);
 			putColorWithLight4(vbo, v, lightBuffer.get(1, 1, 1), lightBuffer.get(0, 1, 0), lightBuffer.get(1, 1, 0), lightBuffer.get(0, 1, 1));
@@ -228,7 +241,7 @@ public class Redstone extends Block implements RedstoneLogic
 			put3f(vbo, x - MINIMUM_TERRAIN_SIZE, y, z + MINIMUM_TERRAIN_SIZE);
 			putColorWithLight4(vbo, v, lightBuffer.get(1, 1, 1), lightBuffer.get(0, 1, 2), lightBuffer.get(1, 1, 2), lightBuffer.get(0, 1, 1));
 			put2f(vbo, TEXTURE_CENTER_CROSS.x() - MINIMUM_TEXTURE_SIZE, TEXTURE_CENTER_CROSS.y() + MINIMUM_TEXTURE_SIZE);
-		} else if (_connectionCount == 2 && (connectedR && connectedF))
+		} else if (cons == 2 && (connectedR && connectedF))
 		{
 			put3f(vbo, x - MINIMUM_TERRAIN_SIZE, y, z - MINIMUM_TERRAIN_SIZE);
 			putColorWithLight4(vbo, v, lightBuffer.get(1, 1, 1), lightBuffer.get(0, 1, 0), lightBuffer.get(1, 1, 0), lightBuffer.get(0, 1, 1));
@@ -245,7 +258,7 @@ public class Redstone extends Block implements RedstoneLogic
 			put3f(vbo, x - MINIMUM_TERRAIN_SIZE, y, z + 0.5f);
 			putColorWithLight4(vbo, v, lightBuffer.get(1, 1, 1), lightBuffer.get(0, 1, 2), lightBuffer.get(1, 1, 2), lightBuffer.get(0, 1, 1));
 			put2f(vbo, TEXTURE_CENTER_CROSS.x() - MINIMUM_TEXTURE_SIZE, TEXTURE_CENTER_CROSS.y() + MAXIMUM_TEXTURE_SIZE);
-		} else if (_connectionCount == 2 && (connectedL && connectedF))
+		} else if (cons == 2 && (connectedL && connectedF))
 		{
 			put3f(vbo, x - 0.5f, y, z - MINIMUM_TERRAIN_SIZE);
 			putColorWithLight4(vbo, v, lightBuffer.get(1, 1, 1), lightBuffer.get(0, 1, 0), lightBuffer.get(1, 1, 0), lightBuffer.get(0, 1, 1));
@@ -262,7 +275,7 @@ public class Redstone extends Block implements RedstoneLogic
 			put3f(vbo, x - 0.5f, y, z + 0.5f);
 			putColorWithLight4(vbo, v, lightBuffer.get(1, 1, 1), lightBuffer.get(0, 1, 2), lightBuffer.get(1, 1, 2), lightBuffer.get(0, 1, 1));
 			put2f(vbo, TEXTURE_CENTER_CROSS.x() - MAXIMUM_TEXTURE_SIZE, TEXTURE_CENTER_CROSS.y() + MAXIMUM_TEXTURE_SIZE);
-		} else if (_connectionCount == 3 && (connectedR && connectedL && connectedB))
+		} else if (cons == 3 && (connectedR && connectedL && connectedB))
 		{
 			put3f(vbo, x - 0.5f, y, z - 0.5f);
 			putColorWithLight4(vbo, v, lightBuffer.get(1, 1, 1), lightBuffer.get(0, 1, 0), lightBuffer.get(1, 1, 0), lightBuffer.get(0, 1, 1));
@@ -279,7 +292,7 @@ public class Redstone extends Block implements RedstoneLogic
 			put3f(vbo, x - 0.5f, y, z + MINIMUM_TERRAIN_SIZE);
 			putColorWithLight4(vbo, v, lightBuffer.get(1, 1, 1), lightBuffer.get(0, 1, 2), lightBuffer.get(1, 1, 2), lightBuffer.get(0, 1, 1));
 			put2f(vbo, TEXTURE_CENTER_CROSS.x() - MAXIMUM_TEXTURE_SIZE, TEXTURE_CENTER_CROSS.y() + MINIMUM_TEXTURE_SIZE);
-		} else if (_connectionCount == 3 && (connectedR && connectedL && connectedF))
+		} else if (cons == 3 && (connectedR && connectedL && connectedF))
 		{
 			put3f(vbo, x - 0.5f, y, z - MINIMUM_TERRAIN_SIZE);
 			putColorWithLight4(vbo, v, lightBuffer.get(1, 1, 1), lightBuffer.get(0, 1, 0), lightBuffer.get(1, 1, 0), lightBuffer.get(0, 1, 1));
@@ -296,7 +309,7 @@ public class Redstone extends Block implements RedstoneLogic
 			put3f(vbo, x - 0.5f, y, z + 0.5f);
 			putColorWithLight4(vbo, v, lightBuffer.get(1, 1, 1), lightBuffer.get(0, 1, 2), lightBuffer.get(1, 1, 2), lightBuffer.get(0, 1, 1));
 			put2f(vbo, TEXTURE_CENTER_CROSS.x() - MAXIMUM_TEXTURE_SIZE, TEXTURE_CENTER_CROSS.y() + MAXIMUM_TEXTURE_SIZE);
-		} else if (_connectionCount == 3 && (connectedR && connectedF && connectedB))
+		} else if (cons == 3 && (connectedR && connectedF && connectedB))
 		{
 			put3f(vbo, x - MINIMUM_TERRAIN_SIZE, y, z - 0.5f);
 			putColorWithLight4(vbo, v, lightBuffer.get(1, 1, 1), lightBuffer.get(0, 1, 0), lightBuffer.get(1, 1, 0), lightBuffer.get(0, 1, 1));
@@ -313,7 +326,7 @@ public class Redstone extends Block implements RedstoneLogic
 			put3f(vbo, x - MINIMUM_TERRAIN_SIZE, y, z + 0.5f);
 			putColorWithLight4(vbo, v, lightBuffer.get(1, 1, 1), lightBuffer.get(0, 1, 2), lightBuffer.get(1, 1, 2), lightBuffer.get(0, 1, 1));
 			put2f(vbo, TEXTURE_CENTER_CROSS.x() - MINIMUM_TEXTURE_SIZE, TEXTURE_CENTER_CROSS.y() + MAXIMUM_TEXTURE_SIZE);
-		} else if (_connectionCount == 3 && (connectedL && connectedF && connectedB))
+		} else if (cons == 3 && (connectedL && connectedF && connectedB))
 		{
 			put3f(vbo, x - 0.5f, y, z - 0.5f);
 			putColorWithLight4(vbo, v, lightBuffer.get(1, 1, 1), lightBuffer.get(0, 1, 0), lightBuffer.get(1, 1, 0), lightBuffer.get(0, 1, 1));
@@ -330,7 +343,7 @@ public class Redstone extends Block implements RedstoneLogic
 			put3f(vbo, x - 0.5f, y, z + 0.5f);
 			putColorWithLight4(vbo, v, lightBuffer.get(1, 1, 1), lightBuffer.get(0, 1, 2), lightBuffer.get(1, 1, 2), lightBuffer.get(0, 1, 1));
 			put2f(vbo, TEXTURE_CENTER_CROSS.x() - MAXIMUM_TEXTURE_SIZE, TEXTURE_CENTER_CROSS.y() + MAXIMUM_TEXTURE_SIZE);
-		} else if (_connectionCount == 4 || _connectionCount == 0)
+		} else if (cons == 4 || cons == 0)
 		{
 			put3f(vbo, x - 0.5f, y, z - 0.5f);
 			putColorWithLight4(vbo, v, lightBuffer.get(1, 1, 1), lightBuffer.get(0, 1, 0), lightBuffer.get(1, 1, 0), lightBuffer.get(0, 1, 1));
