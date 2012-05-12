@@ -15,6 +15,11 @@
  ******************************************************************************/
 package org.craftmania.world;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -95,6 +100,31 @@ public class World
 		_chunkDistanceComparator = new ChunkDistanceComparator();
 		_fogColor = new Vec3f();
 		_time = SECONDS_IN_DAY * 0.3f;
+		
+	}
+
+	public World(String name) throws Exception
+	{
+		this(name, loadSeed(name));
+	}
+
+	private static long loadSeed(String world)
+	{
+		try
+		{
+			File file = Game.getInstance().getRelativeFile(Game.FILE_BASE_USER_DATA, world + "/seed");
+			if (file.exists())
+			{
+				DataInputStream dis = new DataInputStream(new FileInputStream(file));
+				long seed = dis.readLong();
+				dis.close();
+				return seed;
+			}
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return System.nanoTime();
 	}
 
 	public void save() throws Exception
@@ -121,6 +151,14 @@ public class World
 			_chunkManager.saveAndUnloadChunk(chunk, false);
 		}
 		_localChunks.clear();
+		
+		/* Save the seed */
+		{
+			File file = Game.getInstance().getRelativeFile(Game.FILE_BASE_USER_DATA, "${world}/seed");
+			DataOutputStream dos = new DataOutputStream(new FileOutputStream(file));
+			dos.writeLong(_worldSeed);
+			dos.close();
+		}
 	}
 
 	public void render()
@@ -391,7 +429,7 @@ public class World
 		updateLocalChunks();
 
 		_chunkManager.performRememberedBlockChanges();
-		
+
 		/* Perform the redstone power respreading */
 		for (int i = 0; i < _redstoneRefeedPoints.size(); ++i)
 		{

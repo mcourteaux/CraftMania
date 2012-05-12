@@ -700,6 +700,8 @@ public class Player extends GameObject
 
 		/* Selected inventory index */
 		dos.writeByte(_selectedInventoryItemIndex);
+		
+		dos.close();
 
 	}
 
@@ -734,6 +736,8 @@ public class Player extends GameObject
 		_selectedInventoryItemIndex = dis.readByte();
 		setSelectedInventoryItemIndex(_selectedInventoryItemIndex);
 
+		dis.close();
+		
 		return true;
 	}
 

@@ -1,0 +1,1409 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<BugCollection version="2.0.0" sequence="0" timestamp="1332017590000" analysisTimestamp="1332074075594" release="">
+  <Project projectName="CraftMania">
+    <Jar>/Users/martijncourteaux/git/CraftMania/CraftMania/bin</Jar>
+    <SrcDir>/Users/martijncourteaux/git/CraftMania/CraftMania/src</SrcDir>
+    <WrkDir>/Users/martijncourteaux/git/CraftMania</WrkDir>
+  </Project>
+  <BugInstance type="DM_DEFAULT_ENCODING" priority="1" abbrev="Dm" category="I18N">
+    <Class classname="org.craftmania.CraftMania$1">
+      <SourceLine classname="org.craftmania.CraftMania$1" sourcefile="CraftMania.java" sourcepath="org/craftmania/CraftMania.java"/>
+    </Class>
+    <Method classname="org.craftmania.CraftMania$1" name="uncaughtException" signature="(Ljava/lang/Thread;Ljava/lang/Throwable;)V" isStatic="false">
+      <SourceLine classname="org.craftmania.CraftMania$1" start="68" end="75" startBytecode="0" endBytecode="146" sourcefile="CraftMania.java" sourcepath="org/craftmania/CraftMania.java"/>
+    </Method>
+    <Method classname="java.io.ByteArrayOutputStream" name="toString" signature="()Ljava/lang/String;" isStatic="false" role="METHOD_CALLED">
+      <SourceLine classname="java.io.ByteArrayOutputStream" start="163" end="163" startBytecode="0" endBytecode="40" sourcefile="ByteArrayOutputStream.java" sourcepath="java/io/ByteArrayOutputStream.java"/>
+    </Method>
+    <SourceLine classname="org.craftmania.CraftMania$1" start="73" end="73" startBytecode="46" endBytecode="46" sourcefile="CraftMania.java" sourcepath="org/craftmania/CraftMania.java"/>
+  </BugInstance>
+  <BugInstance type="DM_DEFAULT_ENCODING" priority="1" abbrev="Dm" category="I18N">
+    <Class classname="org.craftmania.CraftMania$1">
+      <SourceLine classname="org.craftmania.CraftMania$1" sourcefile="CraftMania.java" sourcepath="org/craftmania/CraftMania.java"/>
+    </Class>
+    <Method classname="org.craftmania.CraftMania$1" name="uncaughtException" signature="(Ljava/lang/Thread;Ljava/lang/Throwable;)V" isStatic="false">
+      <SourceLine classname="org.craftmania.CraftMania$1" start="68" end="75" startBytecode="0" endBytecode="146" sourcefile="CraftMania.java" sourcepath="org/craftmania/CraftMania.java"/>
+    </Method>
+    <Method classname="java.io.PrintStream" name="&lt;init&gt;" signature="(Ljava/io/OutputStream;Z)V" isStatic="false" role="METHOD_CALLED">
+      <SourceLine classname="java.io.PrintStream" start="99" end="101" startBytecode="0" endBytecode="50" sourcefile="PrintStream.java" sourcepath="java/io/PrintStream.java"/>
+    </Method>
+    <SourceLine classname="org.craftmania.CraftMania$1" start="71" end="71" startBytecode="19" endBytecode="19" sourcefile="CraftMania.java" sourcepath="org/craftmania/CraftMania.java"/>
+  </BugInstance>
+  <BugInstance type="EI_EXPOSE_REP" priority="2" abbrev="EI" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.Side">
+      <SourceLine classname="org.craftmania.Side" sourcefile="Side.java" sourcepath="org/craftmania/Side.java"/>
+    </Class>
+    <Method classname="org.craftmania.Side" name="getFaceVertices" signature="()[Lorg/craftmania/math/Vec3f;" isStatic="false">
+      <SourceLine classname="org.craftmania.Side" start="79" end="79" startBytecode="0" endBytecode="46" sourcefile="Side.java" sourcepath="org/craftmania/Side.java"/>
+    </Method>
+    <Field classname="org.craftmania.Side" name="vertices" signature="[Lorg/craftmania/math/Vec3f;" isStatic="false">
+      <SourceLine classname="org.craftmania.Side" sourcefile="Side.java" sourcepath="org/craftmania/Side.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.Side" start="79" end="79" startBytecode="4" endBytecode="4" sourcefile="Side.java" sourcepath="org/craftmania/Side.java"/>
+  </BugInstance>
+  <BugInstance type="MS_EXPOSE_REP" priority="2" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.Side">
+      <SourceLine classname="org.craftmania.Side" sourcefile="Side.java" sourcepath="org/craftmania/Side.java"/>
+    </Class>
+    <Method classname="org.craftmania.Side" name="getSides" signature="()[Lorg/craftmania/Side;" isStatic="true">
+      <SourceLine classname="org.craftmania.Side" start="97" end="101" startBytecode="0" endBytecode="64" sourcefile="Side.java" sourcepath="org/craftmania/Side.java"/>
+    </Method>
+    <Field classname="org.craftmania.Side" name="_cachedValues" signature="[Lorg/craftmania/Side;" isStatic="true">
+      <SourceLine classname="org.craftmania.Side" sourcefile="Side.java" sourcepath="org/craftmania/Side.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.Side" start="101" end="101" startBytecode="15" endBytecode="15" sourcefile="Side.java" sourcepath="org/craftmania/Side.java"/>
+  </BugInstance>
+  <BugInstance type="IS2_INCONSISTENT_SYNC" priority="2" abbrev="IS" category="MT_CORRECTNESS">
+    <Class classname="org.craftmania.blocks.Block">
+      <SourceLine classname="org.craftmania.blocks.Block" sourcefile="Block.java" sourcepath="org/craftmania/blocks/Block.java"/>
+    </Class>
+    <Field classname="org.craftmania.blocks.Block" name="_rendering" signature="Z" isStatic="false">
+      <SourceLine classname="org.craftmania.blocks.Block" sourcefile="Block.java" sourcepath="org/craftmania/blocks/Block.java"/>
+    </Field>
+    <Int value="57" role="INT_SYNC_PERCENT"/>
+    <SourceLine classname="org.craftmania.blocks.Block" start="128" end="128" startBytecode="1" endBytecode="1" sourcefile="Block.java" sourcepath="org/craftmania/blocks/Block.java" role="SOURCE_LINE_UNSYNC_ACCESS"/>
+    <SourceLine classname="org.craftmania.blocks.Block" start="131" end="131" startBytecode="23" endBytecode="23" sourcefile="Block.java" sourcepath="org/craftmania/blocks/Block.java" role="SOURCE_LINE_UNSYNC_ACCESS"/>
+    <SourceLine classname="org.craftmania.blocks.Block" start="239" end="239" startBytecode="1" endBytecode="1" sourcefile="Block.java" sourcepath="org/craftmania/blocks/Block.java" role="SOURCE_LINE_UNSYNC_ACCESS"/>
+    <SourceLine classname="org.craftmania.blocks.Block" start="138" end="138" startBytecode="1" endBytecode="1" sourcefile="Block.java" sourcepath="org/craftmania/blocks/Block.java" role="SOURCE_LINE_SYNC_ACCESS"/>
+    <SourceLine classname="org.craftmania.blocks.Block" start="141" end="141" startBytecode="23" endBytecode="23" sourcefile="Block.java" sourcepath="org/craftmania/blocks/Block.java" role="SOURCE_LINE_SYNC_ACCESS"/>
+    <SourceLine classname="org.craftmania.blocks.Block" start="214" end="214" startBytecode="2" endBytecode="2" sourcefile="Block.java" sourcepath="org/craftmania/blocks/Block.java" role="SOURCE_LINE_SYNC_ACCESS"/>
+    <SourceLine classname="org.craftmania.blocks.DefaultBlock" start="267" end="267" startBytecode="6" endBytecode="6" sourcefile="DefaultBlock.java" sourcepath="org/craftmania/blocks/DefaultBlock.java" role="SOURCE_LINE_SYNC_ACCESS"/>
+  </BugInstance>
+  <BugInstance type="IS2_INCONSISTENT_SYNC" priority="2" abbrev="IS" category="MT_CORRECTNESS" last="0" removedByChange="true">
+    <Class classname="org.craftmania.blocks.Block">
+      <SourceLine classname="org.craftmania.blocks.Block" sourcefile="Block.java" sourcepath="org/craftmania/blocks/Block.java"/>
+    </Class>
+    <Field classname="org.craftmania.blocks.Block" name="_rendering" signature="Z" isStatic="false">
+      <SourceLine classname="org.craftmania.blocks.Block" sourcefile="Block.java" sourcepath="org/craftmania/blocks/Block.java"/>
+    </Field>
+    <Int value="57" role="INT_SYNC_PERCENT"/>
+    <SourceLine classname="org.craftmania.blocks.Block" start="128" end="128" startBytecode="1" endBytecode="1" sourcefile="Block.java" sourcepath="org/craftmania/blocks/Block.java" role="SOURCE_LINE_UNSYNC_ACCESS"/>
+    <SourceLine classname="org.craftmania.blocks.Block" start="131" end="131" startBytecode="23" endBytecode="23" sourcefile="Block.java" sourcepath="org/craftmania/blocks/Block.java" role="SOURCE_LINE_UNSYNC_ACCESS"/>
+    <SourceLine classname="org.craftmania.blocks.Block" start="239" end="239" startBytecode="1" endBytecode="1" sourcefile="Block.java" sourcepath="org/craftmania/blocks/Block.java" role="SOURCE_LINE_UNSYNC_ACCESS"/>
+    <SourceLine classname="org.craftmania.blocks.Block" start="138" end="138" startBytecode="1" endBytecode="1" sourcefile="Block.java" sourcepath="org/craftmania/blocks/Block.java" role="SOURCE_LINE_SYNC_ACCESS"/>
+    <SourceLine classname="org.craftmania.blocks.Block" start="141" end="141" startBytecode="23" endBytecode="23" sourcefile="Block.java" sourcepath="org/craftmania/blocks/Block.java" role="SOURCE_LINE_SYNC_ACCESS"/>
+    <SourceLine classname="org.craftmania.blocks.Block" start="214" end="214" startBytecode="2" endBytecode="2" sourcefile="Block.java" sourcepath="org/craftmania/blocks/Block.java" role="SOURCE_LINE_SYNC_ACCESS"/>
+    <SourceLine classname="org.craftmania.blocks.DefaultBlock" start="267" end="267" startBytecode="6" endBytecode="6" sourcefile="DefaultBlock.java" sourcepath="org/craftmania/blocks/DefaultBlock.java" role="SOURCE_LINE_SYNC_ACCESS"/>
+  </BugInstance>
+  <BugInstance type="DMI_INVOKING_TOSTRING_ON_ARRAY" priority="2" abbrev="USELESS_STRING" category="CORRECTNESS">
+    <Class classname="org.craftmania.blocks.BlockManager">
+      <SourceLine classname="org.craftmania.blocks.BlockManager" sourcefile="BlockManager.java" sourcepath="org/craftmania/blocks/BlockManager.java"/>
+    </Class>
+    <Method classname="org.craftmania.blocks.BlockManager" name="load" signature="()V" isStatic="false">
+      <SourceLine classname="org.craftmania.blocks.BlockManager" start="65" end="103" startBytecode="0" endBytecode="389" sourcefile="BlockManager.java" sourcepath="org/craftmania/blocks/BlockManager.java"/>
+    </Method>
+    <Field classname="org.craftmania.blocks.BlockManager" name="_blockTypes" signature="[Lorg/craftmania/blocks/BlockType;" isStatic="false" role="FIELD_VALUE_OF">
+      <SourceLine classname="org.craftmania.blocks.BlockManager" sourcefile="BlockManager.java" sourcepath="org/craftmania/blocks/BlockManager.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.blocks.BlockManager" start="102" end="102" startBytecode="170" endBytecode="170" sourcefile="BlockManager.java" sourcepath="org/craftmania/blocks/BlockManager.java"/>
+  </BugInstance>
+  <BugInstance type="DMI_INVOKING_TOSTRING_ON_ARRAY" priority="2" abbrev="USELESS_STRING" category="CORRECTNESS">
+    <Class classname="org.craftmania.blocks.BlockManager">
+      <SourceLine classname="org.craftmania.blocks.BlockManager" sourcefile="BlockManager.java" sourcepath="org/craftmania/blocks/BlockManager.java"/>
+    </Class>
+    <Method classname="org.craftmania.blocks.BlockManager" name="load" signature="()V" isStatic="false">
+      <SourceLine classname="org.craftmania.blocks.BlockManager" start="65" end="106" startBytecode="0" endBytecode="389" sourcefile="BlockManager.java" sourcepath="org/craftmania/blocks/BlockManager.java"/>
+    </Method>
+    <Field classname="org.craftmania.blocks.BlockManager" name="_blockTypes" signature="[Lorg/craftmania/blocks/BlockType;" isStatic="false" role="FIELD_VALUE_OF">
+      <SourceLine classname="org.craftmania.blocks.BlockManager" sourcefile="BlockManager.java" sourcepath="org/craftmania/blocks/BlockManager.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.blocks.BlockManager" start="105" end="105" startBytecode="170" endBytecode="170" sourcefile="BlockManager.java" sourcepath="org/craftmania/blocks/BlockManager.java"/>
+  </BugInstance>
+  <BugInstance type="LI_LAZY_INIT_STATIC" priority="2" abbrev="LI" category="MT_CORRECTNESS">
+    <Class classname="org.craftmania.blocks.BlockManager">
+      <SourceLine classname="org.craftmania.blocks.BlockManager" sourcefile="BlockManager.java" sourcepath="org/craftmania/blocks/BlockManager.java"/>
+    </Class>
+    <Method classname="org.craftmania.blocks.BlockManager" name="getInstance" signature="()Lorg/craftmania/blocks/BlockManager;" isStatic="true">
+      <SourceLine classname="org.craftmania.blocks.BlockManager" start="43" end="57" startBytecode="0" endBytecode="24" sourcefile="BlockManager.java" sourcepath="org/craftmania/blocks/BlockManager.java"/>
+    </Method>
+    <Field classname="org.craftmania.blocks.BlockManager" name="__instance" signature="Lorg/craftmania/blocks/BlockManager;" isStatic="true" role="FIELD_ON">
+      <SourceLine classname="org.craftmania.blocks.BlockManager" sourcefile="BlockManager.java" sourcepath="org/craftmania/blocks/BlockManager.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.blocks.BlockManager" start="43" end="49" startBytecode="0" endBytecode="19" sourcefile="BlockManager.java" sourcepath="org/craftmania/blocks/BlockManager.java"/>
+  </BugInstance>
+  <BugInstance type="LI_LAZY_INIT_STATIC" priority="2" abbrev="LI" category="MT_CORRECTNESS" last="0" removedByChange="true">
+    <Class classname="org.craftmania.blocks.BlockManager">
+      <SourceLine classname="org.craftmania.blocks.BlockManager" sourcefile="BlockManager.java" sourcepath="org/craftmania/blocks/BlockManager.java"/>
+    </Class>
+    <Method classname="org.craftmania.blocks.BlockManager" name="getInstance" signature="()Lorg/craftmania/blocks/BlockManager;" isStatic="true">
+      <SourceLine classname="org.craftmania.blocks.BlockManager" start="43" end="57" startBytecode="0" endBytecode="24" sourcefile="BlockManager.java" sourcepath="org/craftmania/blocks/BlockManager.java"/>
+    </Method>
+    <Field classname="org.craftmania.blocks.BlockManager" name="__instance" signature="Lorg/craftmania/blocks/BlockManager;" isStatic="true" role="FIELD_ON">
+      <SourceLine classname="org.craftmania.blocks.BlockManager" sourcefile="BlockManager.java" sourcepath="org/craftmania/blocks/BlockManager.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.blocks.BlockManager" start="43" end="49" startBytecode="0" endBytecode="19" sourcefile="BlockManager.java" sourcepath="org/craftmania/blocks/BlockManager.java"/>
+  </BugInstance>
+  <BugInstance type="EI_EXPOSE_REP" priority="2" abbrev="EI" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.datastructures.AABB">
+      <SourceLine classname="org.craftmania.datastructures.AABB" sourcefile="AABB.java" sourcepath="org/craftmania/datastructures/AABB.java"/>
+    </Class>
+    <Method classname="org.craftmania.datastructures.AABB" name="getVertices" signature="()[Lorg/craftmania/math/Vec3f;" isStatic="false">
+      <SourceLine classname="org.craftmania.datastructures.AABB" start="197" end="209" startBytecode="0" endBytecode="143" sourcefile="AABB.java" sourcepath="org/craftmania/datastructures/AABB.java"/>
+    </Method>
+    <Field classname="org.craftmania.datastructures.AABB" name="_vertices" signature="[Lorg/craftmania/math/Vec3f;" isStatic="false">
+      <SourceLine classname="org.craftmania.datastructures.AABB" sourcefile="AABB.java" sourcepath="org/craftmania/datastructures/AABB.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.datastructures.AABB" start="209" end="209" startBytecode="51" endBytecode="51" sourcefile="AABB.java" sourcepath="org/craftmania/datastructures/AABB.java"/>
+  </BugInstance>
+  <BugInstance type="DM_DEFAULT_ENCODING" priority="1" abbrev="Dm" category="I18N">
+    <Class classname="org.craftmania.game.Configuration">
+      <SourceLine classname="org.craftmania.game.Configuration" sourcefile="Configuration.java" sourcepath="org/craftmania/game/Configuration.java"/>
+    </Class>
+    <Method classname="org.craftmania.game.Configuration" name="loadFromFile" signature="(Ljava/lang/String;)V" isStatic="false">
+      <SourceLine classname="org.craftmania.game.Configuration" start="139" end="192" startBytecode="0" endBytecode="645" sourcefile="Configuration.java" sourcepath="org/craftmania/game/Configuration.java"/>
+    </Method>
+    <Method classname="java.io.FileReader" name="&lt;init&gt;" signature="(Ljava/io/File;)V" isStatic="false" role="METHOD_CALLED">
+      <SourceLine classname="java.io.FileReader" start="55" end="56" startBytecode="0" endBytecode="40" sourcefile="FileReader.java" sourcepath="java/io/FileReader.java"/>
+    </Method>
+    <SourceLine classname="org.craftmania.game.Configuration" start="141" end="141" startBytecode="18" endBytecode="18" sourcefile="Configuration.java" sourcepath="org/craftmania/game/Configuration.java"/>
+  </BugInstance>
+  <BugInstance type="OS_OPEN_STREAM" priority="2" abbrev="OS" category="BAD_PRACTICE">
+    <Class classname="org.craftmania.game.Configuration">
+      <SourceLine classname="org.craftmania.game.Configuration" sourcefile="Configuration.java" sourcepath="org/craftmania/game/Configuration.java"/>
+    </Class>
+    <Method classname="org.craftmania.game.Configuration" name="loadFromFile" signature="(Ljava/lang/String;)V" isStatic="false">
+      <SourceLine classname="org.craftmania.game.Configuration" start="139" end="192" startBytecode="0" endBytecode="143" sourcefile="Configuration.java" sourcepath="org/craftmania/game/Configuration.java"/>
+    </Method>
+    <Type descriptor="Ljava/io/Reader;" role="TYPE_CLOSEIT">
+      <SourceLine classname="java.io.Reader" start="49" end="232" sourcefile="Reader.java" sourcepath="java/io/Reader.java"/>
+    </Type>
+    <SourceLine classname="org.craftmania.game.Configuration" start="141" end="141" startBytecode="9" endBytecode="9" sourcefile="Configuration.java" sourcepath="org/craftmania/game/Configuration.java"/>
+  </BugInstance>
+  <BugInstance type="OS_OPEN_STREAM" priority="2" abbrev="OS" category="BAD_PRACTICE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.game.Configuration">
+      <SourceLine classname="org.craftmania.game.Configuration" sourcefile="Configuration.java" sourcepath="org/craftmania/game/Configuration.java"/>
+    </Class>
+    <Method classname="org.craftmania.game.Configuration" name="loadFromFile" signature="(Ljava/lang/String;)V" isStatic="false">
+      <SourceLine classname="org.craftmania.game.Configuration" start="139" end="192" startBytecode="0" endBytecode="143" sourcefile="Configuration.java" sourcepath="org/craftmania/game/Configuration.java"/>
+    </Method>
+    <Type descriptor="Ljava/io/Reader;" role="TYPE_CLOSEIT">
+      <SourceLine classname="java.io.Reader" start="49" end="232" sourcefile="Reader.java" sourcepath="java/io/Reader.java"/>
+    </Type>
+    <SourceLine classname="org.craftmania.game.Configuration" start="141" end="141" startBytecode="9" endBytecode="9" sourcefile="Configuration.java" sourcepath="org/craftmania/game/Configuration.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="BUILD_OR_ACTION" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="47" end="47" startBytecode="57" endBytecode="57" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="BUILD_OR_ACTION" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="47" end="47" startBytecode="57" endBytecode="57" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="CROUCH" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="44" end="44" startBytecode="42" endBytecode="42" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="CROUCH" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="44" end="44" startBytecode="42" endBytecode="42" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="INVENTORY" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="45" end="45" startBytecode="47" endBytecode="47" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="INVENTORY" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="45" end="45" startBytecode="47" endBytecode="47" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="JUMP" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="43" end="43" startBytecode="37" endBytecode="37" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="JUMP" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="43" end="43" startBytecode="37" endBytecode="37" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="MOVE_BACK" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="38" end="38" startBytecode="25" endBytecode="25" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="MOVE_BACK" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="38" end="38" startBytecode="25" endBytecode="25" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="MOVE_FORWARD" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="37" end="37" startBytecode="21" endBytecode="21" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="MOVE_FORWARD" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="37" end="37" startBytecode="21" endBytecode="21" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="MOVE_LEFT" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="39" end="39" startBytecode="29" endBytecode="29" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="MOVE_LEFT" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="39" end="39" startBytecode="29" endBytecode="29" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="MOVE_RIGHT" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="40" end="40" startBytecode="33" endBytecode="33" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="MOVE_RIGHT" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="40" end="40" startBytecode="33" endBytecode="33" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="SET_SUN_HIGHT" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="53" end="53" startBytecode="77" endBytecode="77" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="SET_SUN_HIGHT" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="53" end="53" startBytecode="77" endBytecode="77" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="SMASH" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="46" end="46" startBytecode="52" endBytecode="52" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="SMASH" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="46" end="46" startBytecode="52" endBytecode="52" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="TOGGLE_GOD_MODE" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="50" end="50" startBytecode="62" endBytecode="62" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="TOGGLE_GOD_MODE" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="50" end="50" startBytecode="62" endBytecode="62" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="TOGGLE_LIGHT_POINT" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="51" end="51" startBytecode="67" endBytecode="67" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="TOGGLE_LIGHT_POINT" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="51" end="51" startBytecode="67" endBytecode="67" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="TOGGLE_OVERLAY" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="52" end="52" startBytecode="72" endBytecode="72" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.game.ControlSettings">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.ControlSettings" name="TOGGLE_OVERLAY" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.game.ControlSettings" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.ControlSettings" start="52" end="52" startBytecode="72" endBytecode="72" sourcefile="ControlSettings.java" sourcepath="org/craftmania/game/ControlSettings.java"/>
+  </BugInstance>
+  <BugInstance type="DM_EXIT" priority="2" abbrev="Dm" category="BAD_PRACTICE">
+    <Class classname="org.craftmania.game.Game">
+      <SourceLine classname="org.craftmania.game.Game" sourcefile="Game.java" sourcepath="org/craftmania/game/Game.java"/>
+    </Class>
+    <Method classname="org.craftmania.game.Game" name="init" signature="()V" isStatic="false">
+      <SourceLine classname="org.craftmania.game.Game" start="142" end="172" startBytecode="0" endBytecode="324" sourcefile="Game.java" sourcepath="org/craftmania/game/Game.java"/>
+    </Method>
+    <SourceLine classname="org.craftmania.game.Game" start="158" end="158" startBytecode="79" endBytecode="79" sourcefile="Game.java" sourcepath="org/craftmania/game/Game.java"/>
+  </BugInstance>
+  <BugInstance type="MS_CANNOT_BE_FINAL" priority="2" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.game.Game">
+      <SourceLine classname="org.craftmania.game.Game" sourcefile="Game.java" sourcepath="org/craftmania/game/Game.java"/>
+    </Class>
+    <Field classname="org.craftmania.game.Game" name="RENDER_INFORMATION_OVERLAY" signature="Z" isStatic="true">
+      <SourceLine classname="org.craftmania.game.Game" sourcefile="Game.java" sourcepath="org/craftmania/game/Game.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.game.Game" start="56" end="56" startBytecode="1" endBytecode="1" sourcefile="Game.java" sourcepath="org/craftmania/game/Game.java"/>
+  </BugInstance>
+  <BugInstance type="NP_NULL_ON_SOME_PATH" priority="2" abbrev="NP" category="CORRECTNESS">
+    <Class classname="org.craftmania.game.Game">
+      <SourceLine classname="org.craftmania.game.Game" sourcefile="Game.java" sourcepath="org/craftmania/game/Game.java"/>
+    </Class>
+    <Method classname="org.craftmania.game.Game" name="getUserDataFolder" signature="()Ljava/io/File;" isStatic="false">
+      <SourceLine classname="org.craftmania.game.Game" start="517" end="530" startBytecode="0" endBytecode="236" sourcefile="Game.java" sourcepath="org/craftmania/game/Game.java"/>
+    </Method>
+    <LocalVariable name="f" register="2" pc="82" role="LOCAL_VARIABLE_VALUE_OF"/>
+    <SourceLine classname="org.craftmania.game.Game" start="529" end="529" startBytecode="113" endBytecode="113" sourcefile="Game.java" sourcepath="org/craftmania/game/Game.java" role="SOURCE_LINE_DEREF"/>
+    <SourceLine classname="org.craftmania.game.Game" start="518" end="518" startBytecode="10" endBytecode="10" sourcefile="Game.java" sourcepath="org/craftmania/game/Game.java" role="SOURCE_LINE_NULL_VALUE"/>
+    <SourceLine classname="org.craftmania.game.Game" start="525" end="525" startBytecode="85" endBytecode="85" sourcefile="Game.java" sourcepath="org/craftmania/game/Game.java" role="SOURCE_LINE_KNOWN_NULL"/>
+    <Property name="edu.umd.cs.findbugs.detect.NullDerefProperty.LONG_RANGE_NULL_SOURCE" value="true"/>
+  </BugInstance>
+  <BugInstance type="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" priority="2" abbrev="RV" category="BAD_PRACTICE">
+    <Class classname="org.craftmania.game.Game">
+      <SourceLine classname="org.craftmania.game.Game" sourcefile="Game.java" sourcepath="org/craftmania/game/Game.java"/>
+    </Class>
+    <Method classname="org.craftmania.game.Game" name="getUserDataFolder" signature="()Ljava/io/File;" isStatic="false">
+      <SourceLine classname="org.craftmania.game.Game" start="517" end="530" startBytecode="0" endBytecode="236" sourcefile="Game.java" sourcepath="org/craftmania/game/Game.java"/>
+    </Method>
+    <Method classname="java.io.File" name="mkdir" signature="()Z" isStatic="false" role="METHOD_CALLED">
+      <SourceLine classname="java.io.File" start="1153" end="1157" startBytecode="0" endBytecode="59" sourcefile="File.java" sourcepath="java/io/File.java"/>
+    </Method>
+    <SourceLine classname="org.craftmania.game.Game" start="529" end="529" startBytecode="113" endBytecode="113" sourcefile="Game.java" sourcepath="org/craftmania/game/Game.java"/>
+  </BugInstance>
+  <BugInstance type="SIC_INNER_SHOULD_BE_STATIC" priority="2" abbrev="SIC" category="PERFORMANCE">
+    <Class classname="org.craftmania.inventory.CraftingTableInventory$CraftingTableInventoryRaster">
+      <SourceLine classname="org.craftmania.inventory.CraftingTableInventory$CraftingTableInventoryRaster" start="281" end="373" sourcefile="CraftingTableInventory.java" sourcepath="org/craftmania/inventory/CraftingTableInventory.java"/>
+    </Class>
+  </BugInstance>
+  <BugInstance type="SIC_INNER_SHOULD_BE_STATIC" priority="2" abbrev="SIC" category="PERFORMANCE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.inventory.CraftingTableInventory$CraftingTableInventoryRaster">
+      <SourceLine classname="org.craftmania.inventory.CraftingTableInventory$CraftingTableInventoryRaster" start="281" end="373" sourcefile="CraftingTableInventory.java" sourcepath="org/craftmania/inventory/CraftingTableInventory.java"/>
+    </Class>
+  </BugInstance>
+  <BugInstance type="SIC_INNER_SHOULD_BE_STATIC" priority="2" abbrev="SIC" category="PERFORMANCE">
+    <Class classname="org.craftmania.inventory.DefaultPlayerInventory$DefaultPlayerInventoryRaster">
+      <SourceLine classname="org.craftmania.inventory.DefaultPlayerInventory$DefaultPlayerInventoryRaster" start="334" end="433" sourcefile="DefaultPlayerInventory.java" sourcepath="org/craftmania/inventory/DefaultPlayerInventory.java"/>
+    </Class>
+  </BugInstance>
+  <BugInstance type="SIC_INNER_SHOULD_BE_STATIC" priority="2" abbrev="SIC" category="PERFORMANCE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.inventory.DefaultPlayerInventory$DefaultPlayerInventoryRaster">
+      <SourceLine classname="org.craftmania.inventory.DefaultPlayerInventory$DefaultPlayerInventoryRaster" start="334" end="433" sourcefile="DefaultPlayerInventory.java" sourcepath="org/craftmania/inventory/DefaultPlayerInventory.java"/>
+    </Class>
+  </BugInstance>
+  <BugInstance type="SIC_INNER_SHOULD_BE_STATIC" priority="2" abbrev="SIC" category="PERFORMANCE">
+    <Class classname="org.craftmania.inventory.DoubleContainerInventory$DoubleContainerInventoryRaster">
+      <SourceLine classname="org.craftmania.inventory.DoubleContainerInventory$DoubleContainerInventoryRaster" start="160" end="246" sourcefile="DoubleContainerInventory.java" sourcepath="org/craftmania/inventory/DoubleContainerInventory.java"/>
+    </Class>
+  </BugInstance>
+  <BugInstance type="SIC_INNER_SHOULD_BE_STATIC" priority="2" abbrev="SIC" category="PERFORMANCE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.inventory.DoubleContainerInventory$DoubleContainerInventoryRaster">
+      <SourceLine classname="org.craftmania.inventory.DoubleContainerInventory$DoubleContainerInventoryRaster" start="160" end="246" sourcefile="DoubleContainerInventory.java" sourcepath="org/craftmania/inventory/DoubleContainerInventory.java"/>
+    </Class>
+  </BugInstance>
+  <BugInstance type="DLS_DEAD_LOCAL_STORE" priority="1" abbrev="DLS" category="STYLE">
+    <Class classname="org.craftmania.inventory.RegularInventoryRaster">
+      <SourceLine classname="org.craftmania.inventory.RegularInventoryRaster" sourcefile="RegularInventoryRaster.java" sourcepath="org/craftmania/inventory/RegularInventoryRaster.java"/>
+    </Class>
+    <Method classname="org.craftmania.inventory.RegularInventoryRaster" name="getCellAt" signature="(II)I" isStatic="false">
+      <SourceLine classname="org.craftmania.inventory.RegularInventoryRaster" start="74" end="80" startBytecode="0" endBytecode="38" sourcefile="RegularInventoryRaster.java" sourcepath="org/craftmania/inventory/RegularInventoryRaster.java"/>
+    </Method>
+    <LocalVariable name="x" register="1" pc="31" role="LOCAL_VARIABLE_NAMED"/>
+    <SourceLine classname="org.craftmania.inventory.RegularInventoryRaster" start="77" end="77" startBytecode="30" endBytecode="30" sourcefile="RegularInventoryRaster.java" sourcepath="org/craftmania/inventory/RegularInventoryRaster.java"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.LOCAL_NAME" value="x"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.IS_PARAMETER" value="true"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.BASE_VALUE" value="true"/>
+  </BugInstance>
+  <BugInstance type="IL_INFINITE_RECURSIVE_LOOP" priority="1" abbrev="IL" category="CORRECTNESS">
+    <Class classname="org.craftmania.inventory.RegularInventoryRaster">
+      <SourceLine classname="org.craftmania.inventory.RegularInventoryRaster" sourcefile="RegularInventoryRaster.java" sourcepath="org/craftmania/inventory/RegularInventoryRaster.java"/>
+    </Class>
+    <Method classname="org.craftmania.inventory.RegularInventoryRaster" name="getCenterOfCell" signature="(I)Lorg/lwjgl/util/ReadablePoint;" isStatic="false">
+      <SourceLine classname="org.craftmania.inventory.RegularInventoryRaster" start="59" end="61" startBytecode="0" endBytecode="171" sourcefile="RegularInventoryRaster.java" sourcepath="org/craftmania/inventory/RegularInventoryRaster.java"/>
+    </Method>
+    <SourceLine classname="org.craftmania.inventory.RegularInventoryRaster" start="59" end="59" startBytecode="2" endBytecode="2" sourcefile="RegularInventoryRaster.java" sourcepath="org/craftmania/inventory/RegularInventoryRaster.java"/>
+  </BugInstance>
+  <BugInstance type="IL_INFINITE_RECURSIVE_LOOP" priority="1" abbrev="IL" category="CORRECTNESS" last="0" removedByChange="true">
+    <Class classname="org.craftmania.inventory.RegularInventoryRaster">
+      <SourceLine classname="org.craftmania.inventory.RegularInventoryRaster" sourcefile="RegularInventoryRaster.java" sourcepath="org/craftmania/inventory/RegularInventoryRaster.java"/>
+    </Class>
+    <Method classname="org.craftmania.inventory.RegularInventoryRaster" name="getCenterOfCell" signature="(I)Lorg/lwjgl/util/ReadablePoint;" isStatic="false">
+      <SourceLine classname="org.craftmania.inventory.RegularInventoryRaster" start="59" end="61" startBytecode="0" endBytecode="171" sourcefile="RegularInventoryRaster.java" sourcepath="org/craftmania/inventory/RegularInventoryRaster.java"/>
+    </Method>
+    <SourceLine classname="org.craftmania.inventory.RegularInventoryRaster" start="59" end="59" startBytecode="2" endBytecode="2" sourcefile="RegularInventoryRaster.java" sourcepath="org/craftmania/inventory/RegularInventoryRaster.java"/>
+  </BugInstance>
+  <BugInstance type="IL_INFINITE_RECURSIVE_LOOP" priority="1" abbrev="IL" category="CORRECTNESS">
+    <Class classname="org.craftmania.inventory.RegularInventoryRaster">
+      <SourceLine classname="org.craftmania.inventory.RegularInventoryRaster" sourcefile="RegularInventoryRaster.java" sourcepath="org/craftmania/inventory/RegularInventoryRaster.java"/>
+    </Class>
+    <Method classname="org.craftmania.inventory.RegularInventoryRaster" name="getCenterOfCell" signature="(I)Lorg/lwjgl/util/ReadablePoint;" isStatic="false">
+      <SourceLine classname="org.craftmania.inventory.RegularInventoryRaster" start="59" end="61" startBytecode="0" endBytecode="171" sourcefile="RegularInventoryRaster.java" sourcepath="org/craftmania/inventory/RegularInventoryRaster.java"/>
+    </Method>
+    <SourceLine classname="org.craftmania.inventory.RegularInventoryRaster" start="60" end="60" startBytecode="13" endBytecode="13" sourcefile="RegularInventoryRaster.java" sourcepath="org/craftmania/inventory/RegularInventoryRaster.java"/>
+  </BugInstance>
+  <BugInstance type="IL_INFINITE_RECURSIVE_LOOP" priority="1" abbrev="IL" category="CORRECTNESS" last="0" removedByChange="true">
+    <Class classname="org.craftmania.inventory.RegularInventoryRaster">
+      <SourceLine classname="org.craftmania.inventory.RegularInventoryRaster" sourcefile="RegularInventoryRaster.java" sourcepath="org/craftmania/inventory/RegularInventoryRaster.java"/>
+    </Class>
+    <Method classname="org.craftmania.inventory.RegularInventoryRaster" name="getCenterOfCell" signature="(I)Lorg/lwjgl/util/ReadablePoint;" isStatic="false">
+      <SourceLine classname="org.craftmania.inventory.RegularInventoryRaster" start="59" end="61" startBytecode="0" endBytecode="171" sourcefile="RegularInventoryRaster.java" sourcepath="org/craftmania/inventory/RegularInventoryRaster.java"/>
+    </Method>
+    <SourceLine classname="org.craftmania.inventory.RegularInventoryRaster" start="60" end="60" startBytecode="13" endBytecode="13" sourcefile="RegularInventoryRaster.java" sourcepath="org/craftmania/inventory/RegularInventoryRaster.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.items.ItemManager">
+      <SourceLine classname="org.craftmania.items.ItemManager" sourcefile="ItemManager.java" sourcepath="org/craftmania/items/ItemManager.java"/>
+    </Class>
+    <Field classname="org.craftmania.items.ItemManager" name="ITEM_OFFSET" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.items.ItemManager" sourcefile="ItemManager.java" sourcepath="org/craftmania/items/ItemManager.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.items.ItemManager" start="29" end="29" startBytecode="3" endBytecode="3" sourcefile="ItemManager.java" sourcepath="org/craftmania/items/ItemManager.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.items.ItemManager">
+      <SourceLine classname="org.craftmania.items.ItemManager" sourcefile="ItemManager.java" sourcepath="org/craftmania/items/ItemManager.java"/>
+    </Class>
+    <Field classname="org.craftmania.items.ItemManager" name="ITEM_OFFSET" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.items.ItemManager" sourcefile="ItemManager.java" sourcepath="org/craftmania/items/ItemManager.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.items.ItemManager" start="29" end="29" startBytecode="3" endBytecode="3" sourcefile="ItemManager.java" sourcepath="org/craftmania/items/ItemManager.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="2" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.math.MathHelper">
+      <SourceLine classname="org.craftmania.math.MathHelper" sourcefile="MathHelper.java" sourcepath="org/craftmania/math/MathHelper.java"/>
+    </Class>
+    <Field classname="org.craftmania.math.MathHelper" name="f_2PI" signature="F" isStatic="true">
+      <SourceLine classname="org.craftmania.math.MathHelper" sourcefile="MathHelper.java" sourcepath="org/craftmania/math/MathHelper.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.math.MathHelper" start="24" end="24" startBytecode="7" endBytecode="7" sourcefile="MathHelper.java" sourcepath="org/craftmania/math/MathHelper.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="2" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.math.MathHelper">
+      <SourceLine classname="org.craftmania.math.MathHelper" sourcefile="MathHelper.java" sourcepath="org/craftmania/math/MathHelper.java"/>
+    </Class>
+    <Field classname="org.craftmania.math.MathHelper" name="f_2PI" signature="F" isStatic="true">
+      <SourceLine classname="org.craftmania.math.MathHelper" sourcefile="MathHelper.java" sourcepath="org/craftmania/math/MathHelper.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.math.MathHelper" start="24" end="24" startBytecode="7" endBytecode="7" sourcefile="MathHelper.java" sourcepath="org/craftmania/math/MathHelper.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="2" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.math.MathHelper">
+      <SourceLine classname="org.craftmania.math.MathHelper" sourcefile="MathHelper.java" sourcepath="org/craftmania/math/MathHelper.java"/>
+    </Class>
+    <Field classname="org.craftmania.math.MathHelper" name="f_PI" signature="F" isStatic="true">
+      <SourceLine classname="org.craftmania.math.MathHelper" sourcefile="MathHelper.java" sourcepath="org/craftmania/math/MathHelper.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.math.MathHelper" start="23" end="23" startBytecode="2" endBytecode="2" sourcefile="MathHelper.java" sourcepath="org/craftmania/math/MathHelper.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="2" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.math.MathHelper">
+      <SourceLine classname="org.craftmania.math.MathHelper" sourcefile="MathHelper.java" sourcepath="org/craftmania/math/MathHelper.java"/>
+    </Class>
+    <Field classname="org.craftmania.math.MathHelper" name="f_PI" signature="F" isStatic="true">
+      <SourceLine classname="org.craftmania.math.MathHelper" sourcefile="MathHelper.java" sourcepath="org/craftmania/math/MathHelper.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.math.MathHelper" start="23" end="23" startBytecode="2" endBytecode="2" sourcefile="MathHelper.java" sourcepath="org/craftmania/math/MathHelper.java"/>
+  </BugInstance>
+  <BugInstance type="EQ_COMPARETO_USE_OBJECT_EQUALS" priority="2" abbrev="Eq" category="BAD_PRACTICE">
+    <Class classname="org.craftmania.math.RayBlockIntersection$Intersection">
+      <SourceLine classname="org.craftmania.math.RayBlockIntersection$Intersection" sourcefile="RayBlockIntersection.java" sourcepath="org/craftmania/math/RayBlockIntersection.java"/>
+    </Class>
+    <Method classname="org.craftmania.math.RayBlockIntersection$Intersection" name="compareTo" signature="(Lorg/craftmania/math/RayBlockIntersection$Intersection;)I" isStatic="false">
+      <SourceLine classname="org.craftmania.math.RayBlockIntersection$Intersection" start="65" end="78" startBytecode="0" endBytecode="153" sourcefile="RayBlockIntersection.java" sourcepath="org/craftmania/math/RayBlockIntersection.java"/>
+    </Method>
+  </BugInstance>
+  <BugInstance type="HE_EQUALS_USE_HASHCODE" priority="1" abbrev="HE" category="BAD_PRACTICE">
+    <Class classname="org.craftmania.math.Vec3i">
+      <SourceLine classname="org.craftmania.math.Vec3i" sourcefile="Vec3i.java" sourcepath="org/craftmania/math/Vec3i.java"/>
+    </Class>
+    <Method classname="org.craftmania.math.Vec3i" name="equals" signature="(Ljava/lang/Object;)Z" isStatic="false">
+      <SourceLine classname="org.craftmania.math.Vec3i" start="217" end="225" startBytecode="0" endBytecode="164" sourcefile="Vec3i.java" sourcepath="org/craftmania/math/Vec3i.java"/>
+    </Method>
+  </BugInstance>
+  <BugInstance type="HE_EQUALS_USE_HASHCODE" priority="1" abbrev="HE" category="BAD_PRACTICE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.math.Vec3i">
+      <SourceLine classname="org.craftmania.math.Vec3i" sourcefile="Vec3i.java" sourcepath="org/craftmania/math/Vec3i.java"/>
+    </Class>
+    <Method classname="org.craftmania.math.Vec3i" name="equals" signature="(Ljava/lang/Object;)Z" isStatic="false">
+      <SourceLine classname="org.craftmania.math.Vec3i" start="217" end="225" startBytecode="0" endBytecode="164" sourcefile="Vec3i.java" sourcepath="org/craftmania/math/Vec3i.java"/>
+    </Method>
+  </BugInstance>
+  <BugInstance type="EI_EXPOSE_REP" priority="2" abbrev="EI" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.recipes.Recipe">
+      <SourceLine classname="org.craftmania.recipes.Recipe" sourcefile="Recipe.java" sourcepath="org/craftmania/recipes/Recipe.java"/>
+    </Class>
+    <Method classname="org.craftmania.recipes.Recipe" name="getIngredients" signature="()[[I" isStatic="false">
+      <SourceLine classname="org.craftmania.recipes.Recipe" start="97" end="97" startBytecode="0" endBytecode="46" sourcefile="Recipe.java" sourcepath="org/craftmania/recipes/Recipe.java"/>
+    </Method>
+    <Field classname="org.craftmania.recipes.Recipe" name="_ingredients" signature="[[I" isStatic="false">
+      <SourceLine classname="org.craftmania.recipes.Recipe" sourcefile="Recipe.java" sourcepath="org/craftmania/recipes/Recipe.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.recipes.Recipe" start="97" end="97" startBytecode="4" endBytecode="4" sourcefile="Recipe.java" sourcepath="org/craftmania/recipes/Recipe.java"/>
+  </BugInstance>
+  <BugInstance type="DM_DEFAULT_ENCODING" priority="1" abbrev="Dm" category="I18N">
+    <Class classname="org.craftmania.recipes.RecipeManager">
+      <SourceLine classname="org.craftmania.recipes.RecipeManager" sourcefile="RecipeManager.java" sourcepath="org/craftmania/recipes/RecipeManager.java"/>
+    </Class>
+    <Method classname="org.craftmania.recipes.RecipeManager" name="loadRecipes" signature="()V" isStatic="false">
+      <SourceLine classname="org.craftmania.recipes.RecipeManager" start="42" end="64" startBytecode="0" endBytecode="314" sourcefile="RecipeManager.java" sourcepath="org/craftmania/recipes/RecipeManager.java"/>
+    </Method>
+    <Method classname="java.io.FileReader" name="&lt;init&gt;" signature="(Ljava/io/File;)V" isStatic="false" role="METHOD_CALLED">
+      <SourceLine classname="java.io.FileReader" start="55" end="56" startBytecode="0" endBytecode="40" sourcefile="FileReader.java" sourcepath="java/io/FileReader.java"/>
+    </Method>
+    <SourceLine classname="org.craftmania.recipes.RecipeManager" start="44" end="44" startBytecode="19" endBytecode="19" sourcefile="RecipeManager.java" sourcepath="org/craftmania/recipes/RecipeManager.java"/>
+  </BugInstance>
+  <BugInstance type="EI_EXPOSE_REP2" priority="2" abbrev="EI2" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.rendering.ChunkMesh">
+      <SourceLine classname="org.craftmania.rendering.ChunkMesh" sourcefile="ChunkMesh.java" sourcepath="org/craftmania/rendering/ChunkMesh.java"/>
+    </Class>
+    <Method classname="org.craftmania.rendering.ChunkMesh" name="&lt;init&gt;" signature="([I[I)V" isStatic="false">
+      <SourceLine classname="org.craftmania.rendering.ChunkMesh" start="27" end="30" startBytecode="0" endBytecode="88" sourcefile="ChunkMesh.java" sourcepath="org/craftmania/rendering/ChunkMesh.java"/>
+    </Method>
+    <Field classname="org.craftmania.rendering.ChunkMesh" name="_vbos" signature="[I" isStatic="false">
+      <SourceLine classname="org.craftmania.rendering.ChunkMesh" sourcefile="ChunkMesh.java" sourcepath="org/craftmania/rendering/ChunkMesh.java"/>
+    </Field>
+    <LocalVariable name="vbos" register="2" pc="11" role="LOCAL_VARIABLE_NAMED"/>
+    <SourceLine classname="org.craftmania.rendering.ChunkMesh" start="29" end="29" startBytecode="11" endBytecode="11" sourcefile="ChunkMesh.java" sourcepath="org/craftmania/rendering/ChunkMesh.java"/>
+  </BugInstance>
+  <BugInstance type="EI_EXPOSE_REP2" priority="2" abbrev="EI2" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.rendering.ChunkMesh">
+      <SourceLine classname="org.craftmania.rendering.ChunkMesh" sourcefile="ChunkMesh.java" sourcepath="org/craftmania/rendering/ChunkMesh.java"/>
+    </Class>
+    <Method classname="org.craftmania.rendering.ChunkMesh" name="&lt;init&gt;" signature="([I[I)V" isStatic="false">
+      <SourceLine classname="org.craftmania.rendering.ChunkMesh" start="27" end="30" startBytecode="0" endBytecode="88" sourcefile="ChunkMesh.java" sourcepath="org/craftmania/rendering/ChunkMesh.java"/>
+    </Method>
+    <Field classname="org.craftmania.rendering.ChunkMesh" name="_vertexCount" signature="[I" isStatic="false">
+      <SourceLine classname="org.craftmania.rendering.ChunkMesh" sourcefile="ChunkMesh.java" sourcepath="org/craftmania/rendering/ChunkMesh.java"/>
+    </Field>
+    <LocalVariable name="vertexCount" register="1" pc="6" role="LOCAL_VARIABLE_NAMED"/>
+    <SourceLine classname="org.craftmania.rendering.ChunkMesh" start="28" end="28" startBytecode="6" endBytecode="6" sourcefile="ChunkMesh.java" sourcepath="org/craftmania/rendering/ChunkMesh.java"/>
+  </BugInstance>
+  <BugInstance type="VO_VOLATILE_REFERENCE_TO_ARRAY" priority="2" abbrev="VO" category="MT_CORRECTNESS">
+    <Class classname="org.craftmania.rendering.ChunkMesh">
+      <SourceLine classname="org.craftmania.rendering.ChunkMesh" sourcefile="ChunkMesh.java" sourcepath="org/craftmania/rendering/ChunkMesh.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMesh" name="_vbos" signature="[I" isStatic="false">
+      <SourceLine classname="org.craftmania.rendering.ChunkMesh" sourcefile="ChunkMesh.java" sourcepath="org/craftmania/rendering/ChunkMesh.java"/>
+    </Field>
+  </BugInstance>
+  <BugInstance type="VO_VOLATILE_REFERENCE_TO_ARRAY" priority="2" abbrev="VO" category="MT_CORRECTNESS" last="0" removedByChange="true">
+    <Class classname="org.craftmania.rendering.ChunkMesh">
+      <SourceLine classname="org.craftmania.rendering.ChunkMesh" sourcefile="ChunkMesh.java" sourcepath="org/craftmania/rendering/ChunkMesh.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMesh" name="_vbos" signature="[I" isStatic="false">
+      <SourceLine classname="org.craftmania.rendering.ChunkMesh" sourcefile="ChunkMesh.java" sourcepath="org/craftmania/rendering/ChunkMesh.java"/>
+    </Field>
+  </BugInstance>
+  <BugInstance type="VO_VOLATILE_REFERENCE_TO_ARRAY" priority="2" abbrev="VO" category="MT_CORRECTNESS">
+    <Class classname="org.craftmania.rendering.ChunkMesh">
+      <SourceLine classname="org.craftmania.rendering.ChunkMesh" sourcefile="ChunkMesh.java" sourcepath="org/craftmania/rendering/ChunkMesh.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMesh" name="_vertexCount" signature="[I" isStatic="false">
+      <SourceLine classname="org.craftmania.rendering.ChunkMesh" sourcefile="ChunkMesh.java" sourcepath="org/craftmania/rendering/ChunkMesh.java"/>
+    </Field>
+  </BugInstance>
+  <BugInstance type="VO_VOLATILE_REFERENCE_TO_ARRAY" priority="2" abbrev="VO" category="MT_CORRECTNESS" last="0" removedByChange="true">
+    <Class classname="org.craftmania.rendering.ChunkMesh">
+      <SourceLine classname="org.craftmania.rendering.ChunkMesh" sourcefile="ChunkMesh.java" sourcepath="org/craftmania/rendering/ChunkMesh.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMesh" name="_vertexCount" signature="[I" isStatic="false">
+      <SourceLine classname="org.craftmania.rendering.ChunkMesh" sourcefile="ChunkMesh.java" sourcepath="org/craftmania/rendering/ChunkMesh.java"/>
+    </Field>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.rendering.ChunkMeshBuilder">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshBuilder" name="COLOR_OFFSET" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" start="46" end="46" startBytecode="37" endBytecode="37" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.rendering.ChunkMeshBuilder">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshBuilder" name="COLOR_OFFSET" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" start="46" end="46" startBytecode="37" endBytecode="37" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.rendering.ChunkMeshBuilder">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshBuilder" name="COLOR_SIZE" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" start="45" end="45" startBytecode="27" endBytecode="27" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.rendering.ChunkMeshBuilder">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshBuilder" name="COLOR_SIZE" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" start="45" end="45" startBytecode="27" endBytecode="27" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.rendering.ChunkMeshBuilder">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshBuilder" name="FLOAT_SIZE" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" start="49" end="49" startBytecode="55" endBytecode="55" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.rendering.ChunkMeshBuilder">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshBuilder" name="FLOAT_SIZE" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" start="49" end="49" startBytecode="55" endBytecode="55" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.rendering.ChunkMeshBuilder">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshBuilder" name="POSITION_OFFSET" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" start="44" end="44" startBytecode="23" endBytecode="23" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.rendering.ChunkMeshBuilder">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshBuilder" name="POSITION_OFFSET" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" start="44" end="44" startBytecode="23" endBytecode="23" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.rendering.ChunkMeshBuilder">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshBuilder" name="POSITION_SIZE" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" start="43" end="43" startBytecode="19" endBytecode="19" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.rendering.ChunkMeshBuilder">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshBuilder" name="POSITION_SIZE" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" start="43" end="43" startBytecode="19" endBytecode="19" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.rendering.ChunkMeshBuilder">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshBuilder" name="STRIDE" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" start="42" end="42" startBytecode="15" endBytecode="15" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.rendering.ChunkMeshBuilder">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshBuilder" name="STRIDE" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshBuilder" start="42" end="42" startBytecode="15" endBytecode="15" sourcefile="ChunkMeshBuilder.java" sourcepath="org/craftmania/rendering/ChunkMeshBuilder.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.rendering.ChunkMeshRenderer">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshRenderer" name="COLOR_OFFSET" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" start="30" end="30" startBytecode="24" endBytecode="24" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.rendering.ChunkMeshRenderer">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshRenderer" name="COLOR_OFFSET" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" start="30" end="30" startBytecode="24" endBytecode="24" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.rendering.ChunkMeshRenderer">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshRenderer" name="COLOR_SIZE" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" start="29" end="29" startBytecode="14" endBytecode="14" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.rendering.ChunkMeshRenderer">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshRenderer" name="COLOR_SIZE" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" start="29" end="29" startBytecode="14" endBytecode="14" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.rendering.ChunkMeshRenderer">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshRenderer" name="FLOAT_SIZE" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" start="33" end="33" startBytecode="42" endBytecode="42" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.rendering.ChunkMeshRenderer">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshRenderer" name="FLOAT_SIZE" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" start="33" end="33" startBytecode="42" endBytecode="42" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.rendering.ChunkMeshRenderer">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshRenderer" name="POSITION_OFFSET" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" start="28" end="28" startBytecode="10" endBytecode="10" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.rendering.ChunkMeshRenderer">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshRenderer" name="POSITION_OFFSET" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" start="28" end="28" startBytecode="10" endBytecode="10" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.rendering.ChunkMeshRenderer">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshRenderer" name="POSITION_SIZE" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" start="27" end="27" startBytecode="6" endBytecode="6" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.rendering.ChunkMeshRenderer">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshRenderer" name="POSITION_SIZE" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" start="27" end="27" startBytecode="6" endBytecode="6" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.rendering.ChunkMeshRenderer">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshRenderer" name="STRIDE" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" start="26" end="26" startBytecode="2" endBytecode="2" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.rendering.ChunkMeshRenderer">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshRenderer" name="STRIDE" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" start="26" end="26" startBytecode="2" endBytecode="2" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.rendering.ChunkMeshRenderer">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshRenderer" name="TEX_COORD_OFFSET" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" start="32" end="32" startBytecode="38" endBytecode="38" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.rendering.ChunkMeshRenderer">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshRenderer" name="TEX_COORD_OFFSET" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" start="32" end="32" startBytecode="38" endBytecode="38" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.rendering.ChunkMeshRenderer">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshRenderer" name="TEX_COORD_SIZE" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" start="31" end="31" startBytecode="28" endBytecode="28" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.rendering.ChunkMeshRenderer">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.ChunkMeshRenderer" name="TEX_COORD_SIZE" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.ChunkMeshRenderer" start="31" end="31" startBytecode="28" endBytecode="28" sourcefile="ChunkMeshRenderer.java" sourcepath="org/craftmania/rendering/ChunkMeshRenderer.java"/>
+  </BugInstance>
+  <BugInstance type="URF_UNREAD_FIELD" priority="2" abbrev="UrF" category="PERFORMANCE">
+    <Class classname="org.craftmania.rendering.GLFont">
+      <SourceLine classname="org.craftmania.rendering.GLFont" sourcefile="GLFont.java" sourcepath="org/craftmania/rendering/GLFont.java"/>
+    </Class>
+    <Field classname="org.craftmania.rendering.GLFont" name="font" signature="Ljava/awt/Font;" isStatic="false">
+      <SourceLine classname="org.craftmania.rendering.GLFont" sourcefile="GLFont.java" sourcepath="org/craftmania/rendering/GLFont.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.rendering.GLFont" start="114" end="114" startBytecode="38" endBytecode="38" sourcefile="GLFont.java" sourcepath="org/craftmania/rendering/GLFont.java"/>
+  </BugInstance>
+  <BugInstance type="SIC_INNER_SHOULD_BE_STATIC" priority="2" abbrev="SIC" category="PERFORMANCE">
+    <Class classname="org.craftmania.rendering.particles.Smoke$Particle">
+      <SourceLine classname="org.craftmania.rendering.particles.Smoke$Particle" start="68" end="72" sourcefile="Smoke.java" sourcepath="org/craftmania/rendering/particles/Smoke.java"/>
+    </Class>
+  </BugInstance>
+  <BugInstance type="SIC_INNER_SHOULD_BE_STATIC" priority="2" abbrev="SIC" category="PERFORMANCE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.rendering.particles.Smoke$Particle">
+      <SourceLine classname="org.craftmania.rendering.particles.Smoke$Particle" start="68" end="72" sourcefile="Smoke.java" sourcepath="org/craftmania/rendering/particles/Smoke.java"/>
+    </Class>
+  </BugInstance>
+  <BugInstance type="EQ_COMPARETO_USE_OBJECT_EQUALS" priority="2" abbrev="Eq" category="BAD_PRACTICE">
+    <Class classname="org.craftmania.utilities.ThreadPool$WaitingRunnable">
+      <SourceLine classname="org.craftmania.utilities.ThreadPool$WaitingRunnable" sourcefile="ThreadPool.java" sourcepath="org/craftmania/utilities/ThreadPool.java"/>
+    </Class>
+    <Method classname="org.craftmania.utilities.ThreadPool$WaitingRunnable" name="compareTo" signature="(Lorg/craftmania/utilities/ThreadPool$WaitingRunnable;)I" isStatic="false">
+      <SourceLine classname="org.craftmania.utilities.ThreadPool$WaitingRunnable" start="80" end="80" startBytecode="0" endBytecode="61" sourcefile="ThreadPool.java" sourcepath="org/craftmania/utilities/ThreadPool.java"/>
+    </Method>
+  </BugInstance>
+  <BugInstance type="DB_DUPLICATE_BRANCHES" priority="2" abbrev="DB" category="STYLE">
+    <Class classname="org.craftmania.world.Chunk">
+      <SourceLine classname="org.craftmania.world.Chunk" sourcefile="Chunk.java" sourcepath="org/craftmania/world/Chunk.java"/>
+    </Class>
+    <Method classname="org.craftmania.world.Chunk" name="createMesh" signature="()V" isStatic="false">
+      <SourceLine classname="org.craftmania.world.Chunk" start="131" end="149" startBytecode="0" endBytecode="151" sourcefile="Chunk.java" sourcepath="org/craftmania/world/Chunk.java"/>
+    </Method>
+    <SourceLine classname="org.craftmania.world.Chunk" start="143" end="143" startBytecode="49" endBytecode="54" sourcefile="Chunk.java" sourcepath="org/craftmania/world/Chunk.java"/>
+    <SourceLine classname="org.craftmania.world.Chunk" start="146" end="146" startBytecode="57" endBytecode="59" sourcefile="Chunk.java" sourcepath="org/craftmania/world/Chunk.java"/>
+  </BugInstance>
+  <BugInstance type="DB_DUPLICATE_BRANCHES" priority="2" abbrev="DB" category="STYLE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.world.Chunk">
+      <SourceLine classname="org.craftmania.world.Chunk" sourcefile="Chunk.java" sourcepath="org/craftmania/world/Chunk.java"/>
+    </Class>
+    <Method classname="org.craftmania.world.Chunk" name="createMesh" signature="()V" isStatic="false">
+      <SourceLine classname="org.craftmania.world.Chunk" start="131" end="149" startBytecode="0" endBytecode="151" sourcefile="Chunk.java" sourcepath="org/craftmania/world/Chunk.java"/>
+    </Method>
+    <SourceLine classname="org.craftmania.world.Chunk" start="143" end="143" startBytecode="49" endBytecode="54" sourcefile="Chunk.java" sourcepath="org/craftmania/world/Chunk.java"/>
+    <SourceLine classname="org.craftmania.world.Chunk" start="146" end="146" startBytecode="57" endBytecode="59" sourcefile="Chunk.java" sourcepath="org/craftmania/world/Chunk.java"/>
+  </BugInstance>
+  <BugInstance type="EI_EXPOSE_REP" priority="2" abbrev="EI" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.world.Chunk">
+      <SourceLine classname="org.craftmania.world.Chunk" sourcefile="Chunk.java" sourcepath="org/craftmania/world/Chunk.java"/>
+    </Class>
+    <Method classname="org.craftmania.world.Chunk" name="getLightBuffer" signature="()[[[B" isStatic="false">
+      <SourceLine classname="org.craftmania.world.Chunk" start="1455" end="1455" startBytecode="0" endBytecode="46" sourcefile="Chunk.java" sourcepath="org/craftmania/world/Chunk.java"/>
+    </Method>
+    <Field classname="org.craftmania.world.Chunk" name="_lightBuffer" signature="[[[B" isStatic="false">
+      <SourceLine classname="org.craftmania.world.Chunk" sourcefile="Chunk.java" sourcepath="org/craftmania/world/Chunk.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.world.Chunk" start="1455" end="1455" startBytecode="4" endBytecode="4" sourcefile="Chunk.java" sourcepath="org/craftmania/world/Chunk.java"/>
+  </BugInstance>
+  <BugInstance type="EI_EXPOSE_REP" priority="2" abbrev="EI" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.world.Chunk">
+      <SourceLine classname="org.craftmania.world.Chunk" sourcefile="Chunk.java" sourcepath="org/craftmania/world/Chunk.java"/>
+    </Class>
+    <Method classname="org.craftmania.world.Chunk" name="getLightBuffer" signature="()[[[B" isStatic="false">
+      <SourceLine classname="org.craftmania.world.Chunk" start="1462" end="1462" startBytecode="0" endBytecode="46" sourcefile="Chunk.java" sourcepath="org/craftmania/world/Chunk.java"/>
+    </Method>
+    <Field classname="org.craftmania.world.Chunk" name="_lightBuffer" signature="[[[B" isStatic="false">
+      <SourceLine classname="org.craftmania.world.Chunk" sourcefile="Chunk.java" sourcepath="org/craftmania/world/Chunk.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.world.Chunk" start="1462" end="1462" startBytecode="4" endBytecode="4" sourcefile="Chunk.java" sourcepath="org/craftmania/world/Chunk.java"/>
+  </BugInstance>
+  <BugInstance type="BIT_IOR_OF_SIGNED_BYTE" priority="2" abbrev="BIT" category="CORRECTNESS">
+    <Class classname="org.craftmania.world.ChunkData">
+      <SourceLine classname="org.craftmania.world.ChunkData" sourcefile="ChunkData.java" sourcepath="org/craftmania/world/ChunkData.java"/>
+    </Class>
+    <Method classname="org.craftmania.world.ChunkData" name="getPosition" signature="(I)I" isStatic="false">
+      <SourceLine classname="org.craftmania.world.ChunkData" start="236" end="238" startBytecode="0" endBytecode="88" sourcefile="ChunkData.java" sourcepath="org/craftmania/world/ChunkData.java"/>
+    </Method>
+    <SourceLine classname="org.craftmania.world.ChunkData" start="238" end="238" startBytecode="28" endBytecode="28" sourcefile="ChunkData.java" sourcepath="org/craftmania/world/ChunkData.java"/>
+  </BugInstance>
+  <BugInstance type="SIC_INNER_SHOULD_BE_STATIC" priority="2" abbrev="SIC" category="PERFORMANCE">
+    <Class classname="org.craftmania.world.ChunkData$SpecialBlockPool">
+      <SourceLine classname="org.craftmania.world.ChunkData$SpecialBlockPool" start="276" end="297" sourcefile="ChunkData.java" sourcepath="org/craftmania/world/ChunkData.java"/>
+    </Class>
+  </BugInstance>
+  <BugInstance type="SIC_INNER_SHOULD_BE_STATIC" priority="2" abbrev="SIC" category="PERFORMANCE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.world.ChunkData$SpecialBlockPool">
+      <SourceLine classname="org.craftmania.world.ChunkData$SpecialBlockPool" start="276" end="297" sourcefile="ChunkData.java" sourcepath="org/craftmania/world/ChunkData.java"/>
+    </Class>
+  </BugInstance>
+  <BugInstance type="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" priority="2" abbrev="RV" category="BAD_PRACTICE">
+    <Class classname="org.craftmania.world.ChunkIO">
+      <SourceLine classname="org.craftmania.world.ChunkIO" sourcefile="ChunkIO.java" sourcepath="org/craftmania/world/ChunkIO.java"/>
+    </Class>
+    <Method classname="org.craftmania.world.ChunkIO" name="getChunkFile" signature="(II)Ljava/io/File;" isStatic="false">
+      <SourceLine classname="org.craftmania.world.ChunkIO" start="47" end="51" startBytecode="0" endBytecode="158" sourcefile="ChunkIO.java" sourcepath="org/craftmania/world/ChunkIO.java"/>
+    </Method>
+    <Method classname="java.io.File" name="mkdir" signature="()Z" isStatic="false" role="METHOD_CALLED">
+      <SourceLine classname="java.io.File" start="1153" end="1157" startBytecode="0" endBytecode="59" sourcefile="File.java" sourcepath="java/io/File.java"/>
+    </Method>
+    <SourceLine classname="org.craftmania.world.ChunkIO" start="50" end="50" startBytecode="54" endBytecode="54" sourcefile="ChunkIO.java" sourcepath="org/craftmania/world/ChunkIO.java"/>
+  </BugInstance>
+  <BugInstance type="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" priority="2" abbrev="RV" category="BAD_PRACTICE">
+    <Class classname="org.craftmania.world.ChunkIO">
+      <SourceLine classname="org.craftmania.world.ChunkIO" sourcefile="ChunkIO.java" sourcepath="org/craftmania/world/ChunkIO.java"/>
+    </Class>
+    <Method classname="org.craftmania.world.ChunkIO" name="getChunkFile" signature="(II)Ljava/io/File;" isStatic="false">
+      <SourceLine classname="org.craftmania.world.ChunkIO" start="47" end="51" startBytecode="0" endBytecode="158" sourcefile="ChunkIO.java" sourcepath="org/craftmania/world/ChunkIO.java"/>
+    </Method>
+    <Method classname="java.io.File" name="mkdirs" signature="()Z" isStatic="false" role="METHOD_CALLED">
+      <SourceLine classname="java.io.File" start="1181" end="1195" startBytecode="0" endBytecode="138" sourcefile="File.java" sourcepath="java/io/File.java"/>
+    </Method>
+    <SourceLine classname="org.craftmania.world.ChunkIO" start="49" end="49" startBytecode="45" endBytecode="45" sourcefile="ChunkIO.java" sourcepath="org/craftmania/world/ChunkIO.java"/>
+  </BugInstance>
+  <BugInstance type="DLS_DEAD_LOCAL_STORE" priority="2" abbrev="DLS" category="STYLE">
+    <Class classname="org.craftmania.world.ChunkManager">
+      <SourceLine classname="org.craftmania.world.ChunkManager" sourcefile="ChunkManager.java" sourcepath="org/craftmania/world/ChunkManager.java"/>
+    </Class>
+    <Method classname="org.craftmania.world.ChunkManager" name="moveBlockTo" signature="(IIIIII)V" isStatic="false">
+      <SourceLine classname="org.craftmania.world.ChunkManager" start="208" end="248" startBytecode="0" endBytecode="122" sourcefile="ChunkManager.java" sourcepath="org/craftmania/world/ChunkManager.java"/>
+    </Method>
+    <LocalVariable name="newIndex" register="10" pc="71" role="LOCAL_VARIABLE_NAMED"/>
+    <SourceLine classname="org.craftmania.world.ChunkManager" start="212" end="212" startBytecode="69" endBytecode="69" sourcefile="ChunkManager.java" sourcepath="org/craftmania/world/ChunkManager.java"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.METHOD_RESULT" value="true"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.NO_LOADS" value="true"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.LOCAL_NAME" value="newIndex"/>
+    <Property name="edu.umd.cs.findbugs.detect.DeadLocalStoreProperty.BASE_VALUE" value="true"/>
+  </BugInstance>
+  <BugInstance type="SIC_INNER_SHOULD_BE_STATIC" priority="2" abbrev="SIC" category="PERFORMANCE">
+    <Class classname="org.craftmania.world.ChunkManager$BlockMovement">
+      <SourceLine classname="org.craftmania.world.ChunkManager$BlockMovement" start="271" end="284" sourcefile="ChunkManager.java" sourcepath="org/craftmania/world/ChunkManager.java"/>
+    </Class>
+  </BugInstance>
+  <BugInstance type="SIC_INNER_SHOULD_BE_STATIC" priority="2" abbrev="SIC" category="PERFORMANCE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.world.ChunkManager$BlockMovement">
+      <SourceLine classname="org.craftmania.world.ChunkManager$BlockMovement" start="271" end="284" sourcefile="ChunkManager.java" sourcepath="org/craftmania/world/ChunkManager.java"/>
+    </Class>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.world.DefaultWorldProvider">
+      <SourceLine classname="org.craftmania.world.DefaultWorldProvider" sourcefile="DefaultWorldProvider.java" sourcepath="org/craftmania/world/DefaultWorldProvider.java"/>
+    </Class>
+    <Field classname="org.craftmania.world.DefaultWorldProvider" name="SAMPLE_RATE_HEIGHTS" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.world.DefaultWorldProvider" sourcefile="DefaultWorldProvider.java" sourcepath="org/craftmania/world/DefaultWorldProvider.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.world.DefaultWorldProvider" start="42" end="42" startBytecode="11" endBytecode="11" sourcefile="DefaultWorldProvider.java" sourcepath="org/craftmania/world/DefaultWorldProvider.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.world.DefaultWorldProvider">
+      <SourceLine classname="org.craftmania.world.DefaultWorldProvider" sourcefile="DefaultWorldProvider.java" sourcepath="org/craftmania/world/DefaultWorldProvider.java"/>
+    </Class>
+    <Field classname="org.craftmania.world.DefaultWorldProvider" name="SAMPLE_RATE_HORIZONTAL" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.world.DefaultWorldProvider" sourcefile="DefaultWorldProvider.java" sourcepath="org/craftmania/world/DefaultWorldProvider.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.world.DefaultWorldProvider" start="40" end="40" startBytecode="2" endBytecode="2" sourcefile="DefaultWorldProvider.java" sourcepath="org/craftmania/world/DefaultWorldProvider.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.world.DefaultWorldProvider">
+      <SourceLine classname="org.craftmania.world.DefaultWorldProvider" sourcefile="DefaultWorldProvider.java" sourcepath="org/craftmania/world/DefaultWorldProvider.java"/>
+    </Class>
+    <Field classname="org.craftmania.world.DefaultWorldProvider" name="SAMPLE_RATE_RAW_HEIGHS" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.world.DefaultWorldProvider" sourcefile="DefaultWorldProvider.java" sourcepath="org/craftmania/world/DefaultWorldProvider.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.world.DefaultWorldProvider" start="43" end="43" startBytecode="16" endBytecode="16" sourcefile="DefaultWorldProvider.java" sourcepath="org/craftmania/world/DefaultWorldProvider.java"/>
+  </BugInstance>
+  <BugInstance type="MS_SHOULD_BE_FINAL" priority="1" abbrev="MS" category="MALICIOUS_CODE">
+    <Class classname="org.craftmania.world.DefaultWorldProvider">
+      <SourceLine classname="org.craftmania.world.DefaultWorldProvider" sourcefile="DefaultWorldProvider.java" sourcepath="org/craftmania/world/DefaultWorldProvider.java"/>
+    </Class>
+    <Field classname="org.craftmania.world.DefaultWorldProvider" name="SAMPLE_RATE_TEMPERATURE" signature="I" isStatic="true">
+      <SourceLine classname="org.craftmania.world.DefaultWorldProvider" sourcefile="DefaultWorldProvider.java" sourcepath="org/craftmania/world/DefaultWorldProvider.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.world.DefaultWorldProvider" start="45" end="45" startBytecode="21" endBytecode="21" sourcefile="DefaultWorldProvider.java" sourcepath="org/craftmania/world/DefaultWorldProvider.java"/>
+  </BugInstance>
+  <BugInstance type="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" priority="2" abbrev="UrF" category="STYLE">
+    <Class classname="org.craftmania.world.DefaultWorldProvider$WorldProviderGenerator$DataResults">
+      <SourceLine classname="org.craftmania.world.DefaultWorldProvider$WorldProviderGenerator$DataResults" sourcefile="DefaultWorldProvider.java" sourcepath="org/craftmania/world/DefaultWorldProvider.java"/>
+    </Class>
+    <Field classname="org.craftmania.world.DefaultWorldProvider$WorldProviderGenerator$DataResults" name="closest" signature="F" isStatic="false">
+      <SourceLine classname="org.craftmania.world.DefaultWorldProvider$WorldProviderGenerator$DataResults" sourcefile="DefaultWorldProvider.java" sourcepath="org/craftmania/world/DefaultWorldProvider.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.world.DefaultWorldProvider$WorldProviderGenerator" start="727" end="727" startBytecode="180" endBytecode="180" sourcefile="DefaultWorldProvider.java" sourcepath="org/craftmania/world/DefaultWorldProvider.java"/>
+  </BugInstance>
+  <BugInstance type="ICAST_IDIV_CAST_TO_DOUBLE" priority="2" abbrev="ICAST" category="STYLE">
+    <Class classname="org.craftmania.world.World">
+      <SourceLine classname="org.craftmania.world.World" sourcefile="World.java" sourcepath="org/craftmania/world/World.java"/>
+    </Class>
+    <Method classname="org.craftmania.world.World" name="renderOverlay" signature="()V" isStatic="false">
+      <SourceLine classname="org.craftmania.world.World" start="184" end="323" startBytecode="0" endBytecode="1441" sourcefile="World.java" sourcepath="org/craftmania/world/World.java"/>
+    </Method>
+    <SourceLine classname="org.craftmania.world.World" start="229" end="229" startBytecode="356" endBytecode="356" sourcefile="World.java" sourcepath="org/craftmania/world/World.java"/>
+    <SourceLine classname="org.craftmania.world.World" start="230" end="230" startBytecode="371" endBytecode="371" sourcefile="World.java" sourcepath="org/craftmania/world/World.java" role="SOURCE_LINE_ANOTHER_INSTANCE"/>
+    <SourceLine classname="org.craftmania.world.World" start="232" end="232" startBytecode="389" endBytecode="389" sourcefile="World.java" sourcepath="org/craftmania/world/World.java" role="SOURCE_LINE_ANOTHER_INSTANCE"/>
+    <SourceLine classname="org.craftmania.world.World" start="233" end="233" startBytecode="404" endBytecode="404" sourcefile="World.java" sourcepath="org/craftmania/world/World.java" role="SOURCE_LINE_ANOTHER_INSTANCE"/>
+    <SourceLine classname="org.craftmania.world.World" start="235" end="235" startBytecode="412" endBytecode="412" sourcefile="World.java" sourcepath="org/craftmania/world/World.java" role="SOURCE_LINE_ANOTHER_INSTANCE"/>
+    <SourceLine classname="org.craftmania.world.World" start="236" end="236" startBytecode="430" endBytecode="430" sourcefile="World.java" sourcepath="org/craftmania/world/World.java" role="SOURCE_LINE_ANOTHER_INSTANCE"/>
+    <SourceLine classname="org.craftmania.world.World" start="238" end="238" startBytecode="445" endBytecode="445" sourcefile="World.java" sourcepath="org/craftmania/world/World.java" role="SOURCE_LINE_ANOTHER_INSTANCE"/>
+    <SourceLine classname="org.craftmania.world.World" start="239" end="239" startBytecode="463" endBytecode="463" sourcefile="World.java" sourcepath="org/craftmania/world/World.java" role="SOURCE_LINE_ANOTHER_INSTANCE"/>
+  </BugInstance>
+  <BugInstance type="ICAST_IDIV_CAST_TO_DOUBLE" priority="2" abbrev="ICAST" category="STYLE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.world.World">
+      <SourceLine classname="org.craftmania.world.World" sourcefile="World.java" sourcepath="org/craftmania/world/World.java"/>
+    </Class>
+    <Method classname="org.craftmania.world.World" name="renderOverlay" signature="()V" isStatic="false">
+      <SourceLine classname="org.craftmania.world.World" start="184" end="323" startBytecode="0" endBytecode="1441" sourcefile="World.java" sourcepath="org/craftmania/world/World.java"/>
+    </Method>
+    <SourceLine classname="org.craftmania.world.World" start="229" end="229" startBytecode="356" endBytecode="356" sourcefile="World.java" sourcepath="org/craftmania/world/World.java"/>
+    <SourceLine classname="org.craftmania.world.World" start="230" end="230" startBytecode="371" endBytecode="371" sourcefile="World.java" sourcepath="org/craftmania/world/World.java" role="SOURCE_LINE_ANOTHER_INSTANCE"/>
+    <SourceLine classname="org.craftmania.world.World" start="232" end="232" startBytecode="389" endBytecode="389" sourcefile="World.java" sourcepath="org/craftmania/world/World.java" role="SOURCE_LINE_ANOTHER_INSTANCE"/>
+    <SourceLine classname="org.craftmania.world.World" start="233" end="233" startBytecode="404" endBytecode="404" sourcefile="World.java" sourcepath="org/craftmania/world/World.java" role="SOURCE_LINE_ANOTHER_INSTANCE"/>
+    <SourceLine classname="org.craftmania.world.World" start="235" end="235" startBytecode="412" endBytecode="412" sourcefile="World.java" sourcepath="org/craftmania/world/World.java" role="SOURCE_LINE_ANOTHER_INSTANCE"/>
+    <SourceLine classname="org.craftmania.world.World" start="236" end="236" startBytecode="430" endBytecode="430" sourcefile="World.java" sourcepath="org/craftmania/world/World.java" role="SOURCE_LINE_ANOTHER_INSTANCE"/>
+    <SourceLine classname="org.craftmania.world.World" start="238" end="238" startBytecode="445" endBytecode="445" sourcefile="World.java" sourcepath="org/craftmania/world/World.java" role="SOURCE_LINE_ANOTHER_INSTANCE"/>
+    <SourceLine classname="org.craftmania.world.World" start="239" end="239" startBytecode="463" endBytecode="463" sourcefile="World.java" sourcepath="org/craftmania/world/World.java" role="SOURCE_LINE_ANOTHER_INSTANCE"/>
+  </BugInstance>
+  <BugInstance type="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" priority="2" abbrev="ST" category="STYLE">
+    <Class classname="org.craftmania.world.World">
+      <SourceLine classname="org.craftmania.world.World" sourcefile="World.java" sourcepath="org/craftmania/world/World.java"/>
+    </Class>
+    <Method classname="org.craftmania.world.World" name="processInputSection" signature="(Z)V" isStatic="false">
+      <SourceLine classname="org.craftmania.world.World" start="640" end="669" startBytecode="0" endBytecode="281" sourcefile="World.java" sourcepath="org/craftmania/world/World.java"/>
+    </Method>
+    <Field classname="org.craftmania.game.Game" name="RENDER_INFORMATION_OVERLAY" signature="Z" isStatic="true">
+      <SourceLine classname="org.craftmania.game.Game" sourcefile="Game.java" sourcepath="org/craftmania/game/Game.java"/>
+    </Field>
+    <SourceLine classname="org.craftmania.world.World" start="657" end="657" startBytecode="86" endBytecode="86" sourcefile="World.java" sourcepath="org/craftmania/world/World.java"/>
+  </BugInstance>
+  <BugInstance type="ICAST_INTEGER_MULTIPLY_CAST_TO_LONG" priority="2" abbrev="ICAST" category="STYLE">
+    <Class classname="org.craftmania.world.generators.FloatingIslandGenerator">
+      <SourceLine classname="org.craftmania.world.generators.FloatingIslandGenerator" sourcefile="FloatingIslandGenerator.java" sourcepath="org/craftmania/world/generators/FloatingIslandGenerator.java"/>
+    </Class>
+    <Method classname="org.craftmania.world.generators.FloatingIslandGenerator" name="generateFloatingIsland" signature="(Lorg/craftmania/world/Chunk;III)V" isStatic="false">
+      <SourceLine classname="org.craftmania.world.generators.FloatingIslandGenerator" start="29" end="86" startBytecode="0" endBytecode="962" sourcefile="FloatingIslandGenerator.java" sourcepath="org/craftmania/world/generators/FloatingIslandGenerator.java"/>
+    </Method>
+    <SourceLine classname="org.craftmania.world.generators.FloatingIslandGenerator" start="29" end="29" startBytecode="18" endBytecode="18" sourcefile="FloatingIslandGenerator.java" sourcepath="org/craftmania/world/generators/FloatingIslandGenerator.java"/>
+  </BugInstance>
+  <BugInstance type="ICAST_INTEGER_MULTIPLY_CAST_TO_LONG" priority="2" abbrev="ICAST" category="STYLE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.world.generators.FloatingIslandGenerator">
+      <SourceLine classname="org.craftmania.world.generators.FloatingIslandGenerator" sourcefile="FloatingIslandGenerator.java" sourcepath="org/craftmania/world/generators/FloatingIslandGenerator.java"/>
+    </Class>
+    <Method classname="org.craftmania.world.generators.FloatingIslandGenerator" name="generateFloatingIsland" signature="(Lorg/craftmania/world/Chunk;III)V" isStatic="false">
+      <SourceLine classname="org.craftmania.world.generators.FloatingIslandGenerator" start="29" end="86" startBytecode="0" endBytecode="962" sourcefile="FloatingIslandGenerator.java" sourcepath="org/craftmania/world/generators/FloatingIslandGenerator.java"/>
+    </Method>
+    <SourceLine classname="org.craftmania.world.generators.FloatingIslandGenerator" start="29" end="29" startBytecode="18" endBytecode="18" sourcefile="FloatingIslandGenerator.java" sourcepath="org/craftmania/world/generators/FloatingIslandGenerator.java"/>
+  </BugInstance>
+  <BugInstance type="IM_BAD_CHECK_FOR_ODD" priority="2" abbrev="IM" category="STYLE">
+    <Class classname="org.craftmania.world.generators.TreeGenerator">
+      <SourceLine classname="org.craftmania.world.generators.TreeGenerator" sourcefile="TreeGenerator.java" sourcepath="org/craftmania/world/generators/TreeGenerator.java"/>
+    </Class>
+    <Method classname="org.craftmania.world.generators.TreeGenerator" name="generatePinophyta" signature="(Lorg/craftmania/world/Chunk;III)V" isStatic="false">
+      <SourceLine classname="org.craftmania.world.generators.TreeGenerator" start="251" end="289" startBytecode="0" endBytecode="590" sourcefile="TreeGenerator.java" sourcepath="org/craftmania/world/generators/TreeGenerator.java"/>
+    </Method>
+    <SourceLine classname="org.craftmania.world.generators.TreeGenerator" start="262" end="262" startBytecode="105" endBytecode="105" sourcefile="TreeGenerator.java" sourcepath="org/craftmania/world/generators/TreeGenerator.java"/>
+  </BugInstance>
+  <BugInstance type="IM_BAD_CHECK_FOR_ODD" priority="2" abbrev="IM" category="STYLE" last="0" removedByChange="true">
+    <Class classname="org.craftmania.world.generators.TreeGenerator">
+      <SourceLine classname="org.craftmania.world.generators.TreeGenerator" sourcefile="TreeGenerator.java" sourcepath="org/craftmania/world/generators/TreeGenerator.java"/>
+    </Class>
+    <Method classname="org.craftmania.world.generators.TreeGenerator" name="generatePinophyta" signature="(Lorg/craftmania/world/Chunk;III)V" isStatic="false">
+      <SourceLine classname="org.craftmania.world.generators.TreeGenerator" start="251" end="289" startBytecode="0" endBytecode="590" sourcefile="TreeGenerator.java" sourcepath="org/craftmania/world/generators/TreeGenerator.java"/>
+    </Method>
+    <SourceLine classname="org.craftmania.world.generators.TreeGenerator" start="262" end="262" startBytecode="105" endBytecode="105" sourcefile="TreeGenerator.java" sourcepath="org/craftmania/world/generators/TreeGenerator.java"/>
+  </BugInstance>
+  <Errors errors="0" missingClasses="20">
+    <MissingClass>org.lwjgl.BufferUtils</MissingClass>
+    <MissingClass>org.lwjgl.LWJGLException</MissingClass>
+    <MissingClass>org.lwjgl.Sys</MissingClass>
+    <MissingClass>org.lwjgl.input.Keyboard</MissingClass>
+    <MissingClass>org.lwjgl.input.Mouse</MissingClass>
+    <MissingClass>org.lwjgl.opengl.ARBVertexBufferObject</MissingClass>
+    <MissingClass>org.lwjgl.opengl.ContextCapabilities</MissingClass>
+    <MissingClass>org.lwjgl.opengl.Display</MissingClass>
+    <MissingClass>org.lwjgl.opengl.DisplayMode</MissingClass>
+    <MissingClass>org.lwjgl.opengl.GL11</MissingClass>
+    <MissingClass>org.lwjgl.opengl.GL15</MissingClass>
+    <MissingClass>org.lwjgl.opengl.GLContext</MissingClass>
+    <MissingClass>org.lwjgl.util.Point</MissingClass>
+    <MissingClass>org.lwjgl.util.ReadablePoint</MissingClass>
+    <MissingClass>org.lwjgl.util.Rectangle</MissingClass>
+    <MissingClass>org.lwjgl.util.glu.GLU</MissingClass>
+    <MissingClass>org.newdawn.slick.geom.Polygon</MissingClass>
+    <MissingClass>org.newdawn.slick.opengl.Texture</MissingClass>
+    <MissingClass>org.newdawn.slick.opengl.TextureLoader</MissingClass>
+    <MissingClass>org.newdawn.slick.util.BufferedImageUtil</MissingClass>
+  </Errors>
+  <FindBugsSummary timestamp="Sat, 17 Mar 2012 21:53:10 +0100" total_classes="528" referenced_classes="262" total_bugs="160" total_size="36328" num_packages="16" vm_version="20.4-b02-402" cpu_seconds="97.26" clock_seconds="100.73" peak_mbytes="131.39" alloc_mbytes="123.94" gc_seconds="1.13" priority_2="80" priority_1="80">
+    <PackageStats package="org.craftmania" total_bugs="8" total_types="4" total_size="428" priority_2="4" priority_1="4">
+      <ClassStats class="org.craftmania.CraftMania" sourceFile="CraftMania.java" interface="false" size="37" bugs="0"/>
+      <ClassStats class="org.craftmania.CraftMania$1" sourceFile="CraftMania.java" interface="false" size="10" bugs="4" priority_1="4"/>
+      <ClassStats class="org.craftmania.GameObject" sourceFile="GameObject.java" interface="false" size="5" bugs="0"/>
+      <ClassStats class="org.craftmania.Side" sourceFile="Side.java" interface="false" size="55" bugs="4" priority_2="4"/>
+    </PackageStats>
+    <PackageStats package="org.craftmania.blocks" total_bugs="8" total_types="14" total_size="5132" priority_2="8">
+      <ClassStats class="org.craftmania.blocks.Block" sourceFile="Block.java" interface="false" size="113" bugs="2" priority_2="2"/>
+      <ClassStats class="org.craftmania.blocks.BlockBrush" sourceFile="BlockBrush.java" interface="false" size="12" bugs="0"/>
+      <ClassStats class="org.craftmania.blocks.BlockBrushStorage" sourceFile="BlockBrushStorage.java" interface="false" size="17" bugs="0"/>
+      <ClassStats class="org.craftmania.blocks.BlockConstructor" sourceFile="BlockConstructor.java" interface="false" size="23" bugs="0"/>
+      <ClassStats class="org.craftmania.blocks.BlockManager" sourceFile="BlockManager.java" interface="false" size="81" bugs="6" priority_2="6"/>
+      <ClassStats class="org.craftmania.blocks.BlockMovementPlugin" sourceFile="BlockMovementPlugin.java" interface="false" size="48" bugs="0"/>
+      <ClassStats class="org.craftmania.blocks.BlockRenderer" sourceFile="BlockRenderer.java" interface="false" size="3" bugs="0"/>
+      <ClassStats class="org.craftmania.blocks.BlockType" sourceFile="BlockType.java" interface="false" size="130" bugs="0"/>
+      <ClassStats class="org.craftmania.blocks.BlockType$BlockClass" sourceFile="BlockType.java" interface="false" size="12" bugs="0"/>
+      <ClassStats class="org.craftmania.blocks.BlockXMLLoader" sourceFile="BlockXMLLoader.java" interface="false" size="169" bugs="0"/>
+      <ClassStats class="org.craftmania.blocks.CrossedBlock" sourceFile="CrossedBlock.java" interface="false" size="29" bugs="0"/>
+      <ClassStats class="org.craftmania.blocks.CrossedBlockBrush" sourceFile="CrossedBlockBrush.java" interface="false" size="91" bugs="0"/>
+      <ClassStats class="org.craftmania.blocks.DefaultBlock" sourceFile="DefaultBlock.java" interface="false" size="143" bugs="0"/>
+      <ClassStats class="org.craftmania.blocks.DefaultBlockBrush" sourceFile="DefaultBlockBrush.java" interface="false" size="412" bugs="0"/>
+    </PackageStats>
+    <PackageStats package="org.craftmania.blocks.customblocks" total_bugs="0" total_types="4" total_size="712">
+      <ClassStats class="org.craftmania.blocks.customblocks.Container" sourceFile="Container.java" interface="false" size="24" bugs="0"/>
+      <ClassStats class="org.craftmania.blocks.customblocks.CraftingTable" sourceFile="CraftingTable.java" interface="false" size="25" bugs="0"/>
+      <ClassStats class="org.craftmania.blocks.customblocks.TallGrass" sourceFile="TallGrass.java" interface="false" size="36" bugs="0"/>
+      <ClassStats class="org.craftmania.blocks.customblocks.Torch" sourceFile="Torch.java" interface="false" size="93" bugs="0"/>
+    </PackageStats>
+    <PackageStats package="org.craftmania.datastructures" total_bugs="2" total_types="7" total_size="1712" priority_2="2">
+      <ClassStats class="org.craftmania.datastructures.AABB" sourceFile="AABB.java" interface="false" size="198" bugs="2" priority_2="2"/>
+      <ClassStats class="org.craftmania.datastructures.AABBObject" sourceFile="AABBObject.java" interface="true" size="2" bugs="0"/>
+      <ClassStats class="org.craftmania.datastructures.DataNode" sourceFile="DataNode.java" interface="false" size="17" bugs="0"/>
+      <ClassStats class="org.craftmania.datastructures.Fast3DArray" sourceFile="Fast3DArray.java" interface="false" size="42" bugs="0"/>
+      <ClassStats class="org.craftmania.datastructures.Fast3DByteArray" sourceFile="Fast3DByteArray.java" interface="false" size="32" bugs="0"/>
+      <ClassStats class="org.craftmania.datastructures.FrustumPlane" sourceFile="FrustumPlane.java" interface="false" size="42" bugs="0"/>
+      <ClassStats class="org.craftmania.datastructures.ViewFrustum" sourceFile="ViewFrustum.java" interface="false" size="95" bugs="0"/>
+    </PackageStats>
+    <PackageStats package="org.craftmania.game" total_bugs="38" total_types="8" total_size="2356" priority_2="10" priority_1="28">
+      <ClassStats class="org.craftmania.game.Configuration" sourceFile="Configuration.java" interface="false" size="94" bugs="4" priority_2="2" priority_1="2"/>
+      <ClassStats class="org.craftmania.game.ControlSettings" sourceFile="ControlSettings.java" interface="false" size="105" bugs="26" priority_1="26"/>
+      <ClassStats class="org.craftmania.game.ControlSettings$KeyboardPreset" sourceFile="ControlSettings.java" interface="false" size="11" bugs="0"/>
+      <ClassStats class="org.craftmania.game.FontStorage" sourceFile="FontStorage.java" interface="false" size="26" bugs="0"/>
+      <ClassStats class="org.craftmania.game.Game" sourceFile="Game.java" interface="false" size="264" bugs="8" priority_2="8"/>
+      <ClassStats class="org.craftmania.game.PerformanceMonitor" sourceFile="PerformanceMonitor.java" interface="false" size="20" bugs="0"/>
+      <ClassStats class="org.craftmania.game.PerformanceMonitor$Operation" sourceFile="PerformanceMonitor.java" interface="false" size="17" bugs="0"/>
+      <ClassStats class="org.craftmania.game.TextureStorage" sourceFile="TextureStorage.java" interface="false" size="52" bugs="0"/>
+    </PackageStats>
+    <PackageStats package="org.craftmania.inventory" total_bugs="12" total_types="16" total_size="4304" priority_2="6" priority_1="6">
+      <ClassStats class="org.craftmania.inventory.CraftingTableInventory" sourceFile="CraftingTableInventory.java" interface="false" size="132" bugs="0"/>
+      <ClassStats class="org.craftmania.inventory.CraftingTableInventory$CraftingTableInventoryRaster" sourceFile="CraftingTableInventory.java" interface="false" size="51" bugs="2" priority_2="2"/>
+      <ClassStats class="org.craftmania.inventory.DefaultPlayerInventory" sourceFile="DefaultPlayerInventory.java" interface="false" size="171" bugs="0"/>
+      <ClassStats class="org.craftmania.inventory.DefaultPlayerInventory$DefaultPlayerInventoryRaster" sourceFile="DefaultPlayerInventory.java" interface="false" size="54" bugs="2" priority_2="2"/>
+      <ClassStats class="org.craftmania.inventory.DoubleContainerInventory" sourceFile="DoubleContainerInventory.java" interface="false" size="82" bugs="0"/>
+      <ClassStats class="org.craftmania.inventory.DoubleContainerInventory$DoubleContainerInventoryRaster" sourceFile="DoubleContainerInventory.java" interface="false" size="49" bugs="2" priority_2="2"/>
+      <ClassStats class="org.craftmania.inventory.Inventory" sourceFile="Inventory.java" interface="false" size="147" bugs="0"/>
+      <ClassStats class="org.craftmania.inventory.Inventory$InventoryItemStack" sourceFile="Inventory.java" interface="false" size="62" bugs="0"/>
+      <ClassStats class="org.craftmania.inventory.Inventory$InventoryPlace" sourceFile="Inventory.java" interface="false" size="40" bugs="0"/>
+      <ClassStats class="org.craftmania.inventory.InventoryEvent" sourceFile="InventoryEvent.java" interface="false" size="23" bugs="0"/>
+      <ClassStats class="org.craftmania.inventory.InventoryIO" sourceFile="InventoryIO.java" interface="false" size="39" bugs="0"/>
+      <ClassStats class="org.craftmania.inventory.InventoryImageCreator" sourceFile="InventoryImageCreator.java" interface="false" size="114" bugs="0"/>
+      <ClassStats class="org.craftmania.inventory.InventoryItem" sourceFile="InventoryItem.java" interface="false" size="34" bugs="0"/>
+      <ClassStats class="org.craftmania.inventory.InventoryRaster" sourceFile="InventoryRaster.java" interface="true" size="8" bugs="0"/>
+      <ClassStats class="org.craftmania.inventory.RegularInventoryRaster" sourceFile="RegularInventoryRaster.java" interface="false" size="55" bugs="6" priority_1="6"/>
+      <ClassStats class="org.craftmania.inventory.SharedInventoryContent" sourceFile="SharedInventoryContent.java" interface="false" size="15" bugs="0"/>
+    </PackageStats>
+    <PackageStats package="org.craftmania.items" total_bugs="2" total_types="6" total_size="796" priority_1="2">
+      <ClassStats class="org.craftmania.items.GenericItem" sourceFile="GenericItem.java" interface="false" size="10" bugs="0"/>
+      <ClassStats class="org.craftmania.items.ItemManager" sourceFile="ItemManager.java" interface="false" size="34" bugs="2" priority_1="2"/>
+      <ClassStats class="org.craftmania.items.ItemXMLLoader" sourceFile="ItemXMLLoader.java" interface="false" size="65" bugs="0"/>
+      <ClassStats class="org.craftmania.items.TexturedItem" sourceFile="TexturedItem.java" interface="false" size="41" bugs="0"/>
+      <ClassStats class="org.craftmania.items.Tool" sourceFile="Tool.java" interface="false" size="34" bugs="0"/>
+      <ClassStats class="org.craftmania.items.Tool$Material" sourceFile="Tool.java" interface="false" size="15" bugs="0"/>
+    </PackageStats>
+    <PackageStats package="org.craftmania.items.tools" total_bugs="0" total_types="11" total_size="192">
+      <ClassStats class="org.craftmania.items.tools.BedrockAxe" sourceFile="BedrockAxe.java" interface="false" size="4" bugs="0"/>
+      <ClassStats class="org.craftmania.items.tools.BedrockPickaxe" sourceFile="BedrockPickaxe.java" interface="false" size="8" bugs="0"/>
+      <ClassStats class="org.craftmania.items.tools.BedrockShovel" sourceFile="BedrockShovel.java" interface="false" size="4" bugs="0"/>
+      <ClassStats class="org.craftmania.items.tools.BedrockSword" sourceFile="BedrockSword.java" interface="false" size="4" bugs="0"/>
+      <ClassStats class="org.craftmania.items.tools.StoneAxe" sourceFile="StoneAxe.java" interface="false" size="4" bugs="0"/>
+      <ClassStats class="org.craftmania.items.tools.StonePickaxe" sourceFile="StonePickaxe.java" interface="false" size="4" bugs="0"/>
+      <ClassStats class="org.craftmania.items.tools.StoneShovel" sourceFile="StoneShovel.java" interface="false" size="4" bugs="0"/>
+      <ClassStats class="org.craftmania.items.tools.WoodenAxe" sourceFile="WoodenAxe.java" interface="false" size="4" bugs="0"/>
+      <ClassStats class="org.craftmania.items.tools.WoodenPickaxe" sourceFile="WoodenPickaxe.java" interface="false" size="4" bugs="0"/>
+      <ClassStats class="org.craftmania.items.tools.WoodenShovel" sourceFile="WoodenShovel.java" interface="false" size="4" bugs="0"/>
+      <ClassStats class="org.craftmania.items.tools.WoodenSword" sourceFile="WoodenSword.java" interface="false" size="4" bugs="0"/>
+    </PackageStats>
+    <PackageStats package="org.craftmania.math" total_bugs="8" total_types="8" total_size="2336" priority_2="6" priority_1="2">
+      <ClassStats class="org.craftmania.math.BlockDistanceComparator" sourceFile="BlockDistanceComparator.java" interface="false" size="32" bugs="0"/>
+      <ClassStats class="org.craftmania.math.MathHelper" sourceFile="MathHelper.java" interface="false" size="163" bugs="4" priority_2="4"/>
+      <ClassStats class="org.craftmania.math.RayBlockIntersection" sourceFile="RayBlockIntersection.java" interface="false" size="45" bugs="0"/>
+      <ClassStats class="org.craftmania.math.RayBlockIntersection$Intersection" sourceFile="RayBlockIntersection.java" interface="false" size="44" bugs="2" priority_2="2"/>
+      <ClassStats class="org.craftmania.math.Vec2f" sourceFile="Vec2f.java" interface="false" size="61" bugs="0"/>
+      <ClassStats class="org.craftmania.math.Vec2i" sourceFile="Vec2i.java" interface="false" size="55" bugs="0"/>
+      <ClassStats class="org.craftmania.math.Vec3f" sourceFile="Vec3f.java" interface="false" size="98" bugs="0"/>
+      <ClassStats class="org.craftmania.math.Vec3i" sourceFile="Vec3i.java" interface="false" size="86" bugs="2" priority_1="2"/>
+    </PackageStats>
+    <PackageStats package="org.craftmania.recipes" total_bugs="4" total_types="2" total_size="416" priority_2="2" priority_1="2">
+      <ClassStats class="org.craftmania.recipes.Recipe" sourceFile="Recipe.java" interface="false" size="71" bugs="2" priority_2="2"/>
+      <ClassStats class="org.craftmania.recipes.RecipeManager" sourceFile="RecipeManager.java" interface="false" size="33" bugs="2" priority_1="2"/>
+    </PackageStats>
+    <PackageStats package="org.craftmania.rendering" total_bugs="38" total_types="8" total_size="2576" priority_2="10" priority_1="28">
+      <ClassStats class="org.craftmania.rendering.BufferManager" sourceFile="BufferManager.java" interface="false" size="43" bugs="0"/>
+      <ClassStats class="org.craftmania.rendering.Camera" sourceFile="Camera.java" interface="false" size="76" bugs="0"/>
+      <ClassStats class="org.craftmania.rendering.ChunkMesh" sourceFile="ChunkMesh.java" interface="false" size="33" bugs="8" priority_2="8"/>
+      <ClassStats class="org.craftmania.rendering.ChunkMeshBuilder" sourceFile="ChunkMeshBuilder.java" interface="false" size="231" bugs="12" priority_1="12"/>
+      <ClassStats class="org.craftmania.rendering.ChunkMeshBuilder$MeshType" sourceFile="ChunkMeshBuilder.java" interface="false" size="11" bugs="0"/>
+      <ClassStats class="org.craftmania.rendering.ChunkMeshRenderer" sourceFile="ChunkMeshRenderer.java" interface="false" size="49" bugs="16" priority_1="16"/>
+      <ClassStats class="org.craftmania.rendering.GLFont" sourceFile="GLFont.java" interface="false" size="177" bugs="2" priority_2="2"/>
+      <ClassStats class="org.craftmania.rendering.GLUtils" sourceFile="GLUtils.java" interface="false" size="24" bugs="0"/>
+    </PackageStats>
+    <PackageStats package="org.craftmania.rendering.particles" total_bugs="2" total_types="2" total_size="340" priority_2="2">
+      <ClassStats class="org.craftmania.rendering.particles.Smoke" sourceFile="Smoke.java" interface="false" size="71" bugs="0"/>
+      <ClassStats class="org.craftmania.rendering.particles.Smoke$Particle" sourceFile="Smoke.java" interface="false" size="14" bugs="2" priority_2="2"/>
+    </PackageStats>
+    <PackageStats package="org.craftmania.utilities" total_bugs="2" total_types="10" total_size="1696" priority_2="2">
+      <ClassStats class="org.craftmania.utilities.FastArrayList" sourceFile="FastArrayList.java" interface="false" size="174" bugs="0"/>
+      <ClassStats class="org.craftmania.utilities.IOUtilities" sourceFile="IOUtilities.java" interface="false" size="13" bugs="0"/>
+      <ClassStats class="org.craftmania.utilities.IntList" sourceFile="IntList.java" interface="false" size="88" bugs="0"/>
+      <ClassStats class="org.craftmania.utilities.IntegerPool" sourceFile="IntegerPool.java" interface="false" size="31" bugs="0"/>
+      <ClassStats class="org.craftmania.utilities.MultiTimer" sourceFile="MultiTimer.java" interface="false" size="23" bugs="0"/>
+      <ClassStats class="org.craftmania.utilities.ReverseIterator" sourceFile="ReverseIterator.java" interface="false" size="17" bugs="0"/>
+      <ClassStats class="org.craftmania.utilities.SmartRandom" sourceFile="SmartRandom.java" interface="false" size="23" bugs="0"/>
+      <ClassStats class="org.craftmania.utilities.ThreadPool" sourceFile="ThreadPool.java" interface="false" size="29" bugs="0"/>
+      <ClassStats class="org.craftmania.utilities.ThreadPool$1" sourceFile="ThreadPool.java" interface="false" size="12" bugs="0"/>
+      <ClassStats class="org.craftmania.utilities.ThreadPool$WaitingRunnable" sourceFile="ThreadPool.java" interface="false" size="14" bugs="2" priority_2="2"/>
+    </PackageStats>
+    <PackageStats package="org.craftmania.world" total_bugs="32" total_types="25" total_size="9656" priority_2="24" priority_1="8">
+      <ClassStats class="org.craftmania.world.AbstractChunk" sourceFile="AbstractChunk.java" interface="false" size="56" bugs="0"/>
+      <ClassStats class="org.craftmania.world.Biome" sourceFile="Biome.java" interface="false" size="13" bugs="0"/>
+      <ClassStats class="org.craftmania.world.Chunk" sourceFile="Chunk.java" interface="false" size="789" bugs="6" priority_2="6"/>
+      <ClassStats class="org.craftmania.world.Chunk$LightType" sourceFile="Chunk.java" interface="false" size="12" bugs="0"/>
+      <ClassStats class="org.craftmania.world.ChunkData" sourceFile="ChunkData.java" interface="false" size="134" bugs="2" priority_2="2"/>
+      <ClassStats class="org.craftmania.world.ChunkData$SpecialBlockPool" sourceFile="ChunkData.java" interface="false" size="21" bugs="2" priority_2="2"/>
+      <ClassStats class="org.craftmania.world.ChunkDistanceComparator" sourceFile="ChunkDistanceComparator.java" interface="false" size="24" bugs="0"/>
+      <ClassStats class="org.craftmania.world.ChunkIO" sourceFile="ChunkIO.java" interface="false" size="79" bugs="4" priority_2="4"/>
+      <ClassStats class="org.craftmania.world.ChunkManager" sourceFile="ChunkManager.java" interface="false" size="168" bugs="2" priority_2="2"/>
+      <ClassStats class="org.craftmania.world.ChunkManager$BlockMovement" sourceFile="ChunkManager.java" interface="false" size="20" bugs="2" priority_2="2"/>
+      <ClassStats class="org.craftmania.world.ChunkThreading" sourceFile="ChunkThreading.java" interface="false" size="54" bugs="0"/>
+      <ClassStats class="org.craftmania.world.ChunkThreading$1" sourceFile="ChunkThreading.java" interface="false" size="14" bugs="0"/>
+      <ClassStats class="org.craftmania.world.ChunkThreading$2" sourceFile="ChunkThreading.java" interface="false" size="14" bugs="0"/>
+      <ClassStats class="org.craftmania.world.ChunkThreading$3" sourceFile="ChunkThreading.java" interface="false" size="15" bugs="0"/>
+      <ClassStats class="org.craftmania.world.ChunkThreading$4" sourceFile="ChunkThreading.java" interface="false" size="15" bugs="0"/>
+      <ClassStats class="org.craftmania.world.ChunkThreading$5" sourceFile="ChunkThreading.java" interface="false" size="15" bugs="0"/>
+      <ClassStats class="org.craftmania.world.ChunkThreading$6" sourceFile="ChunkThreading.java" interface="false" size="16" bugs="0"/>
+      <ClassStats class="org.craftmania.world.DefaultWorldProvider" sourceFile="DefaultWorldProvider.java" interface="false" size="328" bugs="8" priority_1="8"/>
+      <ClassStats class="org.craftmania.world.DefaultWorldProvider$DataPoint2D" sourceFile="DefaultWorldProvider.java" interface="false" size="26" bugs="0"/>
+      <ClassStats class="org.craftmania.world.DefaultWorldProvider$WorldProviderGenerator" sourceFile="DefaultWorldProvider.java" interface="false" size="97" bugs="2" priority_2="2"/>
+      <ClassStats class="org.craftmania.world.DefaultWorldProvider$WorldProviderGenerator$DataResults" sourceFile="DefaultWorldProvider.java" interface="false" size="16" bugs="0"/>
+      <ClassStats class="org.craftmania.world.Sky" sourceFile="Sky.java" interface="false" size="116" bugs="0"/>
+      <ClassStats class="org.craftmania.world.World" sourceFile="World.java" interface="false" size="345" bugs="4" priority_2="4"/>
+      <ClassStats class="org.craftmania.world.WorldProvider" sourceFile="WorldProvider.java" interface="false" size="15" bugs="0"/>
+      <ClassStats class="org.craftmania.world.WorldProvider$TreeDefinition" sourceFile="WorldProvider.java" interface="false" size="12" bugs="0"/>
+    </PackageStats>
+    <PackageStats package="org.craftmania.world.characters" total_bugs="0" total_types="2" total_size="1992">
+      <ClassStats class="org.craftmania.world.characters.CharacterBody" sourceFile="CharacterBody.java" interface="false" size="52" bugs="0"/>
+      <ClassStats class="org.craftmania.world.characters.Player" sourceFile="Player.java" interface="false" size="446" bugs="0"/>
+    </PackageStats>
+    <PackageStats package="org.craftmania.world.generators" total_bugs="4" total_types="5" total_size="1684" priority_2="4">
+      <ClassStats class="org.craftmania.world.generators.BuildingGenerator" sourceFile="BuildingGenerator.java" interface="false" size="77" bugs="0"/>
+      <ClassStats class="org.craftmania.world.generators.ChunkGenerator" sourceFile="ChunkGenerator.java" interface="false" size="159" bugs="0"/>
+      <ClassStats class="org.craftmania.world.generators.FloatingIslandGenerator" sourceFile="FloatingIslandGenerator.java" interface="false" size="41" bugs="2" priority_2="2"/>
+      <ClassStats class="org.craftmania.world.generators.Generator" sourceFile="Generator.java" interface="false" size="10" bugs="0"/>
+      <ClassStats class="org.craftmania.world.generators.TreeGenerator" sourceFile="TreeGenerator.java" interface="false" size="134" bugs="2" priority_2="2"/>
+    </PackageStats>
+    <FindBugsProfile>
+      <ClassProfile name="edu.umd.cs.findbugs.SAXBugCollectionHandler" totalMilliseconds="126" invocations="1" avgMicrosecondsPerInvocation="126764" maxMicrosecondsPerInvocation="126764" standardDeviationMircosecondsPerInvocation="0"/>
+    </FindBugsProfile>
+  </FindBugsSummary>
+  <ClassFeatures></ClassFeatures>
+  <History></History>
+</BugCollection>

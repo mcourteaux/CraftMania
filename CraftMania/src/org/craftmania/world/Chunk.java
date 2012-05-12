@@ -1491,13 +1491,13 @@ public class Chunk implements AABBObject
 
 	private void specializeBlock(int x, int y, int z)
 	{
-		new Exception("Specialze Block").printStackTrace(System.out);
 
 		Chunk chunk = getChunkContaining(x, y, z, false, false, false);
 
 		byte type = chunk.getBlockTypeAbsolute(x, y, z, false, false, false);
 		int index = ChunkData.positionToIndex(x - chunk.getAbsoluteX(), y, z - chunk.getAbsoluteZ());
 
+		new Exception("Specialze Block (" + _blockManager.getBlockType(type).getName() + ")").printStackTrace(System.out);
 		System.out.println("Specialize Block: " + x + ", " + y + ", " + z + " (" + index + ")");
 
 		if (chunk._chunkData.isSpecial(index))

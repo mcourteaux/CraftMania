@@ -273,15 +273,15 @@ public class ChunkGenerator extends Generator
 		if (random.randomInt(35) == -1)
 		{
 			FloatingIslandGenerator gen = new FloatingIslandGenerator(_worldProvider);
-			int x = chunk.getAbsoluteX() + random.randomInt(Chunk.CHUNK_SIZE_HORIZONTAL);
-			int z = chunk.getAbsoluteZ() + random.randomInt(Chunk.CHUNK_SIZE_HORIZONTAL);
+			int x = chunk.getAbsoluteX() + random.randomInt(1);// * Chunk.CHUNK_SIZE_HORIZONTAL);
+			int z = chunk.getAbsoluteZ() + random.randomInt(1);// * Chunk.CHUNK_SIZE_HORIZONTAL);
 			int y = _heightMap[x - chunk.getAbsoluteX()][z - chunk.getAbsoluteZ()];
 
-			gen.generateFloatingIsland(chunk, x, y + random.randomInt(40, 80), z);
+			gen.generateNiceFloatingIsland(chunk, x, y + random.randomInt(40, 80), z);
 		}
 
 		/* Generate a structure */
-		if (random.randomInt(10) == 0)
+		if (random.randomInt(10) == -1)
 		{
 			BuildingGenerator gen = new BuildingGenerator();
 			int x = chunk.getAbsoluteX() + random.randomInt(Chunk.CHUNK_SIZE_HORIZONTAL / 2);

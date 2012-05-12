@@ -1,18 +1,20 @@
 package org.craftmania.world.generators;
 
+import java.awt.Polygon;
 import java.util.Random;
 
 import org.craftmania.blocks.BlockType;
 import org.craftmania.math.MathHelper;
+import org.craftmania.utilities.PerlinNoise;
 import org.craftmania.utilities.SmartRandom;
 import org.craftmania.world.Chunk;
 import org.craftmania.world.WorldProvider;
-import org.newdawn.slick.geom.Polygon;
 
 public class FloatingIslandGenerator extends Generator
 {
 
 	private SmartRandom _random;
+	private PerlinNoise _pNoise;
 	private BlockType _dirt;
 	private BlockType _grass;
 	private WorldProvider _provider;
@@ -23,10 +25,38 @@ public class FloatingIslandGenerator extends Generator
 		_grass = _blockManager.getBlockType("grass");
 		_provider = provider;
 	}
+	
+	public void generateNiceFloatingIsland(Chunk chunk, int ix, int iy, int iz)
+	{
+		System.out.println("Gen Floating Island " + ix + ", " + iz);
+		
+		_random = new SmartRandom(new Random(_worldSeed + ix * 1024L + iy * 512L + iz));
+		_pNoise = new PerlinNoise(_random.randomLong());
+		
+		int dimX = _random.randomInt(10, 20);
+		int dimY = _random.randomInt(10, 20);
+		int dimZ = _random.randomInt(10, 20);
+		
+		for (int x = 0; x < dimX; ++x)
+		{
+			for (int y = 0; y < dimY; ++y)
+			{
+				for (int z = 0; z < dimZ; ++z)
+				{
+					float noise = 100.0f * _pNoise.noise((float) x / dimX, (float) y / dimY, (float) z / dimZ);
+					if (noise > 0.25f)
+					{
+						chunk.setDefaultBlockAbsolute(ix + x, iy + y, iz + z, _dirt, (byte) 0, true, true, false);
+					}
+				}
+			}
+		}
+	}
 
 	public void generateFloatingIsland(Chunk chunk, int ix, int iy, int iz)
 	{
 		_random = new SmartRandom(new Random(_worldSeed + ix * 1024L + iy * 512L + iz));
+		_pNoise = new PerlinNoise(_random.randomLong());
 
 		Polygon polygon = new Polygon();
 
@@ -46,11 +76,11 @@ public class FloatingIslandGenerator extends Generator
 				s = _random.randomFloat(s - size / 5.0f, s + size / 5.0f);
 				s = MathHelper.clamp(s, size / 2.0f, size * 2.0f);
 
-				polygon.addPoint(pX * s, pY * s);
+				polygon.addPoint((int) (pX * s), (int) (pY * s));
 			}
 		}
 
-		int radius = MathHelper.ceil(polygon.getBoundingCircleRadius());
+		int radius = MathHelper.ceil((float) Math.sqrt(polygon.getBounds2D().getWidth() * polygon.getBounds2D().getHeight()));
 
 		int referenceHeight = _provider.getHeightAt(ix + 20, iz - 20);
 		boolean treeBuilt = false;
