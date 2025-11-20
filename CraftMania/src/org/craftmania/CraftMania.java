@@ -36,9 +36,6 @@ public class CraftMania
 	 */
 	public static void main(String[] args) throws Exception
 	{
-//		test();
-
-		loadNativeLibs();
 		initUncaughtExceptionHandler();
 
 		/* Initialize the Game */
@@ -84,70 +81,4 @@ public class CraftMania
 			}
 		});
 	}
-
-	private static void loadNativeLibs() throws Exception
-	{
-		if (System.getProperty("os.name").equals("Mac OS X"))
-		{
-			addLibraryPath("natives/macosx");
-		} else if (System.getProperty("os.name").equals("Linux"))
-		{
-			addLibraryPath("natives/linux");
-		} else
-		{
-			addLibraryPath("natives/windows");
-		}
-	}
-
-	private static void addLibraryPath(String s) throws Exception
-	{
-		final Field usrPathsField = ClassLoader.class.getDeclaredField("usr_paths");
-		usrPathsField.setAccessible(true);
-
-		final String[] paths = (String[]) usrPathsField.get(null);
-
-		for (String path : paths)
-		{
-			if (path.equals(s))
-			{
-				return;
-			}
-		}
-
-		final String[] newPaths = Arrays.copyOf(paths, paths.length + 1);
-		newPaths[newPaths.length - 1] = s;
-		usrPathsField.set(null, newPaths);
-	}
-	
-	public static void test()
-	{
-		SmartRandom random = new SmartRandom(new Random());
-		
-		int CHUNK_SIZE_HORIZONTAL = 16;
-		
-		long start = System.nanoTime();
-		int relativeX = random.randomInt(0, 12);
-		int relativeZ = random.randomInt(0, 12);
-		System.out.println(((relativeX | relativeZ) & 0xFFFFFFF0) == 0);
-
-		for (long i = 0; i < 90000000000l; ++i)
-		{
-//			relativeX = random.randomInt(-12800, 12800);
-//			relativeZ = random.randomInt(-12800, 12800);
-//			boolean correct = (0 <= relativeX && relativeX < CHUNK_SIZE_HORIZONTAL && 0 <= relativeZ && relativeZ< CHUNK_SIZE_HORIZONTAL);
-		
-//			boolean experiment = (((relativeX | relativeZ) & 0xFFFFFFF0) == 0);
-			
-//			if (correct != experiment)
-//			{
-//				System.out.println("Wrong for: " + relativeX + ", " + relativeZ);
-//			}
-		
-		}
-		long time = System.nanoTime() - start;
-		System.out.println(time / 1e9f);
-		
-		System.exit(0);
-	}
-
 }
